@@ -1,0 +1,16 @@
+
+let a = [10, 42, 0, 5 , 5];
+
+if true {
+  print("h  {a + 2} uh");
+} else {
+  print("huh");
+}
+
+let module = {
+  "node" = {
+    "name" = "",
+  }
+};
+
+return module;

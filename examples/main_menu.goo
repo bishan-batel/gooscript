@@ -1,0 +1,33 @@
+# gooscript
+
+use "game";
+
+return {
+  "Root" = {
+    parent = "/",
+    type = "Node2D",
+    position = Vec2(9, 0),
+    transform = Matrix4x4(1, 1, 1, 1)
+  },
+
+  "Play Button" = {
+    parent = "/Root",
+    type = "Button",
+    position = Vec2(0, 0),
+    text = "Play Game",
+    on_press = fn() {
+      log("Pressed button");
+      game.change_scene("res://PauseMenu.goo");
+    }
+  },
+};
+
+for i in range(10) {
+  scene["Button {i}"] = {
+    parent = "/Root",
+    type = "Button",
+    position = Vec2(i, 0)
+  };
+}
+
+return scene;

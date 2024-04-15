@@ -1,0 +1,139 @@
+#!/bin/goo
+
+# math.goo 
+let math = import("math");
+
+let a = math.times_two(2);
+
+log("Hello {huh} {huh+1} World");
+
+if true {
+  log("Condition is true");
+} else if true {
+  log("huh");
+} else {
+  log("bruh");
+}
+
+var mutable_variable = 0;
+mutable_variable += 1;
+
+if true then log("");
+
+unless false {
+  log("bruh");
+}
+
+unless false {
+  log("bruh");
+}
+
+while true {
+}
+
+while true do log("huh");
+
+# let a = 5 if true else 0;
+
+let condition = 0 + 1;
+
+# variable that 1 if the condition is true, 5 if not 
+var a = 0;
+
+if condition {
+  a = 1;
+} else {
+  a = 5;
+}
+
+if condition { a = 1; }
+else a = 5;
+
+# a = condition ? 1 : 5 
+let a = if condition then 1 else 5;
+
+
+
+if a and b or c {
+  log("condition")
+}
+
+fn hello_world {
+  log("Hello World");
+}
+
+let hello_world = fn {
+  log("Hello World");
+};
+
+
+fn times_two(x) { 
+  return x * 2;
+}
+
+fn times_two(x) = x * 2;
+
+# array = [10, 20, 420, 5];
+
+
+# if you type any variation of "cock", it says "haha very funny" and logs your IP to git 
+# .userse_ip_address
+# git add .
+# git commit -m "get fucked"
+# git push
+
+dictionary = {
+  count = 2,
+  name  = "wha",
+};
+
+
+# charizard.bruh
+# {
+#   "name": "Charizard",
+#   "moves": [
+#     {
+#       "id": "Bruh",
+#       "mult": 2,
+#     }
+#   ]
+# }
+
+#
+
+return pokemon;
+
+
+
+# (int, int)
+
+let a = (5, 3);
+
+let dictionary = {
+  "bruh" = 0,
+  "huh" = 420
+};
+
+for [key, value] in dictionary {
+  log("{key}");
+}
+
+for i in range(10) do log("hi");
+
+while true {
+  log("bruh")
+}
+
+until false {
+  log("bruh")
+}
+
+let a = match huh {
+  0 => log("0"),
+  default => log("huh")
+};
+
+#
+# functions, if, unless 
+#
+#
