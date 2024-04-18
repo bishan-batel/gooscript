@@ -1,4 +1,6 @@
-#pragma once 
+#pragma once
+
+namespace lexer {
 
 enum class Keyword {
   NIL,
@@ -18,3 +20,5 @@ enum class Keyword {
   MATCH,
   DEFAULT
 };
+
+}

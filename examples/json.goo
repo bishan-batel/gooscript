@@ -1,0 +1,37 @@
+#!/bin/env goo
+
+use { sqrt } from math;
+
+
+fn funny_number() {
+  return 69;
+}
+
+fn funny_number() { 69 }
+
+fn funny_number { 69 }
+
+fn funny_number = 69;
+
+
+sqrt(3);
+
+log "hello world";
+
+print_dictionary {
+  hello = "world",
+  bruh = "moment"
+};
+
+
+let a = [420, 69];
+
+for element in a {
+  log "{element}"
+}
+
+
+
+(10).times fn {
+  log "bruh"
+};

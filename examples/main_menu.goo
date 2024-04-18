@@ -1,8 +1,16 @@
-# gooscript
+#!/bin/env goo
 
-use "game";
+let [a, b] = use("game");
 
-return {
+for i in range(10) {
+  scene["Button {i}"] = {
+    parent = "/Root",
+    type = "Button",
+    position = Vec2(i, 0)
+  };
+}
+
+{
   "Root" = {
     parent = "/",
     type = "Node2D",
@@ -17,17 +25,7 @@ return {
     text = "Play Game",
     on_press = fn() {
       log("Pressed button");
-      game.change_scene("res://PauseMenu.goo");
+      use("game").change_scene("res://PauseMenu.goo");
     }
   },
-};
-
-for i in range(10) {
-  scene["Button {i}"] = {
-    parent = "/Root",
-    type = "Button",
-    position = Vec2(i, 0)
-  };
 }
-
-return scene;

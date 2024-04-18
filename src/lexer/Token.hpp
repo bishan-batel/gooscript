@@ -1,7 +1,10 @@
 #pragma once
-#include "keyword.hpp"
-#include <preamble.hpp>
-#include <box.hpp>
+#include "Keyword.hpp"
+#include "Operator.hpp"
+#include "libs/crabpp/inc/box.hpp"
+#include "libs/crabpp/inc/preamble.hpp"
+
+namespace lexer {
 
 class Token {
   StringView slice;
@@ -32,3 +35,16 @@ public:
 
   [[nodiscard]] Keyword get_word() const { return keyword; }
 };
+
+class OperatorToken : public Token {
+  Operator op;
+
+public:
+  explicit OperatorToken(Operator op);
+
+  [[nodiscard]] Box<Token> clone() const override;
+
+  [[nodiscard]] Operator get_op() const;
+};
+
+} // namespace lexer
