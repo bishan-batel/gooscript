@@ -1,37 +1,22 @@
 #!/bin/env goo
 
-use { sqrt } from math;
+use tree from animation_tree;
+use game;
 
-
-fn funny_number() {
-  return 69;
-}
-
-fn funny_number() { 69 }
-
-fn funny_number { 69 }
-
-fn funny_number = 69;
-
-
-sqrt(3);
-
-log "hello world";
-
-print_dictionary {
-  hello = "world",
-  bruh = "moment"
+tree.animation {
+  name = "Idle",
+  on_update = fn {
+    if abs(game.player.velocity.x) > 0.1 {
+      tree.switch_to "Running";
+    }
+  }
 };
 
-
-let a = [420, 69];
-
-for element in a {
-  log "{element}"
-}
-
-
-
-(10).times fn {
-  log "bruh"
+tree.animation {
+  name = "Idle",
+  on_update = fn {
+    if abs(game.player.velocity.x) > 0.1 {
+      tree.switch_to "Running";
+    }
+  }
 };

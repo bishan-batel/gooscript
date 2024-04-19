@@ -1,7 +1,7 @@
-return {
+{
   sqrt = fn(x) { @builtin sqrt(x) },
   pow = fn(x) { @builtin pow(m, n) },
   round = fn(x) { @builtin round(x) } ,
-  ceil = fn(x) { @builtin ceil(x) } ,
+  ceil= fn(x) { @builtin ceil(x) } ,
   floor = fn(x) { @builtin floor(x) } ,
-};
+}

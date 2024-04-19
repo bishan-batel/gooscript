@@ -4,8 +4,12 @@
 #include "libs/crabpp/inc/box.hpp"
 #include "libs/crabpp/inc/preamble.hpp"
 
-namespace lexer {
+// fn main() 
+// j;alsjdf;a
+// list [ keyword('fn'), identifier('main'), openParen, closeParen ] 
 
+
+namespace lexer {
 class Token {
   StringView slice;
 

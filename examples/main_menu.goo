@@ -1,6 +1,11 @@
 #!/bin/env goo
+module a;
 
-let [a, b] = use("game");
+fn print_if_even(x) {
+  if x mod 2 == 0 then log "{x}";
+}
+
+let a = if ongod then 69 else 420;
 
 for i in range(10) {
   scene["Button {i}"] = {

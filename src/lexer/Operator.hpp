@@ -3,12 +3,13 @@
 #include "preamble.hpp"
 
 namespace lexer {
-  enum [[maybe_unused]]  OperatorFlag : u32 {
+  enum [[maybe_unused]] OperatorFlag : u32 {
     COMPARISON_FLAG = 1 << 30,
     BINARY_FLAG = 1 << 29,
     ASSIGN_FLAG = 1 << 28,
     UNARY_FLAG = 1 << 27,
     DELIMITER_FLAG = 1 << 26,
+    PARENTHETICAL = 1 << 25,
     PARENTHETICAL_OPEN_FLAG = 1 << 25,
     PARENTHETICAL_CLOSE_FLAG = 1 << 24,
   };
@@ -20,9 +21,9 @@ namespace lexer {
 #define unary(x) ((x) | UNARY_FLAG)
 #define delimiter(x) ((x) | DELIMITER_FLAG)
 
-#define paren(x, closed) (x | PARENTHETICAL_##closed##_FLAG)
+#define paren(x, closed) ((x) | PARENTHETICAL_##closed##_FLAG)
 
-  enum class  [[maybe_unused]] Operator : u32 {
+  enum class [[maybe_unused]] Operator : u32 {
     ASSIGN = assign(0),
     MOD_ASSIGN = assign(1),
     MUL_ASSIGN = assign(2),
@@ -60,17 +61,20 @@ namespace lexer {
     BRACKET_OPEN = paren(31, OPEN),
     BRACKET_CLOSE = paren(31, CLOSE),
 
-
     CURLY_OPEN = paren(32, OPEN),
     CURLY_CLOSE = paren(32, CLOSE),
   };
 
+  [[maybe_unused]]
   bool is_binary(Operator op);
 
+  [[maybe_unused]]
   bool is_assign(Operator op);
 
+  [[maybe_unused]]
   bool is_delimiter(Operator op);
 
+  [[maybe_unused]]
   bool is_parenthetical(Operator op);
 
 #undef binary

@@ -41,6 +41,7 @@ set(SOURCE_FILES
   src/main.cpp
         src/lexer/Token.cpp
         src/lexer/Operator.cpp
+        src/lexer/Keyword.cpp
 )
 set(LIBS_DIR "${PROJECT_SOURCE_DIR}/libs")
 
