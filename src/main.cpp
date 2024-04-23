@@ -1,13 +1,10 @@
 #include <iostream>
+#include <memory>
 #include <preamble.hpp>
 
-#include "src/lexer/Token.hpp"
-#include <expected>
+#include <vector>
 
 int main() {
   std::cout << "huh" << std::endl;
-
-  const Box<lexer::Token> token =
-      box::make<lexer::KeywordToken>(lexer::Keyword::DEFAULT);
   std::cin.get();
 }

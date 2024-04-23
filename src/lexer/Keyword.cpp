@@ -3,12 +3,11 @@
 //
 #include "Keyword.hpp"
 
-namespace lexer {
-  Option<Keyword> identifier_to_keyword(std::string_view view) {
-    if (KEYWORD_TABLE.contains(view)) {
-      return opt::some(KEYWORD_TABLE.at(view));
+namespace goos::lexer {
+  Option<Keyword> identifier_to_keyword(const std::string_view name) {
+    if (KEYWORD_TABLE.contains(name)) {
+      return crab::some(KEYWORD_TABLE.at(name));
     }
-    return opt::none;
+    return crab::none;
   }
-
 }

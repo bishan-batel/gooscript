@@ -1,8 +1,8 @@
 #pragma once
 
-#include "preamble.hpp"
+#include <preamble.hpp>
 
-namespace lexer {
+namespace goos::lexer {
   enum [[maybe_unused]] OperatorFlag : u32 {
     COMPARISON_FLAG = 1 << 30,
     BINARY_FLAG = 1 << 29,
@@ -14,14 +14,14 @@ namespace lexer {
     PARENTHETICAL_CLOSE_FLAG = 1 << 24,
   };
 
-#define binary(x) ((x) | BINARY_FLAG)
-#define assign(x) ((x) | BINARY_FLAG | ASSIGN_FLAG)
+  #define binary(x) ((x) | BINARY_FLAG)
+  #define assign(x) ((x) | BINARY_FLAG | ASSIGN_FLAG)
 
-#define compare(x) ((x) | BINARY_FLAG | COMPARISON_FLAG)
-#define unary(x) ((x) | UNARY_FLAG)
-#define delimiter(x) ((x) | DELIMITER_FLAG)
+  #define compare(x) ((x) | BINARY_FLAG | COMPARISON_FLAG)
+  #define unary(x) ((x) | UNARY_FLAG)
+  #define delimiter(x) ((x) | DELIMITER_FLAG)
 
-#define paren(x, closed) ((x) | PARENTHETICAL_##closed##_FLAG)
+  #define paren(x, closed) ((x) | PARENTHETICAL_##closed##_FLAG)
 
   enum class [[maybe_unused]] Operator : u32 {
     ASSIGN = assign(0),
@@ -32,12 +32,13 @@ namespace lexer {
     SUB_ASSIGN = assign(5),
     BIT_OR_ASSIGN = assign(6),
     BIT_AND_ASSIGN = assign(7),
+
     XOR = binary(8),
     BIT_OR = binary(9),
     BIT_AND = binary(10),
     AND = binary(11),
     OR = binary(12),
-    NOT = 13 | UNARY_FLAG,
+    NOT = unary(13),
     EQUALS = compare(14),
     NOT_EQUALS = compare(15),
     GREATER = compare(16),
@@ -77,10 +78,10 @@ namespace lexer {
   [[maybe_unused]]
   bool is_parenthetical(Operator op);
 
-#undef binary
-#undef assign
-#undef compare
-#undef unary
-#undef delimiter
-#undef paren
+  #undef binary
+  #undef assign
+  #undef compare
+  #undef unary
+  #undef delimiter
+  #undef paren
 } // namespace lexer
