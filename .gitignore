@@ -4,3 +4,4 @@
 /libs/crabpp/*
 /.cache
 /compile_commands.json
+/tree-sitter/
