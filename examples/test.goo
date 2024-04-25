@@ -51,6 +51,7 @@ let condition = 0 + 1;
 var a = 0;
 
 let a = null;
+
 if condition {
   a = 1;
 } else {

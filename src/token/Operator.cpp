@@ -3,3 +3,13 @@
 //
 
 #include "Operator.hpp"
+
+namespace goos::token {
+  Operator::Operator(const lexer::Operator op) : op(op) {}
+
+  lexer::Operator Operator::get_op() const { return op; }
+
+  Box<Token> Operator::clone() const {
+    return crab::make_box<Operator>(*this);
+  }
+}

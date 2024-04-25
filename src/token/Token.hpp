@@ -6,10 +6,9 @@ namespace goos::token {
   class Token {
     StringView slice;
 
-  protected:
+  public:
     Token(const Token &) = default;
 
-  public:
     Token() = default;
 
     Token(Token &&) = delete;
@@ -22,6 +21,6 @@ namespace goos::token {
 
     [[nodiscard]] virtual Box<Token> clone() const = 0;
 
-    [[nodiscard]] StringView get_slice() const { return slice; }
+    [[nodiscard]] StringView get_slice() const;
   };
 } // namespace lexer

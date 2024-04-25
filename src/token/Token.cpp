@@ -1,3 +1,9 @@
 #include "Token.hpp"
 
-namespace goos::token {}
+#include <stdexcept>
+
+namespace goos::token {
+  StringView Token::get_slice() const {
+    return slice;
+  }
+}

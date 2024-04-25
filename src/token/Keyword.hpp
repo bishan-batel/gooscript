@@ -13,7 +13,7 @@ namespace goos::token {
   public:
     explicit Keyword(lexer::Keyword word);
 
-    [[nodiscard]] lexer::Keyword get_word() const { return word; }
+    [[nodiscard]] lexer::Keyword get_word() const;
 
     [[nodiscard]] Box<Token> clone() const override;
   };

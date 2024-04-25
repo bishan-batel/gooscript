@@ -7,7 +7,9 @@
 namespace goos::token {
   Keyword::Keyword(const lexer::Keyword word) : word(word) {}
 
+  lexer::Keyword Keyword::get_word() const { return word; }
+
   Box<Token> Keyword::clone() const {
-    throw std::logic_error("Not implemented");
+    return crab::make_box<Keyword>(*this);
   }
 }
