@@ -15,12 +15,12 @@ int main() {
     goos::lexer::Lexer::tokenize(content),
     [](const goos::lexer::TokenList &list) {
       for (const auto &token: list) {
-        fmt::println("{}", token->to_string());
+        fmt::print("('{}') ", token->to_string());
       }
     }
   ).or_else(
     [](auto e) {
-      fmt::print(stderr, "ERROR:\n{}", e.what());
+      fmt::println(stderr, "ERROR:\n{}", e.what());
     }
   );
 

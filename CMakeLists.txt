@@ -24,6 +24,19 @@ set(SOURCE_FILES
         src/token/Integer.hpp
         src/token/StringLiteral.cpp
         src/token/StringLiteral.hpp
+        src/ast/Expression.cpp
+        src/ast/Expression.hpp
+        src/ast/expression/Binary.cpp
+        src/ast/expression/Binary.hpp
+        src/ast/expression/Unary.cpp
+        src/ast/expression/Unary.hpp
+        src/ast/Statement.cpp
+        src/ast/Statement.hpp
+        src/meta/VariantType.hpp
+        src/ast/expression/Function.cpp
+        src/ast/expression/Function.hpp
+        src/meta/VariableDefinition.cpp
+        src/meta/VariableDefinition.hpp
 )
 
 # Executable

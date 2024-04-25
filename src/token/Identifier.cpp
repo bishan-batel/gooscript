@@ -12,6 +12,6 @@ namespace goos::token {
   Box<Token> Identifier::clone() const { return crab::make_box<Identifier>(*this); }
 
   String Identifier::to_string() const {
-    return fmt::format("Ident{{\"{}\"}}", identifier);
+    return fmt::format("{}", identifier);
   }
 }

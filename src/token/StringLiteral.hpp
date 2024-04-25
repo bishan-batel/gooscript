@@ -8,8 +8,10 @@
 namespace goos::token {
   class StringLiteral final : public Token {
     String literal;
+
   public:
     explicit StringLiteral(StringView string);
+
     [[nodiscard]] Box<Token> clone() const override;
 
     [[nodiscard]] String to_string() const override;
