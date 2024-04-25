@@ -4,14 +4,14 @@
 
 #include <fmt/core.h>
 
-#include "build/Release/_deps/crab-src/include/pattern_match.hpp"
-#include "build/Release/_deps/crab-src/include/preamble.hpp"
+#include "pattern_match.hpp"
+#include "preamble.hpp"
 #include "lexer/Lexer.hpp"
 
 int main() {
   const Rc content{(std::stringstream{} << std::ifstream{"examples/syntax.goo"}.rdbuf()).str()};;
 
-  crab::if_ok(
+  if_ok(
     goos::lexer::Lexer::tokenize(content),
     [](const goos::lexer::TokenList &list) {
       for (const auto &token: list) {

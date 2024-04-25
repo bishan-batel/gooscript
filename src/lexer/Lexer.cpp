@@ -12,7 +12,10 @@
 
 #include "Keyword.hpp"
 #include "Operator.hpp"
+#include "token/Decimal.hpp"
 #include "token/Identifier.hpp"
+#include "token/Integer.hpp"
+#include "token/StringLiteral.hpp"
 
 namespace goos::lexer {
   StringView Error::to_string(const Type type) {
@@ -50,8 +53,16 @@ namespace goos::lexer {
     return Error{type, content, crab::range(begin, std::min(content.as_ref()->size(), position))};
   }
 
+  void Lexer::push(Box<Token> token) {
+    tokens.push_back(std::move(token));
+  }
+
   char Lexer::curr() const {
     return is_eof() ? '\0' : content.as_ref()->at(position);
+  }
+
+  bool Lexer::is_curr(const char c) const {
+    return curr() == c;
   }
 
   char Lexer::next(const usize n) {
@@ -61,9 +72,9 @@ namespace goos::lexer {
 
   bool Lexer::is_eof() const { return position >= content.as_ref()->size(); }
 
-  String Lexer::substr(const Range<> range) const {
+  StringView Lexer::substr(const Range<> range) const {
     auto constraint{[this](auto n) { return std::min(n, content.as_ref()->size()); }};
-    return content.as_ref()->substr(
+    return StringView{*content.as_ref()}.substr(
       constraint(range.lower_bound()),
       constraint(range.upper_bound()) - constraint(range.lower_bound())
     );
@@ -115,11 +126,44 @@ namespace goos::lexer {
   }
 
   Result<bool> Lexer::number_literal() {
-    return crab::ok(false);
+    if (not std::isdigit(curr())) {
+      return crab::ok(false);
+    }
+
+    const usize begin = position;
+
+    bool has_dot = false;
+    while (std::isdigit(next()) or (not has_dot and is_curr('.'))) {
+      has_dot |= is_curr('.');
+    }
+
+    const String num_str{substr(crab::range_inclusive(begin, position))};
+
+    if (has_dot) {
+      emplace<token::Decimal>(std::stod(num_str));
+    } else {
+      emplace<token::Integer>(std::stoll(num_str));
+    }
+
+    return crab::ok(true);
   }
 
   Result<bool> Lexer::string_literal() {
-    return crab::ok(false);
+    if (not is_curr('"')) return crab::ok(false);
+
+    const usize begin = position + 1;
+    while (not is_eof() and next() != '"') {}
+
+    if (not is_curr('"')) {
+      return err(error(Error::Type::UNTERMINATED_STRING, begin));
+    }
+
+    const StringView literal = substr(crab::range(begin, position));
+    next();
+
+    emplace<token::StringLiteral>(literal);
+
+    return crab::ok(true);
   }
 
   Result<bool> Lexer::operator_tok() {
@@ -153,11 +197,6 @@ namespace goos::lexer {
     }
 
     String word{substr(crab::range(begin, position))};
-
-    debug_assert(
-      std::ranges::none_of(word, [](auto c) { return token::INVALID_IDENTIFIER_CHARS.contains(c); } ),
-      "Failed to correctly parse chars"
-    );
 
     if (auto keyword = identifier_to_keyword(word)) {
       emplace<token::Keyword>(keyword.get_unchecked());

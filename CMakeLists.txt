@@ -18,6 +18,12 @@ set(SOURCE_FILES
         src/lexer/Lexer.hpp
         src/token/Identifier.cpp
         src/token/Identifier.hpp
+        src/token/Decimal.cpp
+        src/token/Decimal.hpp
+        src/token/Integer.cpp
+        src/token/Integer.hpp
+        src/token/StringLiteral.cpp
+        src/token/StringLiteral.hpp
 )
 
 # Executable
@@ -54,11 +60,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain crab fmt)
 #add_custom_target(pch COMMAND clang++ -std=gnu++23 -x c++-header
 #        ${CMAKE_CURRENT_SOURCE_DIR}/libs/crabpp/inc/preamble.hpp
 #        -o ${CMAKE_CURRENT_BINARY_DIR}/preamble.hpp.pch)
-
-
-add_custom_command(
-        TARGET ${PROJECT_NAME}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/examples
-        ${PROJECT_BINARY_DIR}/examples
-        COMMENT "Copy resources to build tree")

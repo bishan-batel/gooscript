@@ -20,7 +20,7 @@ namespace goos::lexer {
       UNKNOWN_CHARACTER
     };
 
-    static StringView to_string(Type type);
+    static auto to_string(Type type) -> StringView;
 
   private:
     Rc<String> section;
@@ -32,9 +32,9 @@ namespace goos::lexer {
   public:
     Error(Type type, const Rc<String> &section, Range<> range);
 
-    [[nodiscard]] StringView what() const override;
+    [[nodiscard]] auto what() const -> StringView override;
 
-    [[nodiscard]] Type get_type() const;
+    [[nodiscard]] auto get_type() const -> Type;
   };
 }
 
@@ -54,9 +54,7 @@ namespace goos::lexer {
 
     [[nodiscard]] Error error(Error::Type, usize begin) const;
 
-    void push(Box<Token> token) {
-      tokens.push_back(std::move(token));
-    }
+    void push(Box<Token> token);
 
     template<typename T, typename... Args> requires std::is_constructible_v<T, Args...>
     void emplace(Args... args) {
@@ -65,11 +63,13 @@ namespace goos::lexer {
 
     [[nodiscard]] char curr() const;
 
-    char next(usize n=1);
+    [[nodiscard]] bool is_curr(char c) const;
+
+    char next(usize n = 1);
 
     [[nodiscard]] bool is_eof() const;
 
-    [[nodiscard]] String substr(Range<> range) const;
+    [[nodiscard]] StringView substr(Range<> range) const;
 
   public:
     static Result<TokenList> tokenize(const Rc<String> &content);
