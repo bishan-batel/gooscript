@@ -1,7 +1,6 @@
 #pragma once
 
 #include <option.hpp>
-#include <unordered_map>
 
 namespace goos::lexer {
   enum class Keyword {
@@ -25,7 +24,7 @@ namespace goos::lexer {
     RETURN,
   };
 
-  inline static const std::unordered_map<std::string_view, Keyword> KEYWORD_TABLE{
+  inline static const Dictionary<StringView, Keyword> STR_TO_KEYWORD_TABLE{
     {"module", Keyword::MODULE},
     {"use", Keyword::USE},
 
@@ -53,6 +52,16 @@ namespace goos::lexer {
     {"default", Keyword::DEFAULT},
     {"fn", Keyword::FN},
     {"return", Keyword::RETURN},
+  };
+
+  static const auto KEYWORD_TO_STR_MAP{
+    [] {
+      Dictionary<Keyword, StringView> map;
+      for (const auto &[k, v]: STR_TO_KEYWORD_TABLE) {
+        map.emplace(v, k);
+      }
+      return map;
+    }()
   };
 
   [[nodiscard]] Option<Keyword> identifier_to_keyword(std::string_view name);

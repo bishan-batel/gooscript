@@ -5,8 +5,8 @@
 
 namespace goos::lexer {
   Option<Keyword> identifier_to_keyword(const std::string_view name) {
-    if (KEYWORD_TABLE.contains(name)) {
-      return crab::some(KEYWORD_TABLE.at(name));
+    if (STR_TO_KEYWORD_TABLE.contains(name)) {
+      return crab::some(STR_TO_KEYWORD_TABLE.at(name));
     }
     return crab::none;
   }

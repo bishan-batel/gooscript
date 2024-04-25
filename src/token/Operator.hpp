@@ -16,5 +16,7 @@ namespace goos::token {
     [[nodiscard]] lexer::Operator get_op() const;
 
     [[nodiscard]] Box<Token> clone() const override;
+
+    [[nodiscard]] String to_string() const override;
   };
 }

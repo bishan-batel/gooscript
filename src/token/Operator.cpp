@@ -12,4 +12,8 @@ namespace goos::token {
   Box<Token> Operator::clone() const {
     return crab::make_box<Operator>(*this);
   }
+
+  String Operator::to_string() const {
+    return String{lexer::OPERATOR_TO_STR_MAP.at(op)};
+  }
 }

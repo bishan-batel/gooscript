@@ -66,6 +66,55 @@ namespace goos::lexer {
     CURLY_CLOSE = paren(32, CLOSE),
   };
 
+  static const Dictionary<StringView, Operator> STR_TO_OPERATOR_MAP{
+    {"=", Operator::ASSIGN},
+    {"%=", Operator::MOD_ASSIGN},
+    {"*=", Operator::MUL_ASSIGN},
+    {"/=", Operator::DIV_ASSIGN},
+    {"+=", Operator::ADD_ASSIGN},
+    {"-=", Operator::SUB_ASSIGN},
+    {"|=", Operator::BIT_OR_ASSIGN},
+    {"&=", Operator::BIT_AND_ASSIGN},
+    {"^", Operator::XOR},
+    {"|", Operator::BIT_OR},
+    {"&", Operator::BIT_AND},
+    {"and", Operator::AND},
+    {"or", Operator::OR},
+    {"not", Operator::NOT},
+    {"==", Operator::EQUALS},
+    {"!=", Operator::NOT_EQUALS},
+    {">", Operator::GREATER},
+    {"<", Operator::LESS},
+    {">=", Operator::GREATER_OR_EQUALS},
+    {"<=", Operator::LESS_OR_EQUALS},
+    {"<<", Operator::SHIFT_LEFT},
+    {">>", Operator::SHIFT_RIGHT},
+    {"+", Operator::ADD},
+    {"-", Operator::SUB},
+    {"*", Operator::MUL},
+    {"/", Operator::DIV},
+    {"%", Operator::MOD},
+    {"=>", Operator::ARROW},
+    {";", Operator::SEMICOLON},
+    {":", Operator::COMMA},
+    {"(", Operator::PAREN_OPEN},
+    {")", Operator::PAREN_CLOSE},
+    {"[", Operator::BRACKET_OPEN},
+    {"]", Operator::BRACKET_CLOSE},
+    {"{", Operator::CURLY_OPEN},
+    {"}", Operator::CURLY_CLOSE},
+  };
+
+  static const auto OPERATOR_TO_STR_MAP{
+    [] {
+      Dictionary<Operator, StringView> map;
+      for (const auto &[k, v]: STR_TO_OPERATOR_MAP) {
+        map.emplace(v, k);
+      }
+      return map;
+    }()
+  };
+
   [[maybe_unused]]
   bool is_binary(Operator op);
 

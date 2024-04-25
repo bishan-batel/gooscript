@@ -1,6 +1,7 @@
 #pragma once
 #include <preamble.hpp>
 #include <box.hpp>
+#include <fmt/core.h>
 
 namespace goos::token {
   class Token {
@@ -22,5 +23,7 @@ namespace goos::token {
     [[nodiscard]] virtual Box<Token> clone() const = 0;
 
     [[nodiscard]] StringView get_slice() const;
+
+    [[nodiscard]] virtual String to_string() const = 0;
   };
 } // namespace lexer

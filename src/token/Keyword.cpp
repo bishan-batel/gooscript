@@ -12,4 +12,8 @@ namespace goos::token {
   Box<Token> Keyword::clone() const {
     return crab::make_box<Keyword>(*this);
   }
+
+  String Keyword::to_string() const {
+    return String{lexer::KEYWORD_TO_STR_MAP.at(word)};
+  }
 }
