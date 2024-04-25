@@ -1,10 +1,9 @@
 #include <iostream>
-#include <memory>
-#include <preamble.hpp>
 
-#include <vector>
+#include <fmt/core.h>
 
 int main() {
-  std::cout << "huh" << std::endl;
+  fmt::println("huh");
+
   std::cin.get();
 }

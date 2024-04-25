@@ -45,8 +45,9 @@ CPMAddPackage("gh:bishan-batel/crab#main")
 include_directories(${PROJECT_NAME} ${crabpp_SOURCE_DIR}/inc)
 
 CPMAddPackage("gh:catchorg/Catch2@3.4.0")
+CPMAddPackage("gh:fmtlib/fmt#10.2.1")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain crab)
+target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain crab fmt)
 
 #add_custom_target(pch COMMAND clang++ -std=gnu++23 -x c++-header
 #        ${CMAKE_CURRENT_SOURCE_DIR}/libs/crabpp/inc/preamble.hpp
