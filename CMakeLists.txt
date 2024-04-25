@@ -14,8 +14,8 @@ set(SOURCE_FILES
         src/token/Token.cpp
         src/token/Keyword.cpp
         src/token/Operator.cpp
-        src/lexer/Tokenizer.cpp
-        src/lexer/Tokenizer.hpp
+        src/lexer/Lexer.cpp
+        src/lexer/Lexer.hpp
 )
 
 # Executable
@@ -41,7 +41,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 include(cmake/CPM.cmake)
 
-CPMAddPackage("gh:bishan-batel/crabpp#main")
+CPMAddPackage("gh:bishan-batel/crab#main")
 include_directories(${PROJECT_NAME} ${crabpp_SOURCE_DIR}/inc)
 
 CPMAddPackage("gh:catchorg/Catch2@3.4.0")
