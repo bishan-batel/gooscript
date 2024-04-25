@@ -1,6 +1,3 @@
-[submodule "libs/crabpp"]
-	path = libs/crabpp
-	url = https://github.com/bishan-batel/crabpp
 [submodule "tree-sitter"]
 	path = tree-sitter
 	url = https://github.com/bishan-batel/tree-sitter-gooscript
