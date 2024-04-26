@@ -14,4 +14,11 @@ namespace goos::token {
   }
 
   StringView StringLiteral::get_string() const { return literal; }
+
+  bool StringLiteral::operator==(const Token &other) const {
+    if (Option<Ref<StringLiteral>> ref = crab::ref::cast<StringLiteral>(other)) {
+      return ref.get_unchecked()->literal == literal;
+    }
+    return false;
+  }
 }

@@ -20,6 +20,8 @@ namespace goos::token {
 
     void operator=(Token &&) = delete;
 
+    [[nodiscard]] virtual bool operator==(const Token &other) const = 0;
+
     [[nodiscard]] virtual Box<Token> clone() const = 0;
 
     [[nodiscard]] StringView get_slice() const;

@@ -17,5 +17,7 @@ namespace goos::token {
     [[nodiscard]] String to_string() const override;
 
     [[nodiscard]] StringView get_string() const;
+
+    [[nodiscard]] bool operator==(const Token &other) const override;
   };
 }

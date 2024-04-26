@@ -42,7 +42,8 @@ set(SOURCE_FILES
 # Executable
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src)
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+add_library(${PROJECT_NAME} ${SOURCE_FILES})
+# add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -63,12 +64,12 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 include(cmake/CPM.cmake)
 
 CPMAddPackage("gh:bishan-batel/crab#main")
-include_directories(${PROJECT_NAME} ${crab_SOURCE_DIR}/include)
-
-CPMAddPackage("gh:catchorg/Catch2@3.4.0")
 CPMAddPackage("gh:fmtlib/fmt#10.2.1")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain crab fmt)
+
+#target_include_directories(${PROJECT_NAME} PUBLIC ${crab_SOURCE_DIR}/include)
+target_link_libraries(${PROJECT_NAME} PRIVATE crab fmt)
+add_subdirectory(test)
 
 #add_custom_target(pch COMMAND clang++ -std=gnu++23 -x c++-header
 #        ${CMAKE_CURRENT_SOURCE_DIR}/libs/crabpp/inc/preamble.hpp

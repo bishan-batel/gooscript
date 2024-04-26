@@ -16,4 +16,11 @@ namespace goos::token {
   String Keyword::to_string() const {
     return String{lexer::KEYWORD_TO_STR_MAP.at(word)};
   }
+
+  bool Keyword::operator==(const Token &other) const {
+    if (const Option<Ref<Keyword>> keyword = crab::ref::cast<Keyword>(other)) {
+      return keyword.get_unchecked()->word == word;
+    }
+    return false;
+  }
 }

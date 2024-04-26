@@ -14,4 +14,11 @@ namespace goos::token {
   String Decimal::to_string() const {
     return fmt::format("{}D", number);
   }
+
+  bool Decimal::operator==(const Token &other) const {
+    if (const Option<Ref<Decimal>> num = crab::ref::cast<Decimal>(other)) {
+      return num.get_unchecked()->number == number;
+    }
+    return false;
+  }
 }

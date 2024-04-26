@@ -60,5 +60,7 @@ namespace goos::token {
     [[nodiscard]] Box<Token> clone() const override;
 
     [[nodiscard]] String to_string() const override;
+
+    [[nodiscard]] bool operator==(const Token &other) const override;
   };
 }
