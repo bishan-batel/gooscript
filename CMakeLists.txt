@@ -63,7 +63,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 include(cmake/CPM.cmake)
 
 CPMAddPackage("gh:bishan-batel/crab#main")
-include_directories(${PROJECT_NAME} ${crabpp_SOURCE_DIR}/inc)
+include_directories(${PROJECT_NAME} ${crab_SOURCE_DIR}/include)
 
 CPMAddPackage("gh:catchorg/Catch2@3.4.0")
 CPMAddPackage("gh:fmtlib/fmt#10.2.1")

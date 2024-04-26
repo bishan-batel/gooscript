@@ -7,8 +7,11 @@
 
 #include "Token.hpp"
 
+using schar = i8;
+using uchar = u8;
+
 namespace goos::token {
-  static const Set INVALID_IDENTIFIER_CHARS{
+  static const Set<uchar> INVALID_IDENTIFIER_CHARS{
     '[',
     ']',
     '(',

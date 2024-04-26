@@ -7,6 +7,9 @@
 #include "pattern_match.hpp"
 #include "preamble.hpp"
 #include "lexer/Lexer.hpp"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("Lexer", "What") {}
 
 int main() {
   const Rc content{(std::stringstream{} << std::ifstream{"examples/syntax.goo"}.rdbuf()).str()};;

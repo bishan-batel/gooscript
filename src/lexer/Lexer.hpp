@@ -44,6 +44,8 @@ namespace goos::lexer {
 
   using TokenList = Vec<Box<token::Token> >;
 
+  static const Set<char> WHITESPACE_CHARS{' ', '\t', '\n', '\r'};
+
   class Lexer {
     using Token = token::Token;
     usize position = 0;

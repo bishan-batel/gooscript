@@ -117,9 +117,8 @@ namespace goos::lexer {
   }
 
   Result<bool> Lexer::whitespace() {
-    static const Set whitespace_chars{' ', '\t', '\n', '\r'};
 
-    if (not whitespace_chars.contains(curr())) return crab::ok(false);
+    if (not WHITESPACE_CHARS.contains(curr())) return crab::ok(false);
 
     next();
     return crab::ok(true);

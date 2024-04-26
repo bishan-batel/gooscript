@@ -4,7 +4,7 @@
 
 #pragma once
 #include <ast/Expression.hpp>
-#include <build/Release/_deps/crab-src/include/box.hpp>
+#include <box.hpp>
 #include <meta/VariableDefinition.hpp>
 
 namespace goos::ast::expression {
