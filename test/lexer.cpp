@@ -19,7 +19,7 @@ using namespace crab;
 #define STR(str) crab::make_box<goos::token::StringLiteral>(str)
 
 auto parse(lexer::TokenList &list, const StringView source) {
-  list = std::move(lexer::Lexer::tokenize(Rc<String>{String{source}}).get_unchecked());
+  list = std::move(lexer::Lexer::tokenize(Rc{String{source}}).get_unchecked());
 }
 
 template<typename... Args>
@@ -121,7 +121,7 @@ TEST_CASE("Lexer", "[lexer]") {
   }
 
   SECTION("Number") {
-    REQUIRE_NOTHROW(parse(toks, "42 42. 42.02what"));
+    REQUIRE_NOTHROW(parse(toks, R"(42 42. 42.02what)"));
 
     matches(
       toks,
@@ -131,7 +131,7 @@ TEST_CASE("Lexer", "[lexer]") {
       IDENT(what)
     );
 
-    REQUIRE_NOTHROW(parse(toks, "huh let42 let 42. 42.02what"));
+    REQUIRE_NOTHROW(parse(toks, R"(huh let42 let 42. 42.02what)"));
 
     matches(
       toks,
@@ -145,42 +145,47 @@ TEST_CASE("Lexer", "[lexer]") {
   }
 
   SECTION("String") {
-    REQUIRE_NOTHROW(
-      parse(
+    SECTION("Normal") {
+      REQUIRE_NOTHROW(
+        parse(
+          toks,
+          R"( "huh" "me when the"42 )")
+      );
+
+      matches(
         toks,
-        R"( "huh" "me when the"42 )")
-    );
+        STR("huh"),
+        STR("me when the"),
+        NUMI(42)
+      );
+    }
 
-    matches(
-      toks,
-      STR("huh"),
-      STR("me when the"),
-      NUMI(42)
-    );
+    SECTION("Unterminated String") {
+      REQUIRE_THROWS(
+        parse(
+          toks,
+          R"( "huh" "me when the )")
+      );
 
-    REQUIRE_THROWS(
-      parse(
+      REQUIRE_THROWS(
+        parse(
+          toks,
+          R"( huh""what" )")
+      );
+
+      REQUIRE_NOTHROW(
+        parse(
+          toks,
+          R"( huh"""what" )")
+      );
+
+      matches(
         toks,
-        R"( "huh" "me when the )")
-    );
+        IDENT(huh),
+        STR(""),
+        STR("what")
+      );
+    }
 
-    REQUIRE_THROWS(
-      parse(
-        toks,
-        R"( huh""what" )")
-    );
-
-    REQUIRE_NOTHROW(
-      parse(
-        toks,
-        R"( huh"""what" )")
-    );
-
-    matches(
-      toks,
-      IDENT(huh),
-      STR(""),
-      STR("what")
-    );
   }
 }

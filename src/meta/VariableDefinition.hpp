@@ -15,4 +15,3 @@ namespace goos::meta {
     [[nodiscard]] const String& get_name() const;
   };
 }
-

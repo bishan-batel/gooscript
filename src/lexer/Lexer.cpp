@@ -4,7 +4,9 @@
 
 #include "Lexer.hpp"
 
+#include <codecvt>
 #include <functional>
+#include <sstream>
 #include <bits/ranges_algo.h>
 #include <fmt/compile.h>
 #include <token/Keyword.hpp>
@@ -117,7 +119,6 @@ namespace goos::lexer {
   }
 
   Result<bool> Lexer::whitespace() {
-
     if (not WHITESPACE_CHARS.contains(curr())) return crab::ok(false);
 
     next();
@@ -147,20 +148,87 @@ namespace goos::lexer {
     return crab::ok(true);
   }
 
+  // Option<Error> Lexer::hex_sequence(std::stringstream &stream) {
+  //   const auto begin = position;
+  //
+  //   const auto is_valid_hex{
+  //     [](const char c) {
+  //       return (c >= 'A' && c <= 'F') or
+  //              (c >= 'a' && c <= 'f') or
+  //              std::isdigit(c);
+  //     }
+  //   };
+  //
+  //   constexpr usize MAX_HEX_ESCAPE_LEN{4};
+  //   std::array hex_chars{'0', '0', '0', '0'}; {
+  //     usize i = 0;
+  //     for (; i < MAX_HEX_ESCAPE_LEN and is_valid_hex(next()); i++) {
+  //       hex_chars[i] = static_cast<char>(std::tolower(curr()));
+  //     }
+  //
+  //     // followed by no valid hex
+  //     if (i != 4) {
+  //       return some(error(Error::Type::INVALID_ESCAPED_STRING, begin));
+  //     }
+  //   }
+  //
+  //   usize first_non_zero = 0;
+  //   for (; first_non_zero < MAX_HEX_ESCAPE_LEN and hex_chars[first_non_zero] == '0'; first_non_zero++) {}
+  //
+  //   if (first_non_zero == MAX_HEX_ESCAPE_LEN) {
+  //     stream << '\0';
+  //     return crab::none;
+  //   }
+  //
+  //   for (usize i = first_non_zero; i < MAX_HEX_ESCAPE_LEN; i++) {
+  //     const char &c = hex_chars[i];
+  //     stream << static_cast<char>(std::isdigit(c) ? c - '0' : c - 'a' + 0xa);
+  //   }
+  //
+  //   return crab::none;
+  // }
+
   Result<bool> Lexer::string_literal() {
     if (not is_curr('"')) return crab::ok(false);
 
     const usize begin = position + 1;
-    while (not is_eof() and next() != '"') {}
+
+    std::stringstream literal;
+    while (not is_eof() and next() != '"') {
+      if (curr() != '\\') {
+        literal << curr();
+        continue;
+      }
+      next();
+
+      #define CASE(x, y)  case x: {literal << y; continue; }
+      switch (curr()) {
+        CASE('0', '\0')
+        CASE('n', '\n')
+        CASE('r', '\r')
+        CASE('v', '\v')
+        CASE('t', '\t')
+        CASE('b', '\b')
+        CASE('f', '\f')
+        CASE('\'', '\'')
+        CASE('"', '"')
+        CASE('\\', '\\')
+        case '\n': { continue; }
+
+        default:
+          return err(error(Error::Type::INVALID_ESCAPED_STRING, begin));
+      }
+      #undef CASE
+      // Parse Escape Sequence
+    }
 
     if (not is_curr('"')) {
       return err(error(Error::Type::UNTERMINATED_STRING, begin));
     }
 
-    const StringView literal = substr(crab::range(begin, position));
     next();
 
-    emplace<token::StringLiteral>(literal);
+    emplace<token::StringLiteral>(literal.str());
 
     return crab::ok(true);
   }

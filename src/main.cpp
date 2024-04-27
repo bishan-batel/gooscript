@@ -4,23 +4,5 @@
 
 #include <fmt/core.h>
 
-#include "pattern_match.hpp"
-#include "preamble.hpp"
+#include <pattern_match.hpp>
 #include "lexer/Lexer.hpp"
-
-int main() {
-  const Rc content{(std::stringstream{} << std::ifstream{"examples/syntax.goo"}.rdbuf()).str()};;
-
-  if_ok(
-    goos::lexer::Lexer::tokenize(content),
-    [](const goos::lexer::TokenList &list) {
-      for (const auto &token: list) {
-        fmt::print("('{}') ", token->to_string());
-      }
-    }
-  ).or_else(
-    [](auto e) {
-      fmt::println(stderr, "ERROR:\n{}", e.what());
-    }
-  );
-}

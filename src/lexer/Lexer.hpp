@@ -42,7 +42,7 @@ namespace goos::lexer {
   template<typename T>
   using Result = Result<T, Error>;
 
-  using TokenList = Vec<Box<token::Token> >;
+  using TokenList = Vec<Box<token::Token>>;
 
   static const Set<char> WHITESPACE_CHARS{' ', '\t', '\n', '\r'};
 
@@ -80,6 +80,8 @@ namespace goos::lexer {
     [[nodiscard]] Result<bool> whitespace();
 
     [[nodiscard]] Result<bool> number_literal();
+
+    // [[maybe_unused]] [[nodiscard]] Option<Error> hex_sequence(std::stringstream &stream);
 
     [[nodiscard]] Result<bool> string_literal();
 
