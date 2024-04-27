@@ -21,7 +21,7 @@ namespace goos::ast::expression {
   }
 
   Option<meta::VariantType> FunctionDefine::variant_type() const {
-    return body->variant_type();
+    return crab::some(meta::VariantType::FUNCTION);
   }
 
   const Expression& FunctionDefine::get_body() const { return body; }

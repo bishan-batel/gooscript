@@ -12,5 +12,7 @@ namespace goos::meta {
     BOOLEAN,
     OBJECT,
     ARRAY,
+    FUNCTION,
+    UNIT,
   };
 }
