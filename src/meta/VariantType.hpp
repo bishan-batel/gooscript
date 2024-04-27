@@ -13,6 +13,7 @@ namespace goos::meta {
     OBJECT,
     ARRAY,
     FUNCTION,
+    NIL,
     UNIT,
   };
 }

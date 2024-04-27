@@ -53,6 +53,8 @@ set(SOURCE_FILES
         src/ast/statements/Eval.hpp
         src/ast/expression/literal/Unit.cpp
         src/ast/expression/literal/Unit.hpp
+        src/ast/expression/literal/Nil.cpp
+        src/ast/expression/literal/Nil.hpp
 )
 
 
