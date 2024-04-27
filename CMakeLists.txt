@@ -47,6 +47,12 @@ set(SOURCE_FILES
         src/ast/expression/literal/Integer.hpp
         src/ast/expression/literal/Boolean.cpp
         src/ast/expression/literal/Boolean.hpp
+        src/ast/expression/compound/ScopeBlock.cpp
+        src/ast/expression/compound/ScopeBlock.hpp
+        src/ast/statements/Eval.cpp
+        src/ast/statements/Eval.hpp
+        src/ast/expression/literal/Unit.cpp
+        src/ast/expression/literal/Unit.hpp
 )
 
 

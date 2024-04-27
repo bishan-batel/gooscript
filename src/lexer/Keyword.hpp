@@ -22,6 +22,7 @@ namespace goos::lexer {
     DEFAULT,
     FN,
     RETURN,
+    EVAL
   };
 
   inline static const Dictionary<StringView, Keyword> STR_TO_KEYWORD_TABLE{
@@ -52,6 +53,7 @@ namespace goos::lexer {
     {"default", Keyword::DEFAULT},
     {"fn", Keyword::FN},
     {"return", Keyword::RETURN},
+    {"eval", Keyword::EVAL},
   };
 
   static const auto KEYWORD_TO_STR_MAP{
