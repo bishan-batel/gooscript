@@ -9,6 +9,7 @@ namespace goos::meta {
     INTEGER,
     DECIMAL,
     STRING,
+    BOOLEAN,
     OBJECT,
     ARRAY,
   };

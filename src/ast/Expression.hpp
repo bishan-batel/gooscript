@@ -14,6 +14,6 @@ namespace goos::ast {
   public:
     Expression() = default;
 
-    virtual Option<meta::VariantType> variant_type() = 0;
+    [[nodiscard]] virtual Option<meta::VariantType> variant_type() const = 0;
   };
 }

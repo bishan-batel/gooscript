@@ -3,9 +3,10 @@
 //
 
 #pragma once
-#include <ast/Expression.hpp>
 #include <box.hpp>
-#include <meta/VariableDefinition.hpp>
+
+#include "ast/Expression.hpp"
+#include "meta/VariableDefinition.hpp"
 
 namespace goos::ast::expression {
   class FunctionDefine final : public Expression {
@@ -22,7 +23,7 @@ namespace goos::ast::expression {
 
     [[nodiscard]] String to_string() const override;
 
-    Option<meta::VariantType> variant_type() override;
+    [[nodiscard]] Option<meta::VariantType> variant_type() const override;
 
     [[nodiscard]] const Vec<meta::VariableDefinition>& get_params() const;
 

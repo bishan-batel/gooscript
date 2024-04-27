@@ -21,6 +21,6 @@ namespace goos::ast::expression {
 
     [[nodiscard]] String to_string() const override;
 
-    Option<meta::VariantType> variant_type() override;
+    Option<meta::VariantType> variant_type() const override;
   };
 }

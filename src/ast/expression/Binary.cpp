@@ -4,7 +4,7 @@
 
 #include "Binary.hpp"
 
-#include "build/Release/_deps/fmt-src/include/fmt/compile.h"
+#include <fmt/compile.h>
 
 namespace goos::ast::expression {
   Binary::Binary(Box<Expression> lhs, const lexer::Operator op, Box<Expression> rhs)
@@ -23,7 +23,7 @@ namespace goos::ast::expression {
     );
   }
 
-  Option<meta::VariantType> Binary::variant_type() {
+  Option<meta::VariantType> Binary::variant_type() const {
     auto left_variant = lhs->variant_type();
     auto right_variant = rhs->variant_type();
 

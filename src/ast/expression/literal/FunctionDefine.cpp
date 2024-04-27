@@ -20,7 +20,7 @@ namespace goos::ast::expression {
     return fmt::format("fn ({}) = {}", stream.str(), body->to_string());
   }
 
-  Option<meta::VariantType> FunctionDefine::variant_type() {
+  Option<meta::VariantType> FunctionDefine::variant_type() const {
     return body->variant_type();
   }
 

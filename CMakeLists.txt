@@ -33,14 +33,22 @@ set(SOURCE_FILES
         src/ast/Statement.cpp
         src/ast/Statement.hpp
         src/meta/VariantType.hpp
-        src/ast/expression/Function.cpp
-        src/ast/expression/Function.hpp
+        src/ast/expression/literal/FunctionDefine.cpp
+        src/ast/expression/literal/FunctionDefine.hpp
         src/meta/VariableDefinition.cpp
         src/meta/VariableDefinition.hpp
+        src/ast/expression/FunctionCall.cpp
+        src/ast/expression/FunctionCall.hpp
+        src/ast/expression/literal/String.cpp
+        src/ast/expression/literal/String.hpp
+        src/ast/expression/literal/Decimal.cpp
+        src/ast/expression/literal/Decimal.hpp
+        src/ast/expression/literal/Integer.cpp
+        src/ast/expression/literal/Integer.hpp
+        src/ast/expression/literal/Boolean.cpp
+        src/ast/expression/literal/Boolean.hpp
 )
 
-# Executable
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src)
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 # add_executable(${PROJECT_NAME} ${SOURCE_FILES})
@@ -67,7 +75,9 @@ CPMAddPackage("gh:bishan-batel/crab#main")
 CPMAddPackage("gh:fmtlib/fmt#10.2.1")
 
 
-#target_include_directories(${PROJECT_NAME} PUBLIC ${crab_SOURCE_DIR}/include)
+# Executable
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src ${crab_SOURCE_DIR}/include)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE crab fmt)
 add_subdirectory(test)
 

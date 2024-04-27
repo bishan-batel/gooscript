@@ -15,10 +15,10 @@ namespace goos::ast::expression {
   public:
     Unary(lexer::Operator op, Box<Expression> expr);
 
-    [[nodiscard]] const Expression &get_expression() const;
+    [[nodiscard]] const Expression& get_expression() const;
 
     [[nodiscard]] String to_string() const override;
 
-    Option<meta::VariantType> variant_type() override;
+    [[nodiscard]] Option<meta::VariantType> variant_type() const override;
   };
 }

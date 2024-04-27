@@ -9,13 +9,13 @@ namespace goos::ast::expression {
   Unary::Unary(const lexer::Operator op, Box<Expression> expr)
     : expr{std::move(expr)}, op{op} {}
 
-  const Expression &Unary::get_expression() const { return expr; }
+  const Expression& Unary::get_expression() const { return expr; }
 
   String Unary::to_string() const {
     return fmt::format("{} ({})", lexer::OPERATOR_TO_STR_MAP.at(op), expr->to_string());
   }
 
-  Option<meta::VariantType> Unary::variant_type() {
+  Option<meta::VariantType> Unary::variant_type() const {
     return expr->variant_type();
   }
 }
