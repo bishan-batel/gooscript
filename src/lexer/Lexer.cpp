@@ -6,6 +6,7 @@
 
 #include <codecvt>
 #include <functional>
+#include <ranges>
 #include <sstream>
 #include <bits/ranges_algo.h>
 #include <fmt/compile.h>
@@ -94,7 +95,7 @@ namespace goos::lexer {
         [&] { return lexer.identifier(); }
       };
 
-      bool found = false;
+      bool found_working_pass = false;
 
       const usize begin{lexer.position};
       for (const auto &pass: passes) {
@@ -105,12 +106,12 @@ namespace goos::lexer {
         }
 
         if (result.get_unchecked()) {
-          found = true;
+          found_working_pass = true;
           break;
         }
       }
 
-      if (found) continue;
+      if (found_working_pass) continue;
 
       return err(lexer.error(Error::Type::UNKNOWN_CHARACTER, begin));
     }
@@ -147,46 +148,6 @@ namespace goos::lexer {
 
     return crab::ok(true);
   }
-
-  // Option<Error> Lexer::hex_sequence(std::stringstream &stream) {
-  //   const auto begin = position;
-  //
-  //   const auto is_valid_hex{
-  //     [](const char c) {
-  //       return (c >= 'A' && c <= 'F') or
-  //              (c >= 'a' && c <= 'f') or
-  //              std::isdigit(c);
-  //     }
-  //   };
-  //
-  //   constexpr usize MAX_HEX_ESCAPE_LEN{4};
-  //   std::array hex_chars{'0', '0', '0', '0'}; {
-  //     usize i = 0;
-  //     for (; i < MAX_HEX_ESCAPE_LEN and is_valid_hex(next()); i++) {
-  //       hex_chars[i] = static_cast<char>(std::tolower(curr()));
-  //     }
-  //
-  //     // followed by no valid hex
-  //     if (i != 4) {
-  //       return some(error(Error::Type::INVALID_ESCAPED_STRING, begin));
-  //     }
-  //   }
-  //
-  //   usize first_non_zero = 0;
-  //   for (; first_non_zero < MAX_HEX_ESCAPE_LEN and hex_chars[first_non_zero] == '0'; first_non_zero++) {}
-  //
-  //   if (first_non_zero == MAX_HEX_ESCAPE_LEN) {
-  //     stream << '\0';
-  //     return crab::none;
-  //   }
-  //
-  //   for (usize i = first_non_zero; i < MAX_HEX_ESCAPE_LEN; i++) {
-  //     const char &c = hex_chars[i];
-  //     stream << static_cast<char>(std::isdigit(c) ? c - '0' : c - 'a' + 0xa);
-  //   }
-  //
-  //   return crab::none;
-  // }
 
   Result<bool> Lexer::string_literal() {
     if (not is_curr('"')) return crab::ok(false);
