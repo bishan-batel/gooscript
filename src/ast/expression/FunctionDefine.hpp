@@ -8,24 +8,24 @@
 #include <meta/VariableDefinition.hpp>
 
 namespace goos::ast::expression {
-  class Function final : public Expression {
+  class FunctionDefine final : public Expression {
     Option<String> name;
     Vec<meta::VariableDefinition> params;
     Box<Expression> body;
 
   public:
-    explicit Function(
+    explicit FunctionDefine(
       Option<String> name,
       Vec<meta::VariableDefinition> params,
       Box<Expression> body
     );
 
-    [[nodiscard]] const Vec<meta::VariableDefinition> &get_params() const;
-
-    [[nodiscard]] const Expression &get_body() const;
-
     [[nodiscard]] String to_string() const override;
 
     Option<meta::VariantType> variant_type() override;
+
+    [[nodiscard]] const Vec<meta::VariableDefinition>& get_params() const;
+
+    [[nodiscard]] const Expression& get_body() const;
   };
 }

@@ -2,20 +2,16 @@
 // Created by bishan_ on 4/25/24.
 //
 
-#include "Function.hpp"
+#include "FunctionDefine.hpp"
 
 #include <sstream>
 #include <fmt/compile.h>
 
 namespace goos::ast::expression {
-  Function::Function(Option<String> name, Vec<meta::VariableDefinition> params, Box<Expression> body)
+  FunctionDefine::FunctionDefine(Option<String> name, Vec<meta::VariableDefinition> params, Box<Expression> body)
     : name(std::move(name)), params{std::move(params)}, body{std::move(body)} {}
 
-  const Expression &Function::get_body() const { return body; }
-
-  const Vec<meta::VariableDefinition> &Function::get_params() const { return params; }
-
-  String Function::to_string() const {
+  String FunctionDefine::to_string() const {
     std::stringstream stream{};
 
     for (const auto &param: params) {
@@ -24,7 +20,11 @@ namespace goos::ast::expression {
     return fmt::format("fn ({}) = {}", stream.str(), body->to_string());
   }
 
-  Option<meta::VariantType> Function::variant_type() {
+  Option<meta::VariantType> FunctionDefine::variant_type() {
     return body->variant_type();
   }
+
+  const Expression& FunctionDefine::get_body() const { return body; }
+
+  const Vec<meta::VariableDefinition>& FunctionDefine::get_params() const { return params; }
 }
