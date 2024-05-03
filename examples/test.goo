@@ -1,10 +1,8 @@
 #!/bin/goo
 
-# math.goo 
-use math; 
-
 let math = use("math");
 
+# math.goo 
 
 # i borrowed 
 let a = math.times_two(2);
@@ -26,10 +24,7 @@ mutable_variable += 1;
 if true then log("");
 
 unless false {
-
   log("bruh");
-
-
 }
 
 unless false {
@@ -114,6 +109,34 @@ dictionary = {
 
 return pokemon;
 
+let iterator = fn(lower_bound, upper_bound) {
+  return {
+    num = lower_bound,
+    upper = upper_bound,
+
+    next = fn(self) {
+      num += 1;
+      return if num < upper_bound then num else 0;
+    },
+  };
+};
+
+class Iterator {
+};
+
+
+let i;
+
+while (i = iterator.next()) {
+  log("{i}");
+}
+
+for i in iterator {
+  log("{i}");
+}
+
+
+
 
 
 # (int, int)
@@ -142,11 +165,7 @@ until false {
 let a = match huh {
   0 => log("0"),
   default => log("huh")
-
-
-
 };
-
 
 let a = Vec2.new();
 
@@ -170,6 +189,7 @@ add_animation {
 };
 
 add_animation("Huh") fn {
+
 };
 
 #
