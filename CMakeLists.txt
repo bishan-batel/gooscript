@@ -33,8 +33,8 @@ set(SOURCE_FILES
         src/ast/Statement.cpp
         src/ast/Statement.hpp
         src/meta/VariantType.hpp
-        src/ast/expression/literal/FunctionDefine.cpp
-        src/ast/expression/literal/FunctionDefine.hpp
+        src/ast/expression/literal/Lambda.cpp
+        src/ast/expression/literal/Lambda.hpp
         src/meta/VariableDefinition.cpp
         src/meta/VariableDefinition.hpp
         src/ast/expression/FunctionCall.cpp
@@ -55,6 +55,18 @@ set(SOURCE_FILES
         src/ast/expression/literal/Unit.hpp
         src/ast/expression/literal/Nil.cpp
         src/ast/expression/literal/Nil.hpp
+        src/ast/statements/Return.cpp
+        src/ast/statements/Return.hpp
+        src/ast/expression/compound/If.cpp
+        src/ast/expression/compound/If.hpp
+        src/ast/expression/compound/While.cpp
+        src/ast/expression/compound/While.hpp
+        src/ast/VariableDeclare.cpp
+        src/ast/VariableDeclare.hpp
+        src/ast/expression/IdentifierBinding.cpp
+        src/ast/expression/IdentifierBinding.hpp
+        src/ast/expression/BuiltinLambda.cpp
+        src/ast/expression/BuiltinLambda.hpp
 )
 
 
