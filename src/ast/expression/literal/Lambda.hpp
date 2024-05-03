@@ -9,14 +9,12 @@
 #include "meta/VariableDefinition.hpp"
 
 namespace goos::ast::expression {
-  class FunctionDefine final : public Expression {
-    Option<String> name;
+  class Lambda final : public Expression {
     Vec<meta::VariableDefinition> params;
     Box<Expression> body;
 
   public:
-    explicit FunctionDefine(
-      Option<String> name,
+    explicit Lambda(
       Vec<meta::VariableDefinition> params,
       Box<Expression> body
     );
