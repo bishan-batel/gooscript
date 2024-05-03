@@ -5,10 +5,6 @@
 #include "Nil.hpp"
 
 namespace goos::ast::expression {
-  Nil::Nil() {
-    throw std::logic_error("Not implemented");
-  }
-
   String Nil::to_string() const {
     return "nil";
   }

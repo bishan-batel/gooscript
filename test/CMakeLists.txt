@@ -4,6 +4,7 @@ CPMAddPackage("gh:catchorg/Catch2@3.5.4")
 # Tests
 add_executable(gooscript-tests
         lexer.cpp
+        ast.cpp
 )
 
 target_link_libraries(gooscript-tests PRIVATE Catch2::Catch2WithMain crab fmt gooscript)

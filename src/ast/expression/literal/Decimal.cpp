@@ -12,7 +12,7 @@ namespace goos::ast::expression {
   f64 Decimal::get_number() const { return literal; }
 
   String Decimal::to_string() const {
-    return fmt::format("");
+    return fmt::format("{}D", literal);
   }
 
   Box<Expression> Decimal::clone_expr() const {

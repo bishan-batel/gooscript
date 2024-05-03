@@ -39,8 +39,8 @@ set(SOURCE_FILES
         src/meta/VariableDefinition.hpp
         src/ast/expression/FunctionCall.cpp
         src/ast/expression/FunctionCall.hpp
-        src/ast/expression/literal/String.cpp
-        src/ast/expression/literal/String.hpp
+        src/ast/expression/literal/StringLiteral.cpp
+        src/ast/expression/literal/StringLiteral.hpp
         src/ast/expression/literal/Decimal.cpp
         src/ast/expression/literal/Decimal.hpp
         src/ast/expression/literal/Integer.cpp

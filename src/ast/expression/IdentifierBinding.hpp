@@ -9,14 +9,14 @@
 
 namespace goos::ast::expression {
   class IdentifierBinding final : public Expression {
-    String identifier;
+    ::String identifier;
 
   public:
-    explicit IdentifierBinding(String identifier);
+    explicit IdentifierBinding(::String identifier);
 
-    [[nodiscard]] const String& get_identifier() const;
+    [[nodiscard]] const ::String& get_identifier() const;
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] ::String to_string() const override;
 
     [[nodiscard]] Box<Expression> clone_expr() const override;
   };
