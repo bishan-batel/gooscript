@@ -6,7 +6,6 @@
 #include <box.hpp>
 
 #include "ast/Expression.hpp"
-#include "meta/VariableDefinition.hpp"
 
 namespace goos::ast::expression {
   class Lambda final : public Expression {

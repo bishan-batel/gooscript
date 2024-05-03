@@ -35,8 +35,6 @@ set(SOURCE_FILES
         src/meta/VariantType.hpp
         src/ast/expression/literal/Lambda.cpp
         src/ast/expression/literal/Lambda.hpp
-        src/meta/VariableDefinition.cpp
-        src/meta/VariableDefinition.hpp
         src/ast/expression/FunctionCall.cpp
         src/ast/expression/FunctionCall.hpp
         src/ast/expression/literal/StringLiteral.cpp
