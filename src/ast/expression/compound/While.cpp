@@ -17,7 +17,7 @@ namespace goos::ast::expression {
     return fmt::format("while {} {{ {} }}", condition->to_string(), body->to_string());
   }
 
-  Option<meta::VariantType> While::variant_type() const {
-    return crab::some(meta::VariantType::UNIT);
+  Box<Expression> While::clone_expr() const {
+    return crab::make_box<While>(condition->clone_expr(), body->clone_expr());
   }
 } // namespace goos::ast::expression

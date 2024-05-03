@@ -7,14 +7,14 @@
 #include "ast/Expression.hpp"
 
 namespace goos ::ast ::expression {
-  class If final: public Expression {
-      Box<Expression> condition, then, else_then;
+  class If final : public Expression {
+    Box<Expression> condition, then, else_then;
 
-    public:
-      If(Box<Expression> condition, Box<Expression> then, Box<Expression> else_then);
+  public:
+    If(Box<Expression> condition, Box<Expression> then, Box<Expression> else_then);
 
-      [[nodiscard]] String to_string() const override;
+    [[nodiscard]] String to_string() const override;
 
-      [[nodiscard]] Option<meta::VariantType> variant_type() const override;
+    [[nodiscard]] Box<Expression> clone_expr() const override;
   };
 } // namespace goos::ast::expression

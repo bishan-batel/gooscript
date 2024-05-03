@@ -3,3 +3,5 @@
 //
 
 #include "Expression.hpp"
+
+Box<goos::ast::Statement> goos::ast::Expression::clone() const { return clone_expr(); }

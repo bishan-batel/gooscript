@@ -11,7 +11,5 @@ namespace goos::ast::expression {
     return "unit";
   }
 
-  Option<meta::VariantType> Unit::variant_type() const {
-    return crab::some(meta::VariantType::UNIT);
-  }
+  Box<Expression> Unit::clone_expr() const { return crab::make_box<Unit>(); }
 }

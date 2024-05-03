@@ -10,22 +10,30 @@
 #include "ast/expression/literal/Unit.hpp"
 #include "ast/statements/Eval.hpp"
 
-goos::ast::expression::ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements)
-  : statements{std::move(statements)}, eval{crab::make_box<Eval>(crab::make_box<Unit>())} {}
+namespace goos::ast::expression {
+  ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements)
+    : statements{std::move(statements)}, eval{crab::make_box<Eval>(crab::make_box<Unit>())} {}
 
-goos::ast::expression::ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements, Box<Eval> eval)
-  : statements{std::move(statements)}, eval{std::move(eval)} {}
+  ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements, Box<Eval> eval)
+    : statements{std::move(statements)}, eval{std::move(eval)} {}
 
-String goos::ast::expression::ScopeBlock::to_string() const {
-  std::stringstream stream{};
+  String ScopeBlock::to_string() const {
+    std::stringstream stream{};
 
-  for (const auto &statement: statements) {
-    stream << statement->to_string() << ";\n";
+    for (const auto &statement: statements) {
+      stream << statement->to_string() << ";\n";
+    }
+
+    return fmt::format("scope {{ {} }}", stream.str());
   }
 
-  return fmt::format("scope {{ {} }}", stream.str());
-}
+  Box<Expression> ScopeBlock::clone_expr() const {
+    Vec<Box<Statement>> statements{};
 
-Option<goos::meta::VariantType> goos::ast::expression::ScopeBlock::variant_type() const {
-  return eval->get_expr().variant_type();
+    for (const auto &statement: statements) {
+      statements.push_back(statement->clone());
+    }
+
+    return crab::make_box<ScopeBlock>(std::move(statements));
+  }
 }

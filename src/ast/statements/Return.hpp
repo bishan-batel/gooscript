@@ -15,5 +15,7 @@ namespace goos::ast {
 
       [[nodiscard]] const Expression &get_expression() const;
       [[nodiscard]] String to_string() const override;
+
+      [[nodiscard]] Box<Statement> clone() const override;
   };
 } // namespace goos::ast

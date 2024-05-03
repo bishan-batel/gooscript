@@ -6,11 +6,13 @@
 #include "Eval.hpp"
 
 namespace goos::ast {
-  Eval::Eval(Box<Expression> expr): expr{std::move(expr)} {}
+  Eval::Eval(Box<Expression> expr): expression{std::move(expr)} {}
 
-  const Expression& Eval::get_expr() const { return expr; }
+  const Expression& Eval::get_expression() const { return expression; }
 
   String Eval::to_string() const {
-    return fmt::format("eval ({})", expr->to_string());
+    return fmt::format("eval ({})", expression->to_string());
   }
+
+  Box<Statement> Eval::clone() const { return crab::make_box<Eval>(expression->clone_expr()); }
 }

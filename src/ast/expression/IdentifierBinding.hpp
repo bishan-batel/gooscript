@@ -18,6 +18,6 @@ namespace goos::ast::expression {
 
     [[nodiscard]] String to_string() const override;
 
-    [[nodiscard]] Option<meta::VariantType> variant_type() const override;
+    [[nodiscard]] Box<Expression> clone_expr() const override;
   };
 }

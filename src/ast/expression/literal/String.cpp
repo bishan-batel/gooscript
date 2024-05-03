@@ -14,7 +14,7 @@ namespace goos::ast::expression {
     return fmt::format("\"{}\"", literal);
   }
 
-  Option<meta::VariantType> String::variant_type() const {
-    return crab::some(meta::VariantType::STRING);
+  Box<Expression> String::clone_expr() const {
+    return crab::make_box<String>(literal);
   }
 }

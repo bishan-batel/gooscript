@@ -10,13 +10,15 @@
 
 namespace goos::ast {
   class Eval final : public Statement {
-    Box<Expression> expr;
+    Box<Expression> expression;
 
   public:
     explicit Eval(Box<Expression> expr);
 
-    [[nodiscard]] const Expression& get_expr() const;
+    [[nodiscard]] const Expression& get_expression() const;
 
     [[nodiscard]] String to_string() const override;
+
+    [[nodiscard]] Box<Statement> clone() const override;
   };
 }

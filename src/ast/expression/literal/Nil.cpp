@@ -13,7 +13,5 @@ namespace goos::ast::expression {
     return "nil";
   }
 
-  Option<meta::VariantType> Nil::variant_type() const {
-    return crab::some(meta::VariantType::NIL);
-  }
+  Box<Expression> Nil::clone_expr() const { return crab::make_box<Nil>(); }
 } // goos

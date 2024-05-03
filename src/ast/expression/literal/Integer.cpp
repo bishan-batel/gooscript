@@ -13,7 +13,5 @@ namespace goos::ast::expression {
     return fmt::format("{}", number);
   }
 
-  Option<meta::VariantType> Integer::variant_type() const {
-    return meta::VariantType::INTEGER;
-  }
+  Box<Expression> Integer::clone_expr() const { return crab::make_box<Integer>(number); }
 }

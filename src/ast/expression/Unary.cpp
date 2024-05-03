@@ -15,7 +15,7 @@ namespace goos::ast::expression {
     return fmt::format("{} ({})", lexer::OPERATOR_TO_STR_MAP.at(op), expr->to_string());
   }
 
-  Option<meta::VariantType> Unary::variant_type() const {
-    return expr->variant_type();
+  Box<Expression> Unary::clone_expr() const {
+    return crab::make_box<Unary>(op, expr->clone_expr());
   }
 }

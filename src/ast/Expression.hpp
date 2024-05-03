@@ -14,6 +14,8 @@ namespace goos::ast {
   public:
     Expression() = default;
 
-    [[nodiscard]] virtual Option<meta::VariantType> variant_type() const = 0;
+    [[nodiscard]] virtual Box<Expression> clone_expr() const = 0;
+
+    [[nodiscard]] Box<Statement> clone() const override final;
   };
 }

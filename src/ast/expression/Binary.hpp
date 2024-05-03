@@ -15,12 +15,12 @@ namespace goos::ast::expression {
   public:
     Binary(Box<Expression> lhs, lexer::Operator op, Box<Expression> rhs);
 
-    [[nodiscard]] const Expression &get_lhs() const;
+    [[nodiscard]] const Expression& get_lhs() const;
 
-    [[nodiscard]] const Expression &get_rhs() const;
+    [[nodiscard]] const Expression& get_rhs() const;
 
     [[nodiscard]] String to_string() const override;
 
-    Option<meta::VariantType> variant_type() const override;
+    [[nodiscard]] Box<Expression> clone_expr() const override;
   };
 }

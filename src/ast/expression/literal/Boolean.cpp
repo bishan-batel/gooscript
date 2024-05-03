@@ -13,7 +13,5 @@ namespace goos::ast::expression {
     return fmt::format(":boolalpha", state);
   }
 
-  Option<meta::VariantType> Boolean::variant_type() const {
-    return crab::some(meta::VariantType::BOOLEAN);
-  }
+  Box<Expression> Boolean::clone_expr() const { return crab::make_box<Boolean>(state); }
 }

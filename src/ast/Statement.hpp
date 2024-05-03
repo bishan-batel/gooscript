@@ -6,8 +6,9 @@
 
 #include <option.hpp>
 #include <preamble.hpp>
+#include <box.hpp>
 
-#include "ref.hpp"
+#include <ref.hpp>
 
 namespace goos::ast {
   class Statement {
@@ -18,17 +19,19 @@ namespace goos::ast {
 
     Statement(Statement &&) = default;
 
-    Statement &operator=(const Statement &) = delete;
+    Statement& operator=(const Statement &) = delete;
 
-    Statement &operator=(Statement &&) = default;
+    Statement& operator=(Statement &&) = default;
 
     virtual ~Statement() = default;
 
     template<typename T> requires std::is_base_of_v<Statement, T>
-    Option<Ref<T> > try_as() const {
-      return crab::ref::from_ptr(dynamic_cast<const T *>(this));
+    Option<Ref<T>> try_as() const {
+      return crab::ref::from_ptr(dynamic_cast<const T*>(this));
     }
 
     [[nodiscard]] virtual String to_string() const = 0;
+
+    [[nodiscard]] virtual Box<Statement> clone() const = 0;
   };
 }

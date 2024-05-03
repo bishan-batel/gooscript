@@ -22,5 +22,13 @@ namespace goos::ast::expression {
     return fmt::format("funcall({})({})", function->to_string(), stream.str());
   }
 
-  Option<meta::VariantType> FunctionCall::variant_type() const { return crab::none; }
+  Box<Expression> FunctionCall::clone_expr() const {
+    Vec<Box<Expression>> arguments_clone{};
+
+    for (const auto &arg: arguments) {
+      arguments_clone.push_back(arg->clone_expr());
+    }
+
+    return crab::make_box<FunctionCall>(function->clone_expr(), std::move(arguments_clone));
+  }
 }

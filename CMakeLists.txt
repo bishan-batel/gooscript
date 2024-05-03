@@ -61,12 +61,12 @@ set(SOURCE_FILES
         src/ast/expression/compound/If.hpp
         src/ast/expression/compound/While.cpp
         src/ast/expression/compound/While.hpp
-        src/ast/VariableDeclare.cpp
-        src/ast/VariableDeclare.hpp
         src/ast/expression/IdentifierBinding.cpp
         src/ast/expression/IdentifierBinding.hpp
-        src/ast/expression/BuiltinLambda.cpp
-        src/ast/expression/BuiltinLambda.hpp
+        src/ast/expression/literal/Array.cpp
+        src/ast/expression/literal/Array.hpp
+        src/ast/expression/literal/Dictionary.cpp
+        src/ast/expression/literal/Dictionary.hpp
 )
 
 

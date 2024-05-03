@@ -15,7 +15,7 @@ namespace goos::ast::expression {
     return fmt::format("");
   }
 
-  Option<meta::VariantType> Decimal::variant_type() const {
-    return crab::some(meta::VariantType::DECIMAL);
+  Box<Expression> Decimal::clone_expr() const {
+    return crab::make_box<Decimal>(literal);
   }
 }

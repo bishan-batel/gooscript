@@ -12,5 +12,7 @@ namespace goos::ast::expression {
 
   String IdentifierBinding::to_string() const { return identifier; }
 
-  Option<meta::VariantType> IdentifierBinding::variant_type() const { return crab::none; }
+  Box<Expression> IdentifierBinding::clone_expr() const {
+    return crab::make_box<IdentifierBinding>(identifier);
+  }
 }
