@@ -5,7 +5,7 @@
 #include <fmt/format.h>
 #include "Eval.hpp"
 
-namespace goos::ast::expression {
+namespace goos::ast {
   Eval::Eval(Box<Expression> expr): expr{std::move(expr)} {}
 
   const Expression& Eval::get_expr() const { return expr; }

@@ -8,7 +8,7 @@
 #include "ast/Expression.hpp"
 #include "ast/Statement.hpp"
 
-namespace goos::ast::expression {
+namespace goos::ast {
   class Eval final : public Statement {
     Box<Expression> expr;
 
