@@ -7,7 +7,7 @@
 namespace goos::token {
   StringLiteral::StringLiteral(const StringView string) : literal(string) {}
 
-  Box<Token> StringLiteral::clone() const { return crab::make_box<StringLiteral>(*this); }
+  Box<Token> StringLiteral::clone() const { return crab::make_box<StringLiteral>(literal); }
 
   String StringLiteral::to_string() const {
     return fmt::format("\"{}\"", literal);

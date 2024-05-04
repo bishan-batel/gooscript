@@ -65,6 +65,12 @@ set(SOURCE_FILES
         src/ast/expression/literal/Array.hpp
         src/ast/expression/literal/Dictionary.cpp
         src/ast/expression/literal/Dictionary.hpp
+        src/parser/TokenStream.cpp
+        src/parser/TokenStream.hpp
+        src/token/EndOfFile.cpp
+        src/token/EndOfFile.hpp
+        src/parser/Error.cpp
+        src/parser/Error.hpp
 )
 
 

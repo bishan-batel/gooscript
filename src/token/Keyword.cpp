@@ -10,7 +10,7 @@ namespace goos::token {
   lexer::Keyword Keyword::get_word() const { return word; }
 
   Box<Token> Keyword::clone() const {
-    return crab::make_box<Keyword>(*this);
+    return crab::make_box<Keyword>(word);
   }
 
   String Keyword::to_string() const {

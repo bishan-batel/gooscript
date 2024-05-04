@@ -1,3 +1,3 @@
-# Headline
+# Gooscript
 
-> An awesome project.
+> cringe programming language 

@@ -8,7 +8,7 @@ namespace goos::token {
     StringView slice;
 
   public:
-    Token(const Token &) = default;
+    Token(const Token &) = delete;
 
     Token() = default;
 

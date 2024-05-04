@@ -9,7 +9,7 @@ namespace goos::token {
 
   f64 Decimal::get_number() const { return number; }
 
-  Box<Token> Decimal::clone() const { return crab::make_box<Decimal>(*this); }
+  Box<Token> Decimal::clone() const { return crab::make_box<Decimal>(number); }
 
   String Decimal::to_string() const {
     return fmt::format("{}D", number);

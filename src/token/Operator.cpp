@@ -10,7 +10,7 @@ namespace goos::token {
   lexer::Operator Operator::get_op() const { return op; }
 
   Box<Token> Operator::clone() const {
-    return crab::make_box<Operator>(*this);
+    return crab::make_box<Operator>(op);
   }
 
   String Operator::to_string() const {

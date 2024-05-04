@@ -3,3 +3,5 @@
 //
 
 #include "Error.hpp"
+
+goos::parser::Error::Error(const token::Token &token) : token{token.clone()} {}

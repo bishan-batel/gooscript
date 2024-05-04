@@ -9,7 +9,7 @@ namespace goos::token {
 
   StringView Identifier::get_identifier() const { return identifier; }
 
-  Box<Token> Identifier::clone() const { return crab::make_box<Identifier>(*this); }
+  Box<Token> Identifier::clone() const { return crab::make_box<Identifier>(identifier); }
 
   String Identifier::to_string() const {
     return fmt::format("{}", identifier);

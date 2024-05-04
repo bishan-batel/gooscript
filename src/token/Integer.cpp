@@ -9,7 +9,7 @@ namespace goos::token {
 
   i64 Integer::get_number() const { return number; }
 
-  Box<Token> Integer::clone() const { return crab::make_box<Integer>(*this); }
+  Box<Token> Integer::clone() const { return crab::make_box<Integer>(number); }
 
   String Integer::to_string() const { return fmt::format("{}", number); }
 
