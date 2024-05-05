@@ -37,15 +37,16 @@ let times_two = fn() {
 
 # IR / Bytecode
 
-var $i
-set $i, :0
+var $i #420
+push $i 
+set $i, #0
 
 # While Loop
 (@a0) jf  @a1, true 
-add $i, :1
+add $i, #1
 
 # If Statement
-(@b0) jle @b1, $i, :10
+(@b0) jle @b1, $i, #10
 
 jmp @a1
 jmp @b1
