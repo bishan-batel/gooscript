@@ -7,6 +7,7 @@
 #include <preamble.hpp>
 #include <lexer/Keyword.hpp>
 #include <lexer/Operator.hpp>
+#include <token/Keyword.hpp>
 #include <token/Operator.hpp>
 
 #include "Error.hpp"
@@ -72,10 +73,10 @@ namespace goos::parser {
     [[nodiscard]] bool try_consume(lexer::Keyword word);
 
     [[nodiscard]]
-    Result<lexer::Keyword> consume_keyword();
+    Result<lexer::Keyword> consume_keyword(Span<lexer::Keyword> allowed = {});
 
     [[nodiscard]]
-    Result<String> consume_operator();
+    Result<lexer::Operator> consume_operator(Span<lexer::Operator> allowed = {});
 
     [[nodiscard]]
     Result<String> consume_identifier();
@@ -87,5 +88,9 @@ namespace goos::parser {
     err::Error error(Args &&... args) {
       return err::Error{crab::make_box<T, Args...>(std::forward<Args>(args)...)};
     }
+
+    err::Error unexpected(String expected);
+
+    err::Error unexpected(String expected, Box<token::Token> received);
   };
 }
