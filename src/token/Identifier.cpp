@@ -7,7 +7,7 @@
 namespace goos::token {
   Identifier::Identifier(String word) : identifier{std::move(word)} {}
 
-  StringView Identifier::get_identifier() const { return identifier; }
+  const String& Identifier::get_identifier() const { return identifier; }
 
   Box<Token> Identifier::clone() const { return crab::make_box<Identifier>(identifier); }
 

@@ -55,7 +55,7 @@ namespace goos::token {
   public:
     explicit Identifier(String word);
 
-    [[nodiscard]] StringView get_identifier() const;
+    [[nodiscard]] const String& get_identifier() const;
 
     [[nodiscard]] Box<Token> clone() const override;
 
