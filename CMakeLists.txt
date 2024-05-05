@@ -71,6 +71,10 @@ set(SOURCE_FILES
         src/token/EndOfFile.hpp
         src/parser/Error.cpp
         src/parser/Error.hpp
+        src/parser/pass/statement/block.cpp
+        src/parser/pass/statement/block.hpp
+        src/parser/pass/statement/statement.hpp
+        src/parser/pass/statement/statement.cpp
 )
 
 

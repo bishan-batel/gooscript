@@ -106,7 +106,7 @@
       <option name="/Default/CodeStyle/Naming/CppNaming/Rules/=Global_0020constants/@EntryIndexedValue" value="&lt;NamingElement Priority=&quot;16&quot;&gt;&lt;Descriptor Static=&quot;Indeterminate&quot; Constexpr=&quot;Indeterminate&quot; Const=&quot;True&quot; Volatile=&quot;Indeterminate&quot; Accessibility=&quot;NOT_APPLICABLE&quot;&gt;&lt;type Name=&quot;global variable&quot; /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect=&quot;True&quot; Prefix=&quot;&quot; Suffix=&quot;&quot; Style=&quot;AA_BB&quot; /&gt;&lt;/NamingElement&gt;" type="string" />
       <option name="/Default/CodeStyle/Naming/CppNaming/Rules/=Typedefs/@EntryIndexedValue" value="&lt;NamingElement Priority=&quot;18&quot;&gt;&lt;Descriptor Static=&quot;Indeterminate&quot; Constexpr=&quot;Indeterminate&quot; Const=&quot;Indeterminate&quot; Volatile=&quot;Indeterminate&quot; Accessibility=&quot;NOT_APPLICABLE&quot;&gt;&lt;type Name=&quot;type alias&quot; /&gt;&lt;type Name=&quot;typedef&quot; /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect=&quot;True&quot; Prefix=&quot;&quot; Suffix=&quot;&quot; Style=&quot;aa_bb&quot;&gt;&lt;ExtraRule Prefix=&quot;&quot; Suffix=&quot;&quot; Style=&quot;AaBb&quot; /&gt;&lt;/Policy&gt;&lt;/NamingElement&gt;" type="string" />
       <option name="/Default/CodeStyle/Naming/CppNaming/Rules/=Macros/@EntryIndexedValue" value="&lt;NamingElement Priority=&quot;19&quot;&gt;&lt;Descriptor Static=&quot;Indeterminate&quot; Constexpr=&quot;Indeterminate&quot; Const=&quot;Indeterminate&quot; Volatile=&quot;Indeterminate&quot; Accessibility=&quot;NOT_APPLICABLE&quot;&gt;&lt;type Name=&quot;macro&quot; /&gt;&lt;/Descriptor&gt;&lt;Policy Inspect=&quot;True&quot; Prefix=&quot;&quot; Suffix=&quot;&quot; Style=&quot;AA_BB&quot;&gt;&lt;ExtraRule Prefix=&quot;&quot; Suffix=&quot;&quot; Style=&quot;aa_bb&quot; /&gt;&lt;/Policy&gt;&lt;/NamingElement&gt;" type="string" />
-      <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppWrongSlashesInIncludeDirective/@EntryIndexedValue" value="WARNING" type="string" />
+      <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppWrongSlashesInIncludeDirective/@EntryIndexedValue" value="ERROR" type="string" />
       <option name="/Default/CodeStyle/CppPreferForwardDeclaration/PreferForwardDeclarations/@EntryValue" value="false" type="bool" />
       <option name="/Default/CodeStyle/CppIncludeDirective/UseAngleBracketsInsteadOfQuotes/@EntryValue" value="ForNonProjectFiles" type="string" />
       <option name="/Default/CodeInspection/CppInitialization/UseUniformInitializationInMemberInitializers/@EntryValue" value="true" type="bool" />
@@ -131,6 +131,7 @@
       <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_PREPROCESSOR_DIRECTIVES/@EntryValue" value="Normal" type="string" />
       <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_EXPRESSION_BRACES/@EntryValue" value="true" type="bool" />
       <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppEnforceFunctionDeclarationStyle/@EntryIndexedValue" value="WARNING" type="string" />
+      <option name="/Default/CodeStyle/CppIncludeDirective/UseRelativePaths/@EntryValue" value="Never" type="string" />
     </RiderCodeStyleSettings>
     <files>
       <extensions>
