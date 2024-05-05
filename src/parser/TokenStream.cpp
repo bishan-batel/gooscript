@@ -17,8 +17,8 @@ namespace goos::parser {
     return list[position];
   }
 
-  const token::Token& TokenStream::next() {
-    position++;
+  const token::Token& TokenStream::next(const usize i) {
+    position += i;
     return curr();
   }
 
@@ -32,6 +32,20 @@ namespace goos::parser {
 
   bool TokenStream::is_curr(const lexer::Keyword &token) const {
     return token::Keyword{token} == curr();
+  }
+
+  bool TokenStream::try_consume(const lexer::Operator op) {
+    if (auto tok = try_consume<token::Operator>()) {
+      return tok.get_unchecked()->get_op() == op;
+    }
+    return false;
+  }
+
+  bool TokenStream::try_consume(const lexer::Keyword word) {
+    if (auto tok = try_consume<token::Keyword>()) {
+      return tok.get_unchecked()->get_word() == word;
+    }
+    return false;
   }
 
   bool TokenStream::is_eof() const {
