@@ -14,56 +14,57 @@ namespace goos::lexer {
     PARENTHETICAL_CLOSE_FLAG = 1 << 24,
   };
 
-  #define binary(x) ((x) | BINARY_FLAG)
-  #define assign(x) ((x) | BINARY_FLAG | ASSIGN_FLAG)
+  #define binary (__COUNTER__ | BINARY_FLAG)
+  #define assign (__COUNTER__ | BINARY_FLAG | ASSIGN_FLAG)
 
-  #define compare(x) ((x) | BINARY_FLAG | COMPARISON_FLAG)
-  #define unary(x) ((x) | UNARY_FLAG)
-  #define delimiter(x) ((x) | DELIMITER_FLAG)
+  #define compare (__COUNTER__ | BINARY_FLAG | COMPARISON_FLAG)
+  #define unary (__COUNTER__ | UNARY_FLAG)
+  #define delimiter (__COUNTER__ | DELIMITER_FLAG)
 
-  #define paren(x, closed) ((x) | PARENTHETICAL_##closed##_FLAG)
+  #define paren(closed) (__COUNTER__ | PARENTHETICAL_##closed##_FLAG)
 
   enum class [[maybe_unused]] Operator : u32 {
-    ASSIGN = assign(0),
-    MOD_ASSIGN = assign(1),
-    MUL_ASSIGN = assign(2),
-    DIV_ASSIGN = assign(3),
-    ADD_ASSIGN = assign(4),
-    SUB_ASSIGN = assign(5),
-    BIT_OR_ASSIGN = assign(6),
-    BIT_AND_ASSIGN = assign(7),
+    ASSIGN = assign,
+    MOD_ASSIGN = assign,
+    MUL_ASSIGN = assign,
+    DIV_ASSIGN = assign,
+    ADD_ASSIGN = assign,
+    SUB_ASSIGN = assign,
+    BIT_OR_ASSIGN = assign,
+    BIT_AND_ASSIGN = assign,
 
-    XOR = binary(8),
-    BIT_OR = binary(9),
-    BIT_AND = binary(10),
-    AND = binary(11),
-    OR = binary(12),
-    NOT = unary(13),
-    EQUALS = compare(14),
-    NOT_EQUALS = compare(15),
-    GREATER = compare(16),
-    LESS = compare(17),
-    GREATER_OR_EQUALS = compare(18),
-    LESS_OR_EQUALS = compare(19),
-    SHIFT_LEFT = binary(20),
-    SHIFT_RIGHT = binary(21),
-    ADD = binary(22),
-    SUB = binary(23),
-    MUL = binary(24),
-    DIV = binary(25),
-    MOD = binary(26),
-    ARROW = delimiter(27),
-    SEMICOLON = delimiter(28),
-    COMMA = delimiter(29),
+    XOR = binary,
+    BIT_OR = binary,
+    BIT_AND = binary,
+    AND = binary,
+    OR = binary,
+    NOT = unary,
+    EQUALS = compare,
+    NOT_EQUALS = compare,
+    GREATER = compare,
+    LESS = compare,
+    GREATER_OR_EQUALS = compare,
+    LESS_OR_EQUALS = compare,
+    SHIFT_LEFT = binary,
+    SHIFT_RIGHT = binary,
+    ADD = binary,
+    SUB = binary,
+    MUL = binary,
+    DIV = binary,
+    MOD = binary,
+    ARROW = delimiter,
+    THIN_ARROW = delimiter,
+    SEMICOLON = delimiter,
+    COMMA = delimiter,
 
-    PAREN_OPEN = paren(30, OPEN),
-    PAREN_CLOSE = paren(30, CLOSE),
+    PAREN_OPEN = paren(OPEN),
+    PAREN_CLOSE = paren(CLOSE),
 
-    BRACKET_OPEN = paren(31, OPEN),
-    BRACKET_CLOSE = paren(31, CLOSE),
+    BRACKET_OPEN = paren(OPEN),
+    BRACKET_CLOSE = paren(CLOSE),
 
-    CURLY_OPEN = paren(32, OPEN),
-    CURLY_CLOSE = paren(32, CLOSE),
+    CURLY_OPEN = paren(OPEN),
+    CURLY_CLOSE = paren(CLOSE),
   };
 
   static const Dictionary<StringView, Operator> STR_TO_OPERATOR_MAP{
