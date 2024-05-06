@@ -75,6 +75,10 @@ set(SOURCE_FILES
         src/parser/pass/statement/block.hpp
         src/parser/pass/statement/statement.hpp
         src/parser/pass/statement/statement.cpp
+        src/source/SourceFile.cpp
+        src/source/SourceFile.hpp
+        src/source/IoError.cpp
+        src/source/IoError.hpp
 )
 
 

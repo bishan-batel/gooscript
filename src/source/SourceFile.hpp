@@ -30,6 +30,6 @@ namespace goos {
 
     [[nodiscard]] Option<Ref<String>> get_name() const;
 
-    [[nodiscard]] const String& get_contents() const;
+    [[nodiscard]] const WideString& get_contents() const;
   };
 } // goos

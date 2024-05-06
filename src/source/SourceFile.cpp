@@ -18,7 +18,7 @@ namespace goos {
     return crab::ok(
       SourceFile(
         path.string(),
-        (std::stringstream{} << stream.rdbuf()).str()
+        (WideStringStream{} << stream.rdbuf()).str()
       )
     );
   }
@@ -28,7 +28,7 @@ namespace goos {
     return crab::some(Ref{name->get_unchecked()});
   }
 
-  const String& SourceFile::get_contents() const { return contents; }
+  const WideString& SourceFile::get_contents() const { return contents; }
 
   SourceFile::SourceFile(String name, WideString contents)
     : name{crab::some(std::move(name))}, contents{std::move(contents)} {}
