@@ -11,7 +11,7 @@ namespace goos::ast {
   VariableDeclaration::VariableDeclaration(WideString name, const meta::Mutability mutability)
     : name{std::move(name)}, mutability{mutability} {}
 
-  WideString VariableDeclaration::to_string() const {
+  auto VariableDeclaration::to_string() const -> WideString {
     WideStringView ty{};
     switch (mutability) {
       case meta::Mutability::CONSTANT:
@@ -27,15 +27,15 @@ namespace goos::ast {
     return fmt::format(L"{} {}", ty, name);
   }
 
-  Box<Statement> VariableDeclaration::clone() const {
+  auto VariableDeclaration::clone() const -> Box<Statement> {
     return crab::make_box<VariableDeclaration>(name, mutability);
   }
 
-  meta::Mutability VariableDeclaration::get_mutability() const {
+  auto VariableDeclaration::get_mutability() const -> meta::Mutability {
     return mutability;
   }
 
-  bool VariableDeclaration::operator==(const Statement &statement) const {
+  auto VariableDeclaration::operator==(const Statement &statement) const -> bool {
     if (Option<Ref<VariableDeclaration>> opt = crab::ref::cast<VariableDeclaration>(statement)) {
       const Ref<VariableDeclaration> other{opt.take_unchecked()};
       return other->mutability == mutability and other->name == name;

@@ -3,7 +3,6 @@
 //
 
 #pragma once
-#include <rc.hpp>
 #include <box.hpp>
 #include <token/Token.hpp>
 
@@ -31,7 +30,7 @@ namespace goos::lexer {
   public:
     Error(Type type, SourceFile section, Range<> range);
 
-    [[nodiscard]] String what() const override;
+    [[nodiscard]] auto what() const -> String override;
 
     [[nodiscard]] auto get_type() const -> Type;
   };
@@ -53,35 +52,35 @@ namespace goos::lexer {
 
     explicit Lexer(SourceFile content);
 
-    [[nodiscard]] Error error(Error::Type, usize begin) const;
+    [[nodiscard]] auto error(Error::Type, usize begin) const -> Error;
 
-    void push(Box<Token> token);
+    auto push(Box<Token> token) -> void;
 
     template<typename T, typename... Args> requires std::is_constructible_v<T, Args...>
-    void emplace(Args... args) {
+    auto emplace(Args... args) -> void {
       push(crab::make_box<T>(args...));
     }
 
-    [[nodiscard]] widechar curr() const;
+    [[nodiscard]] auto curr() const -> widechar;
 
-    [[nodiscard]] bool is_curr(widechar c) const;
+    [[nodiscard]] auto is_curr(widechar c) const -> bool;
 
-    widechar next(usize n = 1);
+    auto next(usize n = 1) -> widechar;
 
-    [[nodiscard]] bool is_eof() const;
+    [[nodiscard]] auto is_eof() const -> bool;
 
   public:
-    static Result<TokenList> tokenize(SourceFile content);
+    static auto tokenize(SourceFile content) -> Result<TokenList>;
 
   private:
-    [[nodiscard]] Result<bool> whitespace();
+    [[nodiscard]] auto whitespace() -> Result<bool>;
 
-    [[nodiscard]] Result<bool> number_literal();
+    [[nodiscard]] auto number_literal() -> Result<bool>;
 
-    [[nodiscard]] Result<bool> string_literal();
+    [[nodiscard]] auto string_literal() -> Result<bool>;
 
-    [[nodiscard]] Result<bool> operator_tok();
+    [[nodiscard]] auto operator_tok() -> Result<bool>;
 
-    [[nodiscard]] Result<bool> identifier();
+    [[nodiscard]] auto identifier() -> Result<bool>;
   };
 }

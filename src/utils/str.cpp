@@ -8,11 +8,11 @@
 #include <locale>
 
 namespace goos::str {
-  String convert(WideStringView string) {
+  auto convert(const WideStringView string) -> String {
     return std::wstring_convert<std::codecvt_utf8<widechar>>().to_bytes(string.data());
   }
 
-  WideString convert(const StringView string) {
+  auto convert(const StringView string) -> WideString {
     return std::wstring_convert<std::codecvt_utf8<widechar>>().from_bytes(string.data());
   }
 }

@@ -19,25 +19,28 @@ namespace goos::ast {
 
     Statement(Statement &&) = default;
 
-    Statement& operator=(const Statement &) = delete;
+    auto operator=(const Statement &) -> Statement& = delete;
 
-    Statement& operator=(Statement &&) = default;
+    auto operator=(Statement &&) -> Statement& = default;
 
     virtual ~Statement() = default;
 
-    [[nodiscard]] virtual bool operator==(const Statement &statement) const = 0;
+    [[nodiscard]] virtual auto operator==(const Statement &statement) const -> bool = 0;
 
-    [[nodiscard]] bool operator!=(const Statement &statement) const;
+    [[nodiscard]] auto operator!=(const Statement &statement) const -> bool;
 
     template<typename T> requires std::is_base_of_v<Statement, T>
-    Option<Ref<T>> try_as() const {
-      return crab::ref::from_ptr(dynamic_cast<const T*>(this));
-    }
+    auto try_as() const -> Option<Ref<T>> ;
 
-    friend std::ostream& operator<<(std::ostream& os, const Statement& statement);
+    friend auto operator<<(std::ostream &os, const Statement &statement) -> std::ostream&;
 
-    [[nodiscard]] virtual WideString to_string() const = 0;
+    [[nodiscard]] virtual auto to_string() const -> WideString = 0;
 
-    [[nodiscard]] virtual Box<Statement> clone() const = 0;
+    [[nodiscard]] virtual auto clone() const -> Box<Statement> = 0;
   };
+
+  template<typename T> requires std::is_base_of_v<Statement, T>
+  auto Statement::try_as() const -> Option<Ref<T>> {
+    return crab::ref::from_ptr(dynamic_cast<const T*>(this));
+  }
 }

@@ -11,7 +11,7 @@
 namespace goos::ast::expression {
   Array::Array(Vec<Box<Expression>> values) : values{std::move(values)} {}
 
-  WideString Array::to_string() const {
+  auto Array::to_string() const -> WideString {
     WideStringStream stream{};
     stream << '[';
     for (const auto &value: values) {
@@ -21,7 +21,7 @@ namespace goos::ast::expression {
     return stream.str();
   }
 
-  Box<Expression> Array::clone_expr() const {
+  auto Array::clone_expr() const -> Box<Expression> {
     Vec<Box<Expression>> cloned{};
 
     for (const auto &value: values) {
@@ -31,7 +31,7 @@ namespace goos::ast::expression {
     return crab::make_box<Array>(std::move(cloned));
   }
 
-  bool Array::operator==(const Statement &statement) const {
+  auto Array::operator==(const Statement &statement) const -> bool {
     auto other_opt{crab::ref::cast<Array>(statement)};
 
     if (other_opt.is_none()) return false;

@@ -9,16 +9,16 @@
 namespace goos::ast::expression {
   Dictionary::Dictionary(Vec<Pair> pairs): pairs{std::move(pairs)} {}
 
-  const Vec<Dictionary::Pair>& Dictionary::get_pairs() const { return pairs; }
+  auto Dictionary::get_pairs() const -> const Vec<Pair>& { return pairs; }
 
-  Option<Ref<Dictionary::Pair>> Dictionary::get(const Expression &key) const {
+  auto Dictionary::get(const Expression &key) const -> Option<Ref<Pair>> {
     for (const auto &pair: pairs) {
       if (*pair.key == key) return crab::some(Ref{pair});
     }
     return crab::none;
   }
 
-  WideString Dictionary::to_string() const {
+  auto Dictionary::to_string() const -> WideString {
     WideStringStream stream{};
 
     stream << '{';
@@ -30,7 +30,7 @@ namespace goos::ast::expression {
     return stream.str();
   }
 
-  Box<Expression> Dictionary::clone_expr() const {
+  auto Dictionary::clone_expr() const -> Box<Expression> {
     Vec<Pair> cloned{};
     for (const auto &[key, value]: pairs) {
       cloned.push_back({key->clone_expr(), value->clone_expr()});
@@ -39,7 +39,7 @@ namespace goos::ast::expression {
     return crab::make_box<Dictionary>(std::move(cloned));
   }
 
-  bool Dictionary::operator==(const Statement &statement) const {
+  auto Dictionary::operator==(const Statement &statement) const -> bool {
     auto other_opt = crab::ref::cast<Dictionary>(statement);
     if (other_opt.is_none()) return false;
     const Ref<Dictionary> other{other_opt.take_unchecked()};

@@ -13,7 +13,7 @@
 // TODO final block evaluation:
 
 namespace goos::parser::pass {
-  OptionalResult<ast::Statement> block(TokenStream &stream) {
+  auto block(TokenStream &stream) -> OptionalResult<ast::Statement> {
     if (not stream.try_consume(lexer::Operator::CURLY_OPEN)) {
       return OptionalResult<ast::Statement>(crab::none);
     }
@@ -36,7 +36,7 @@ namespace goos::parser::pass {
     return crab::ok(crab::some(std::move(block_statement)));
   }
 
-  MustEvalResult<ast::expression::ScopeBlock> block_top_level(TokenStream &stream) {
+  auto block_top_level(TokenStream &stream) -> MustEvalResult<ast::expression::ScopeBlock> {
     Vec<Box<ast::Statement>> statements{};
 
     Box<ast::Eval> eval{crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())};

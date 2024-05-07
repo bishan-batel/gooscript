@@ -15,12 +15,12 @@ namespace goos::ast {
   public:
     explicit Eval(Box<Expression> expr);
 
-    [[nodiscard]] const Expression& get_expression() const;
+    [[nodiscard]] auto get_expression() const -> const Expression&;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] Box<Statement> clone() const override;
+    [[nodiscard]] auto clone() const -> Box<Statement> override;
 
-    [[nodiscard]] bool operator==(const Statement &statement) const override;
+    [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
   };
 }

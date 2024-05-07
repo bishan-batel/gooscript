@@ -4,4 +4,4 @@
 
 #include "Expression.hpp"
 
-Box<goos::ast::Statement> goos::ast::Expression::clone() const { return clone_expr(); }
+auto goos::ast::Expression::clone() const -> Box<Statement> { return clone_expr(); }

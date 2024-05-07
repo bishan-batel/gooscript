@@ -25,24 +25,24 @@ namespace goos {
     /**
      * Creates a source file with given name and
      */
-    static SourceFile create(String name, WideString contents);
+    static auto create(String name, WideString contents) -> SourceFile;
 
-    static SourceFile create(WideString contents);
+    static auto create(WideString contents) -> SourceFile;
 
-    static Result<SourceFile, io::Error> from_file(const std::filesystem::path &path);
+    static auto from_file(const std::filesystem::path &path) -> Result<SourceFile, io::Error>;
 
-    [[nodiscard]] Option<Ref<String>> get_name() const;
+    [[nodiscard]] auto get_name() const -> Option<Ref<String>>;
 
-    [[nodiscard]] const WideString& get_contents() const;
+    [[nodiscard]] auto get_contents() const -> const WideString&;
 
-    [[nodiscard]] WideStringView slice(Range<> range) const;
+    [[nodiscard]] auto slice(Range<> range) const -> WideStringView;
 
-    [[nodiscard]] WideStringView slice(usize from, usize to) const;
+    [[nodiscard]] auto slice(usize from, usize to) const -> WideStringView;
 
-    [[nodiscard]] usize clamp_index(usize i) const;
+    [[nodiscard]] auto clamp_index(usize i) const -> usize;
 
-    [[nodiscard]] widechar get_char(usize position) const;
+    [[nodiscard]] auto get_char(usize position) const -> widechar;
 
-    [[nodiscard]] usize length() const;
+    [[nodiscard]] auto length() const -> usize;
   };
 } // goos

@@ -4,12 +4,9 @@
 
 #include "Lexer.hpp"
 
-#include <codecvt>
 #include <functional>
 #include <ranges>
 #include <sstream>
-#include <bits/ranges_algo.h>
-#include <fmt/compile.h>
 #include <token/Keyword.hpp>
 #include <token/Operator.hpp>
 #include <utility>
@@ -23,7 +20,7 @@
 #include "utils/str.hpp"
 
 namespace goos::lexer {
-  StringView Error::to_string(const Type type) {
+  auto Error::to_string(const Type type) -> StringView {
     switch (type) {
       case Type::UNTERMINATED_STRING:
         return "Unterminated String";
@@ -41,7 +38,7 @@ namespace goos::lexer {
       slice{range},
       type{type} {}
 
-  String Error::what() const {
+  auto Error::what() const -> String {
     const String converted{str::convert(section.slice(slice.lower_bound(), slice.upper_bound()))};
     return
         std::format(
@@ -51,34 +48,34 @@ namespace goos::lexer {
         );
   }
 
-  Error::Type Error::get_type() const { return type; }
+  auto Error::get_type() const -> Error::Type { return type; }
 
   Lexer::Lexer(SourceFile content) : content{std::move(content)} {}
 
-  Error Lexer::error(const Error::Type type, const usize begin) const {
+  auto Lexer::error(const Error::Type type, const usize begin) const -> Error {
     return Error{type, content, crab::range(begin, position)};
   }
 
-  void Lexer::push(Box<Token> token) {
+  auto Lexer::push(Box<Token> token) -> void {
     tokens.push_back(std::move(token));
   }
 
-  widechar Lexer::curr() const {
+  auto Lexer::curr() const -> widechar {
     return is_eof() ? L'\0' : content.get_char(position);
   }
 
-  bool Lexer::is_curr(const widechar c) const {
+  auto Lexer::is_curr(const widechar c) const -> bool {
     return curr() == c;
   }
 
-  widechar Lexer::next(const usize n) {
+  auto Lexer::next(const usize n) -> widechar {
     position += n;
     return curr();
   }
 
-  bool Lexer::is_eof() const { return position >= content.length(); }
+  auto Lexer::is_eof() const -> bool { return position >= content.length(); }
 
-  Result<TokenList> Lexer::tokenize(SourceFile content) {
+  auto Lexer::tokenize(SourceFile content) -> Result<TokenList> {
     Lexer lexer{std::move(content)};
 
     while (not lexer.is_eof()) {
@@ -114,14 +111,14 @@ namespace goos::lexer {
     return crab::ok(std::move(lexer.tokens));
   }
 
-  Result<bool> Lexer::whitespace() {
+  auto Lexer::whitespace() -> Result<bool> {
     if (not WHITESPACE_CHARS.contains(curr())) return crab::ok(false);
 
     next();
     return crab::ok(true);
   }
 
-  Result<bool> Lexer::number_literal() {
+  auto Lexer::number_literal() -> Result<bool> {
     if (not token::DIGIT_CHARS.contains(curr())) {
       return crab::ok(false);
     }
@@ -146,7 +143,7 @@ namespace goos::lexer {
     return crab::ok(true);
   }
 
-  Result<bool> Lexer::string_literal() {
+  auto Lexer::string_literal() -> Result<bool> {
     if (not is_curr(L'"')) return crab::ok(false);
 
     const usize begin = position;
@@ -191,7 +188,7 @@ namespace goos::lexer {
     return crab::ok(true);
   }
 
-  Result<bool> Lexer::operator_tok() {
+  auto Lexer::operator_tok() -> Result<bool> {
     const usize begin = position;
 
     for (const auto &[string, op]: STR_TO_OPERATOR_MAP) {
@@ -209,7 +206,7 @@ namespace goos::lexer {
     return crab::ok(false);
   }
 
-  Result<bool> Lexer::identifier() {
+  auto Lexer::identifier() -> Result<bool> {
     if (token::INVALID_IDENTIFIER_CHARS.contains(curr()) or token::DIGIT_CHARS.contains(curr())) {
       return crab::ok(false);
     }

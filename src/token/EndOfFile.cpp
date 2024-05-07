@@ -6,14 +6,14 @@
 
 goos::token::EndOfFile::EndOfFile() = default;
 
-Box<goos::token::Token> goos::token::EndOfFile::clone() const {
+auto goos::token::EndOfFile::clone() const -> Box<Token> {
   return crab::make_box<EndOfFile>();
 }
 
-WideString goos::token::EndOfFile::to_string() const {
+auto goos::token::EndOfFile::to_string() const -> WideString {
   return L"EOF";
 }
 
-bool goos::token::EndOfFile::operator==(const Token &other) const {
+auto goos::token::EndOfFile::operator==(const Token &other) const -> bool {
   return crab::ref::cast<EndOfFile>(other).is_some();
 }

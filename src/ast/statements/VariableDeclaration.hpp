@@ -14,12 +14,12 @@ namespace goos::ast {
   public:
     explicit VariableDeclaration(WideString name, meta::Mutability mutability);
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] Box<Statement> clone() const override;
+    [[nodiscard]] auto clone() const -> Box<Statement> override;
 
-    [[nodiscard]] meta::Mutability get_mutability() const;
+    [[nodiscard]] auto get_mutability() const -> meta::Mutability;
 
-    [[nodiscard]] bool operator==(const Statement &statement) const override;
+    [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
   };
 }

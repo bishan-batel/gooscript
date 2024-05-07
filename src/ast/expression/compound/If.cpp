@@ -11,7 +11,7 @@ namespace goos::ast::expression {
   If::If(Box<Expression> condition, Box<Expression> then, Box<Expression> else_then)
     : condition{std::move(condition)}, then{std::move(then)}, else_then{std::move(else_then)} {}
 
-  WideString If::to_string() const {
+  auto If::to_string() const -> WideString {
     return fmt::format(
       L"if {} then {{ {} }} else {{ {} }}",
       condition->to_string(),
@@ -20,7 +20,7 @@ namespace goos::ast::expression {
     );
   }
 
-  Box<Expression> If::clone_expr() const {
+  auto If::clone_expr() const -> Box<Expression> {
     return crab::make_box<If>(
       condition->clone_expr(),
       then->clone_expr(),
@@ -28,7 +28,7 @@ namespace goos::ast::expression {
     );
   }
 
-  bool If::operator==(const Statement &statement) const {
+  auto If::operator==(const Statement &statement) const -> bool {
     if (auto other = crab::ref::cast<If>(statement)) {
       const auto &[condition, then, else_then] = *other.get_unchecked();
       return

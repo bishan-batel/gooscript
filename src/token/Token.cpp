@@ -1,15 +1,13 @@
 #include "Token.hpp"
 
-#include <stdexcept>
-
 #include "utils/str.hpp"
 
 namespace goos::token {
-  StringView Token::get_slice() const {
+  auto Token::get_slice() const -> StringView {
     return slice;
   }
 
-  std::ostream& operator<<(std::ostream &os, const Token &token) {
+  auto operator<<(std::ostream &os, const Token &token) -> std::ostream& {
     return os << str::convert(token.to_string());
   }
 }

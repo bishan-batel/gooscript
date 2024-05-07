@@ -9,17 +9,17 @@
 namespace goos::ast::expression {
   StringLiteral::StringLiteral(WideString literal) : literal(std::move(literal)) {}
 
-  const WideString& StringLiteral::get_string() const { return literal; }
+  auto StringLiteral::get_string() const -> const WideString& { return literal; }
 
-  WideString StringLiteral::to_string() const {
+  auto StringLiteral::to_string() const -> WideString {
     return fmt::format(L"\"{}\"", literal);
   }
 
-  Box<Expression> StringLiteral::clone_expr() const {
+  auto StringLiteral::clone_expr() const -> Box<Expression> {
     return crab::make_box<StringLiteral>(literal);
   }
 
-  bool StringLiteral::operator==(const Statement &statement) const {
+  auto StringLiteral::operator==(const Statement &statement) const -> bool {
     if (auto other = crab::ref::cast<StringLiteral>(statement)) {
       return other.take_unchecked()->literal == literal;
     }

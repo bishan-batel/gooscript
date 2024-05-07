@@ -15,14 +15,14 @@ namespace goos::ast::expression {
   public:
     While(Box<Expression> condition, Box<Expression> body);
 
-    [[nodiscard]] const Expression& get_condition() const;
+    [[nodiscard]] auto get_condition() const -> const Expression&;
 
-    [[nodiscard]] const Expression& get_body() const;
+    [[nodiscard]] auto get_body() const -> const Expression&;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] Box<Expression> clone_expr() const override;
+    [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
 
-    [[nodiscard]] bool operator==(const Statement &statement) const override;
+    [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
   };
 } // namespace goos::ast::expression

@@ -4,5 +4,5 @@
 
 #pragma once
 namespace goos::parser::pass::expr {
-  void expression();
+  auto expression() -> void;
 }

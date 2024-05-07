@@ -18,14 +18,14 @@ namespace goos::ast::expression {
       Box<Expression> body
     );
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] const Vec<WideString>& get_params() const;
+    [[nodiscard]] auto get_params() const -> const Vec<WideString>&;
 
-    [[nodiscard]] const Expression& get_body() const;
+    [[nodiscard]] auto get_body() const -> const Expression&;
 
-    [[nodiscard]] Box<Expression> clone_expr() const override;
+    [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
 
-    [[nodiscard]] bool operator==(const Statement &statement) const override;
+    [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
   };
 }

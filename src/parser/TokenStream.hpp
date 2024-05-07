@@ -7,8 +7,6 @@
 #include <preamble.hpp>
 #include <lexer/Keyword.hpp>
 #include <lexer/Operator.hpp>
-#include <token/Keyword.hpp>
-#include <token/Operator.hpp>
 
 #include "Error.hpp"
 #include "ast/Statement.hpp"

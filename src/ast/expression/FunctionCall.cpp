@@ -13,7 +13,7 @@ namespace goos::ast::expression {
     : function{std::move(function)},
       arguments{std::move(arguments)} {}
 
-  WideString FunctionCall::to_string() const {
+  auto FunctionCall::to_string() const -> WideString {
     WideStringStream stream{};
 
     for (const auto &arg: arguments) {
@@ -23,7 +23,7 @@ namespace goos::ast::expression {
     return fmt::format(L"funcall({})({})", function->to_string(), stream.str());
   }
 
-  Box<Expression> FunctionCall::clone_expr() const {
+  auto FunctionCall::clone_expr() const -> Box<Expression> {
     Vec<Box<Expression>> arguments_clone{};
 
     for (const auto &arg: arguments) {
@@ -33,7 +33,7 @@ namespace goos::ast::expression {
     return crab::make_box<FunctionCall>(function->clone_expr(), std::move(arguments_clone));
   }
 
-  bool FunctionCall::operator==(const Statement &statement) const {
+  auto FunctionCall::operator==(const Statement &statement) const -> bool {
     Option<Ref<FunctionCall>> other_opt = crab::ref::cast<FunctionCall>(statement);
     if (other_opt.is_none()) return false;
 

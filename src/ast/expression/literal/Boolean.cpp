@@ -8,15 +8,19 @@
 #include <fmt/xchar.h>
 
 namespace goos::ast::expression {
-  bool Boolean::get_state() const { return state; }
+  auto Boolean::get_state() const -> bool {
+    return state;
+  }
 
-  WideString Boolean::to_string() const {
+  auto Boolean::to_string() const -> WideString {
     return fmt::format(L"{}", state);
   }
 
-  Box<Expression> Boolean::clone_expr() const { return crab::make_box<Boolean>(state); }
+  auto Boolean::clone_expr() const -> Box<Expression> {
+    return crab::make_box<Boolean>(state);
+  }
 
-  bool Boolean::operator==(const Statement &statement) const {
+  auto Boolean::operator==(const Statement &statement) const -> bool {
     if (auto other{crab::ref::cast<Boolean>(statement)}) {
       return other.take_unchecked()->state == state;
     }

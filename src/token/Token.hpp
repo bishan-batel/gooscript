@@ -16,18 +16,18 @@ namespace goos::token {
 
     virtual ~Token() = default;
 
-    void operator=(const Token &) = delete;
+    auto operator=(const Token &) -> void = delete;
 
-    void operator=(Token &&) = delete;
+    auto operator=(Token &&) -> void = delete;
 
-    [[nodiscard]] virtual bool operator==(const Token &other) const = 0;
+    [[nodiscard]] virtual auto operator==(const Token &other) const -> bool = 0;
 
-    [[nodiscard]] virtual Box<Token> clone() const = 0;
+    [[nodiscard]] virtual auto clone() const -> Box<Token> = 0;
 
-    [[nodiscard]] StringView get_slice() const;
+    [[nodiscard]] auto get_slice() const -> StringView;
 
-    [[nodiscard]] virtual WideString to_string() const = 0;
+    [[nodiscard]] virtual auto to_string() const -> WideString = 0;
 
-    friend std::ostream& operator <<(std::ostream &os, const Token &token);
+    friend auto operator <<(std::ostream &os, const Token &token) -> std::ostream&;
   };
 } // namespace lexer

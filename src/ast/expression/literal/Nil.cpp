@@ -5,13 +5,13 @@
 #include "Nil.hpp"
 
 namespace goos::ast::expression {
-  WideString Nil::to_string() const {
+  auto Nil::to_string() const -> WideString {
     return L"nil";
   }
 
-  Box<Expression> Nil::clone_expr() const { return crab::make_box<Nil>(); }
+  auto Nil::clone_expr() const -> Box<Expression> { return crab::make_box<Nil>(); }
 
-  bool Nil::operator==(const Statement &statement) const {
+  auto Nil::operator==(const Statement &statement) const -> bool {
     return crab::ref::cast<Nil>(statement).is_some();
   }
 } // goos

@@ -7,17 +7,17 @@
 namespace goos::token {
   Operator::Operator(const lexer::Operator op) : op(op) {}
 
-  lexer::Operator Operator::get_op() const { return op; }
+  auto Operator::get_op() const -> lexer::Operator { return op; }
 
-  Box<Token> Operator::clone() const {
+  auto Operator::clone() const -> Box<Token> {
     return crab::make_box<Operator>(op);
   }
 
-  WideString Operator::to_string() const {
+  auto Operator::to_string() const -> WideString {
     return WideString{lexer::OPERATOR_TO_STR_MAP.at(op)};
   }
 
-  bool Operator::operator==(const Token &other) const {
+  auto Operator::operator==(const Token &other) const -> bool {
     if (const Option<Ref<Operator>> op = crab::ref::cast<Operator>(other)) {
       return op.get_unchecked()->op == this->op;
     }

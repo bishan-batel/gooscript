@@ -8,15 +8,15 @@
 namespace goos::token {
   Decimal::Decimal(const f64 num) : number{num} {}
 
-  f64 Decimal::get_number() const { return number; }
+  auto Decimal::get_number() const -> f64 { return number; }
 
-  Box<Token> Decimal::clone() const { return crab::make_box<Decimal>(number); }
+  auto Decimal::clone() const -> Box<Token> { return crab::make_box<Decimal>(number); }
 
-  WideString Decimal::to_string() const {
+  auto Decimal::to_string() const -> WideString {
     return fmt::format(L"{}D", number);
   }
 
-  bool Decimal::operator==(const Token &other) const {
+  auto Decimal::operator==(const Token &other) const -> bool {
     if (const Option<Ref<Decimal>> num = crab::ref::cast<Decimal>(other)) {
       return num.get_unchecked()->number == number;
     }

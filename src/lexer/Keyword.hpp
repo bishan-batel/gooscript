@@ -66,5 +66,5 @@ namespace goos::lexer {
     }()
   };
 
-  [[nodiscard]] Option<Keyword> identifier_to_keyword(WideStringView name);
+  [[nodiscard]] auto identifier_to_keyword(WideStringView name) -> Option<Keyword>;
 } // namespace lexer

@@ -16,43 +16,43 @@
 namespace goos::parser {
   TokenStream::TokenStream(lexer::TokenList list) : list{std::move(list)} {}
 
-  const token::Token& TokenStream::curr() const {
+  auto TokenStream::curr() const -> const token::Token& {
     if (is_eof()) return eof;
     return list[position];
   }
 
-  const token::Token& TokenStream::next(const usize i) {
+  auto TokenStream::next(const usize i) -> const token::Token& {
     position += i;
     return curr();
   }
 
-  bool TokenStream::is_curr(const token::Token &token) const {
+  auto TokenStream::is_curr(const token::Token &token) const -> bool {
     return curr() == token;
   }
 
-  bool TokenStream::is_curr(const lexer::Operator &op) const {
+  auto TokenStream::is_curr(const lexer::Operator &op) const -> bool {
     return token::Operator{op} == curr();
   }
 
-  bool TokenStream::is_curr(const lexer::Keyword &keyword) const {
+  auto TokenStream::is_curr(const lexer::Keyword &keyword) const -> bool {
     return token::Keyword{keyword} == curr();
   }
 
-  bool TokenStream::try_consume(const lexer::Operator op) {
+  auto TokenStream::try_consume(const lexer::Operator op) -> bool {
     if (auto tok = try_consume<token::Operator>()) {
       return tok.get_unchecked()->get_op() == op;
     }
     return false;
   }
 
-  bool TokenStream::try_consume(const lexer::Keyword word) {
+  auto TokenStream::try_consume(const lexer::Keyword word) -> bool {
     if (auto tok = try_consume<token::Keyword>()) {
       return tok.get_unchecked()->get_word() == word;
     }
     return false;
   }
 
-  Result<lexer::Keyword> TokenStream::consume_keyword(const Span<lexer::Keyword> allowed) {
+  auto TokenStream::consume_keyword(const Span<lexer::Keyword> allowed) -> Result<lexer::Keyword> {
     if (auto word = try_consume<token::Keyword>()) {
       return crab::ok(word.get_unchecked()->get_word());
     }
@@ -71,17 +71,17 @@ namespace goos::parser {
     );
   }
 
-  Result<lexer::Keyword> TokenStream::consume_keyword(const lexer::Keyword allowed) {
+  auto TokenStream::consume_keyword(const lexer::Keyword allowed) -> Result<lexer::Keyword> {
     std::array arr{allowed};
     return consume_keyword(std::span{arr});
   }
 
-  Result<lexer::Operator> TokenStream::consume_operator(const lexer::Operator allowed) {
+  auto TokenStream::consume_operator(const lexer::Operator allowed) -> Result<lexer::Operator> {
     std::array arr{allowed};
     return consume_operator(std::span{arr});
   }
 
-  Result<lexer::Operator> TokenStream::consume_operator(const Span<lexer::Operator> allowed) {
+  auto TokenStream::consume_operator(const Span<lexer::Operator> allowed) -> Result<lexer::Operator> {
     if (auto op = try_consume<token::Operator>()) {
       return crab::ok(op.get_unchecked()->get_op());
     }
@@ -100,7 +100,7 @@ namespace goos::parser {
     );
   }
 
-  Result<WideString> TokenStream::consume_identifier() {
+  auto TokenStream::consume_identifier() -> Result<WideString> {
     if (auto identifier = try_consume<token::Identifier>()) {
       return crab::ok(identifier.get_unchecked()->get_identifier());
     }
@@ -108,15 +108,15 @@ namespace goos::parser {
     return crab::err(error<err::ExpectedToken>("Expected an Identifier.", curr().clone()));
   }
 
-  bool TokenStream::is_eof() const {
+  auto TokenStream::is_eof() const -> bool {
     return position >= list.size();
   }
 
-  err::Error TokenStream::unexpected(String expected) {
+  auto TokenStream::unexpected(String expected) -> err::Error {
     return unexpected(std::move(expected), curr().clone());
   }
 
-  err::Error TokenStream::unexpected(String expected, Box<token::Token> received) {
+  auto TokenStream::unexpected(String expected, Box<token::Token> received) -> err::Error {
     return error<err::ExpectedToken>(std::move(expected), std::move(received));
   }
 }

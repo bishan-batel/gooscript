@@ -25,12 +25,12 @@ namespace goos::token {
   public:
     explicit Integer(i64 number);
 
-    [[nodiscard]] i64 get_number() const;
+    [[nodiscard]] auto get_number() const -> i64;
 
-    [[nodiscard]] Box<Token> clone() const override;
+    [[nodiscard]] auto clone() const -> Box<Token> override;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] bool operator==(const Token &other) const override;
+    [[nodiscard]] auto operator==(const Token &other) const -> bool override;
   };
 }

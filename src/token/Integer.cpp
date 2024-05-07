@@ -8,13 +8,13 @@
 namespace goos::token {
   Integer::Integer(const i64 number) : number{number} {}
 
-  i64 Integer::get_number() const { return number; }
+  auto Integer::get_number() const -> i64 { return number; }
 
-  Box<Token> Integer::clone() const { return crab::make_box<Integer>(number); }
+  auto Integer::clone() const -> Box<Token> { return crab::make_box<Integer>(number); }
 
-  WideString Integer::to_string() const { return fmt::format(L"{}", number); }
+  auto Integer::to_string() const -> WideString { return fmt::format(L"{}", number); }
 
-  bool Integer::operator==(const Token &other) const {
+  auto Integer::operator==(const Token &other) const -> bool {
     if (const Option<Ref<Integer>> num = crab::ref::cast<Integer>(other)) {
       return num.get_unchecked()->number == number;
     }

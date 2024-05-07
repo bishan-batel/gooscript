@@ -12,12 +12,12 @@ namespace goos::ast::expression {
   public:
     explicit StringLiteral(WideString literal);
 
-    [[nodiscard]] const WideString& get_string() const;
+    [[nodiscard]] auto get_string() const -> const WideString&;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] Box<Expression> clone_expr() const override;
+    [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
 
-    [[nodiscard]] bool operator==(const Statement &statement) const override;
+    [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
   };
 }

@@ -13,12 +13,12 @@ namespace goos::token {
   public:
     explicit Operator(lexer::Operator op);
 
-    [[nodiscard]] lexer::Operator get_op() const;
+    [[nodiscard]] auto get_op() const -> lexer::Operator;
 
-    [[nodiscard]] Box<Token> clone() const override;
+    [[nodiscard]] auto clone() const -> Box<Token> override;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] bool operator==(const Token &other) const override;
+    [[nodiscard]] auto operator==(const Token &other) const -> bool override;
   };
 }
