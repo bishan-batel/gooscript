@@ -20,14 +20,14 @@ namespace goos::ast::expression {
   public:
     explicit Dictionary(Vec<Pair> pairs);
 
-    [[nodiscard]] const Vec<Pair>& get_pairs() const;
+    [[nodiscard]] auto get_pairs() const -> const Vec<Pair>&;
 
-    [[nodiscard]] Option<Ref<Pair>> get(const Expression& key) const;
+    [[nodiscard]] auto get(const Expression &key) const -> Option<Ref<Pair>>;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] Box<Expression> clone_expr() const override;
+    [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
 
-    [[nodiscard]] bool operator==(const Statement &statement) const override;
+    [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
   };
 }

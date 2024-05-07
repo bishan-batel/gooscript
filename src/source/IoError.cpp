@@ -5,11 +5,11 @@
 #include "IoError.hpp"
 #include <fmt/format.h>
 
-String goos::io::Error::what() const {
+auto goos::io::Error::what() const -> String {
   return fmt::format("Failed to Open File: {}", std::strerror(error_code));
 }
 
-i32 goos::io::Error::get_system_error_code() const {
+auto goos::io::Error::get_system_error_code() const -> i32 {
   return error_code;
 }
 

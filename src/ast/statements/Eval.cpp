@@ -9,15 +9,15 @@
 namespace goos::ast {
   Eval::Eval(Box<Expression> expr): expression{std::move(expr)} {}
 
-  const Expression& Eval::get_expression() const { return expression; }
+  auto Eval::get_expression() const -> const Expression& { return expression; }
 
-  WideString Eval::to_string() const {
+  auto Eval::to_string() const -> WideString {
     return fmt::format(L"eval ({})", expression->to_string());
   }
 
-  Box<Statement> Eval::clone() const { return crab::make_box<Eval>(expression->clone_expr()); }
+  auto Eval::clone() const -> Box<Statement> { return crab::make_box<Eval>(expression->clone_expr()); }
 
-  bool Eval::operator==(const Statement &statement) const {
+  auto Eval::operator==(const Statement &statement) const -> bool {
     if (auto other{crab::ref::cast<Eval>(statement)}) {
       return *expression == *other.take_unchecked()->expression;
     }

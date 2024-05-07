@@ -8,13 +8,13 @@
 #include "parser/pass/statement/block.hpp"
 
 namespace goos::parser::pass {
-  [[nodiscard]] MustEvalResult<ast::Statement> statement(TokenStream &stream);
+  [[nodiscard]] auto statement(TokenStream &stream) -> MustEvalResult<ast::Statement>;
 
-  [[nodiscard]] OptionalResult<ast::VariableDeclaration> variable_declare(TokenStream &stream);
+  [[nodiscard]] auto variable_declare(TokenStream &stream) -> OptionalResult<ast::VariableDeclaration>;
 
   namespace meta {
     template<typename F> requires std::is_invocable_v<F, TokenStream&>
-    __always_inline OptionalPass<ast::Statement> transmute(F f) {
+    auto transmute(F f) -> OptionalPass<ast::Statement> {
       return [f](TokenStream &stream) -> OptionalResult<ast::Statement> {
         auto result{f(stream)};
         if (result.is_err()) return crab::err(result.take_err_unchecked());

@@ -8,15 +8,15 @@
 namespace goos::token {
   StringLiteral::StringLiteral(WideString string) : literal(std::move(string)) {}
 
-  Box<Token> StringLiteral::clone() const { return crab::make_box<StringLiteral>(literal); }
+  auto StringLiteral::clone() const -> Box<Token> { return crab::make_box<StringLiteral>(literal); }
 
-  WideString StringLiteral::to_string() const {
+  auto StringLiteral::to_string() const -> WideString {
     return fmt::format(L"\"{}\"", literal);
   }
 
-  const WideString& StringLiteral::get_string() const { return literal; }
+  auto StringLiteral::get_string() const -> const WideString& { return literal; }
 
-  bool StringLiteral::operator==(const Token &other) const {
+  auto StringLiteral::operator==(const Token &other) const -> bool {
     if (Option<Ref<StringLiteral>> ref = crab::ref::cast<StringLiteral>(other)) {
       return ref.get_unchecked()->literal == literal;
     }

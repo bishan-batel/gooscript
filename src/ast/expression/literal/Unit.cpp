@@ -7,13 +7,13 @@
 namespace goos::ast::expression {
   Unit::Unit() = default;
 
-  WideString Unit::to_string() const {
+  auto Unit::to_string() const -> WideString {
     return L"unit";
   }
 
-  Box<Expression> Unit::clone_expr() const { return crab::make_box<Unit>(); }
+  auto Unit::clone_expr() const -> Box<Expression> { return crab::make_box<Unit>(); }
 
-  bool Unit::operator==(const Statement &statement) const {
+  auto Unit::operator==(const Statement &statement) const -> bool {
     return crab::ref::cast<Unit>(statement).is_some();
   }
 }

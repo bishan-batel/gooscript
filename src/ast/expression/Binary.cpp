@@ -11,11 +11,15 @@ namespace goos::ast::expression {
   Binary::Binary(Box<Expression> lhs, const lexer::Operator op, Box<Expression> rhs)
     : lhs(std::move(lhs)), rhs(std::move(rhs)), op(op) {}
 
-  const Expression& Binary::get_lhs() const { return lhs; }
+  auto Binary::get_lhs() const -> const Expression& {
+    return lhs;
+  }
 
-  const Expression& Binary::get_rhs() const { return rhs; }
+  auto Binary::get_rhs() const -> const Expression& {
+    return rhs;
+  }
 
-  WideString Binary::to_string() const {
+  auto Binary::to_string() const -> WideString {
     return fmt::format(
       L"({}) {} ({})",
       lhs->to_string(),
@@ -24,11 +28,11 @@ namespace goos::ast::expression {
     );
   }
 
-  Box<Expression> Binary::clone_expr() const {
+  auto Binary::clone_expr() const -> Box<Expression> {
     return crab::make_box<Binary>(lhs->clone_expr(), op, rhs->clone_expr());
   }
 
-  bool Binary::operator==(const Statement &statement) const {
+  auto Binary::operator==(const Statement &statement) const -> bool {
     auto other_opt = crab::ref::cast<Binary>(statement);
     if (other_opt.is_none()) return false;
 

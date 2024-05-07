@@ -10,17 +10,17 @@
 namespace goos::ast::expression {
   Decimal::Decimal(const f64 literal): literal{literal} {}
 
-  f64 Decimal::get_number() const { return literal; }
+  auto Decimal::get_number() const -> f64 { return literal; }
 
-  WideString Decimal::to_string() const {
+  auto Decimal::to_string() const -> WideString {
     return fmt::format(L"{}D", literal);
   }
 
-  Box<Expression> Decimal::clone_expr() const {
+  auto Decimal::clone_expr() const -> Box<Expression> {
     return crab::make_box<Decimal>(literal);
   }
 
-  bool Decimal::operator==(const Statement &statement) const {
+  auto Decimal::operator==(const Statement &statement) const -> bool {
     if (auto other = crab::ref::cast<Decimal>(statement)) {
       return other.take_unchecked()->literal == literal;
     }

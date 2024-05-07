@@ -12,12 +12,12 @@ namespace goos ::ast:: expression {
   public:
     explicit Decimal(f64 literal);
 
-    [[nodiscard]] f64 get_number() const;
+    [[nodiscard]] auto get_number() const -> f64;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] Box<Expression> clone_expr() const override;
+    [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
 
-    [[nodiscard]] bool operator==(const Statement &statement) const override;
+    [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
   };
 }

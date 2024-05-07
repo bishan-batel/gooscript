@@ -10,17 +10,17 @@ namespace goos::ast::expression {
   Unary::Unary(const lexer::Operator op, Box<Expression> expr)
     : expr{std::move(expr)}, op{op} {}
 
-  const Expression& Unary::get_expression() const { return expr; }
+  auto Unary::get_expression() const -> const Expression& { return expr; }
 
-  WideString Unary::to_string() const {
+  auto Unary::to_string() const -> WideString {
     return fmt::format(L"{} ({})", lexer::OPERATOR_TO_STR_MAP.at(op), expr->to_string());
   }
 
-  Box<Expression> Unary::clone_expr() const {
+  auto Unary::clone_expr() const -> Box<Expression> {
     return crab::make_box<Unary>(op, expr->clone_expr());
   }
 
-  bool Unary::operator==(const Statement &statement) const {
+  auto Unary::operator==(const Statement &statement) const -> bool {
     auto other_opt = crab::ref::cast<Unary>(statement);
     if (other_opt.is_none()) return false;
 

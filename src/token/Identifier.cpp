@@ -8,15 +8,15 @@
 namespace goos::token {
   Identifier::Identifier(WideString word) : identifier{std::move(word)} {}
 
-  const WideString& Identifier::get_identifier() const { return identifier; }
+  auto Identifier::get_identifier() const -> const WideString& { return identifier; }
 
-  Box<Token> Identifier::clone() const { return crab::make_box<Identifier>(identifier); }
+  auto Identifier::clone() const -> Box<Token> { return crab::make_box<Identifier>(identifier); }
 
-  WideString Identifier::to_string() const {
+  auto Identifier::to_string() const -> WideString {
     return fmt::format(L"{}", identifier);
   }
 
-  bool Identifier::operator==(const Token &other) const {
+  auto Identifier::operator==(const Token &other) const -> bool {
     if (const Option<Ref<Identifier>> num = crab::ref::cast<Identifier>(other)) {
       return num.get_unchecked()->identifier == identifier;
     }

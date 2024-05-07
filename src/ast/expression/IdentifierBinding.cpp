@@ -8,15 +8,15 @@
 namespace goos::ast::expression {
   IdentifierBinding::IdentifierBinding(WideString identifier) : identifier{std::move(identifier)} {}
 
-  const WideString& IdentifierBinding::get_identifier() const { return identifier; }
+  auto IdentifierBinding::get_identifier() const -> const WideString& { return identifier; }
 
-  WideString IdentifierBinding::to_string() const { return identifier; }
+  auto IdentifierBinding::to_string() const -> WideString { return identifier; }
 
-  Box<Expression> IdentifierBinding::clone_expr() const {
+  auto IdentifierBinding::clone_expr() const -> Box<Expression> {
     return crab::make_box<IdentifierBinding>(identifier);
   }
 
-  bool IdentifierBinding::operator==(const Statement &statement) const {
+  auto IdentifierBinding::operator==(const Statement &statement) const -> bool {
     if (auto other = crab::ref::cast<IdentifierBinding>(statement)) {
       return other.take_unchecked()->identifier == identifier;
     }

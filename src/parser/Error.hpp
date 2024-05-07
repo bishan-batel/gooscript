@@ -3,8 +3,6 @@
 //
 
 #pragma once
-#include <range.hpp>
-#include <rc.hpp>
 #include <result.hpp>
 #include <token/Token.hpp>
 
@@ -21,19 +19,19 @@ namespace goos::parser::err {
 
     virtual ~ErrorBase() = default;
 
-    ErrorBase& operator=(const ErrorBase &) = delete;
+    auto operator=(const ErrorBase &) -> ErrorBase& = delete;
 
-    ErrorBase& operator=(ErrorBase &&) = delete;
+    auto operator=(ErrorBase &&) -> ErrorBase& = delete;
 
     /**
      * The token that was being read when this error was returned.
      */
-    [[nodiscard]] const token::Token& where() const;
+    [[nodiscard]] auto where() const -> const token::Token&;
 
     /**
      * String message of the error, for debug purpouses
      */
-    [[nodiscard]] virtual String what() const = 0;
+    [[nodiscard]] virtual auto what() const -> String = 0;
   };
 
   class Error final : crab::Error {
@@ -43,7 +41,7 @@ namespace goos::parser::err {
     explicit Error(Box<ErrorBase> error)
       : error{std::move(error)} {}
 
-    [[nodiscard]] String what() const override { return error->what(); }
+    [[nodiscard]] auto what() const -> String override { return error->what(); }
   };
 
   class ExpectedToken final : public ErrorBase {
@@ -52,8 +50,8 @@ namespace goos::parser::err {
   public:
     ExpectedToken(String expected_type, Box<token::Token> receieved);
 
-    [[nodiscard]] String what() const override;
+    [[nodiscard]] auto what() const -> String override;
 
-    [[nodiscard]] const String& get_expected() const;
+    [[nodiscard]] auto get_expected() const -> const String&;
   };
 }

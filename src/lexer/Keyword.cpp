@@ -4,7 +4,7 @@
 #include "Keyword.hpp"
 
 namespace goos::lexer {
-  Option<Keyword> identifier_to_keyword(const WideStringView name) {
+  auto identifier_to_keyword(const WideStringView name) -> Option<Keyword> {
     if (STR_TO_KEYWORD_TABLE.contains(name)) {
       return crab::some(STR_TO_KEYWORD_TABLE.at(name));
     }

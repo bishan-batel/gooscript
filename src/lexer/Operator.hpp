@@ -117,16 +117,16 @@ namespace goos::lexer {
   };
 
   [[maybe_unused]]
-  bool is_binary(Operator op);
+  auto is_binary(Operator op) -> bool;
 
   [[maybe_unused]]
-  bool is_assign(Operator op);
+  auto is_assign(Operator op) -> bool;
 
   [[maybe_unused]]
-  bool is_delimiter(Operator op);
+  auto is_delimiter(Operator op) -> bool;
 
   [[maybe_unused]]
-  bool is_parenthetical(Operator op);
+  auto is_parenthetical(Operator op) -> bool;
 
   #undef binary
   #undef assign

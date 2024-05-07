@@ -12,12 +12,12 @@ namespace goos::token {
   public:
     explicit StringLiteral(WideString string);
 
-    [[nodiscard]] Box<Token> clone() const override;
+    [[nodiscard]] auto clone() const -> Box<Token> override;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] const WideString& get_string() const;
+    [[nodiscard]] auto get_string() const -> const WideString&;
 
-    [[nodiscard]] bool operator==(const Token &other) const override;
+    [[nodiscard]] auto operator==(const Token &other) const -> bool override;
   };
 }

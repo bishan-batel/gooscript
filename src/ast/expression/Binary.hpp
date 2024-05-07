@@ -15,14 +15,14 @@ namespace goos::ast::expression {
   public:
     Binary(Box<Expression> lhs, lexer::Operator op, Box<Expression> rhs);
 
-    [[nodiscard]] const Expression& get_lhs() const;
+    [[nodiscard]] auto get_lhs() const -> const Expression&;
 
-    [[nodiscard]] const Expression& get_rhs() const;
+    [[nodiscard]] auto get_rhs() const -> const Expression&;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] Box<Expression> clone_expr() const override;
+    [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
 
-    [[nodiscard]] bool operator==(const Statement &statement) const override;
+    [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
   };
 }

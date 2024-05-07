@@ -20,7 +20,7 @@ namespace goos::ast::expression {
   ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements, Box<Eval> eval)
     : statements{std::move(statements)}, eval{std::move(eval)} {}
 
-  WideString ScopeBlock::to_string() const {
+  auto ScopeBlock::to_string() const -> WideString {
     WideStringStream stream{};
 
     for (const auto &statement: statements) {
@@ -30,7 +30,7 @@ namespace goos::ast::expression {
     return fmt::format(L"block {{ {} }}", stream.str());
   }
 
-  Box<Expression> ScopeBlock::clone_expr() const {
+  auto ScopeBlock::clone_expr() const -> Box<Expression> {
     Vec<Box<Statement>> statements{};
 
     for (const auto &statement: statements) {
@@ -40,7 +40,7 @@ namespace goos::ast::expression {
     return crab::make_box<ScopeBlock>(std::move(statements));
   }
 
-  bool ScopeBlock::operator==(const Statement &statement) const {
+  auto ScopeBlock::operator==(const Statement &statement) const -> bool {
     auto other_result = crab::ref::cast<ScopeBlock>(statement);
     if (other_result.is_none()) return false;
 

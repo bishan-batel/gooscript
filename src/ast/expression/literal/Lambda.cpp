@@ -15,7 +15,7 @@ namespace goos::ast::expression {
   Lambda::Lambda(Vec<WideString> params, Box<Expression> body)
     : params{std::move(params)}, body{std::move(body)} {}
 
-  WideString Lambda::to_string() const {
+  auto Lambda::to_string() const -> WideString {
     WideStringStream stream{};
 
     for (const auto &param: params) {
@@ -24,13 +24,15 @@ namespace goos::ast::expression {
     return fmt::format(L"fn ({}) = {}", stream.str(), body->to_string());
   }
 
-  const Expression& Lambda::get_body() const { return body; }
+  auto Lambda::get_body() const -> const Expression& {
+    return body;
+  }
 
-  Box<Expression> Lambda::clone_expr() const {
+  auto Lambda::clone_expr() const -> Box<Expression> {
     return crab::make_box<Lambda>(params, body->clone_expr());
   }
 
-  bool Lambda::operator==(const Statement &statement) const {
+  auto Lambda::operator==(const Statement &statement) const -> bool {
     auto other_opt = crab::ref::cast<Lambda>(statement);
     if (other_opt.is_none()) return false;
 
@@ -45,5 +47,7 @@ namespace goos::ast::expression {
     return true;
   }
 
-  const Vec<WideString>& Lambda::get_params() const { return params; }
+  auto Lambda::get_params() const -> const Vec<WideString>& {
+    return params;
+  }
 }

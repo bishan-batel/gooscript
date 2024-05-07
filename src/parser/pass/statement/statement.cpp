@@ -8,7 +8,7 @@
 #include <error.hpp>
 
 namespace goos::parser::pass {
-  MustEvalResult<ast::Statement> statement([[maybe_unused]] TokenStream &stream) {
+  auto statement([[maybe_unused]] TokenStream &stream) -> MustEvalResult<ast::Statement> {
     if (stream.is_eof()) {
       return crab::err(stream.unexpected("Statement"));
     }
@@ -30,7 +30,7 @@ namespace goos::parser::pass {
     return crab::err(stream.error<err::ExpectedToken>("Statement", stream.curr().clone()));
   }
 
-  OptionalResult<ast::VariableDeclaration> variable_declare(TokenStream &stream) {
+  auto variable_declare(TokenStream &stream) -> OptionalResult<ast::VariableDeclaration> {
     goos::meta::Mutability mutability;
 
     if (stream.try_consume(lexer::Keyword::LET)) {

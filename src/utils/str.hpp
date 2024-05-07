@@ -3,12 +3,11 @@
 //
 
 #pragma once
-#include <stdexcept>
 
 #include "preamble.hpp"
 
 namespace goos::str {
-  [[nodiscard]] String convert(WideStringView string);
+  [[nodiscard]] auto convert(WideStringView string) -> String;
 
-  [[nodiscard]] WideString convert(StringView string);
+  [[nodiscard]] auto convert(StringView string) -> WideString;
 }

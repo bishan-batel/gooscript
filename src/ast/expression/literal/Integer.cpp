@@ -10,13 +10,13 @@
 namespace goos::ast::expression {
   Integer::Integer(const i64 number): number{number} {}
 
-  WideString Integer::to_string() const {
+  auto Integer::to_string() const -> WideString {
     return fmt::format(L"{}", number);
   }
 
-  Box<Expression> Integer::clone_expr() const { return crab::make_box<Integer>(number); }
+  auto Integer::clone_expr() const -> Box<Expression> { return crab::make_box<Integer>(number); }
 
-  bool Integer::operator==(const Statement &statement) const {
+  auto Integer::operator==(const Statement &statement) const -> bool {
     if (auto other = crab::ref::cast<Integer>(statement)) {
       return other.take_unchecked()->number == number;
     }

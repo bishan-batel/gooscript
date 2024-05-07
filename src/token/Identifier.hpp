@@ -52,12 +52,12 @@ namespace goos::token {
   public:
     explicit Identifier(WideString word);
 
-    [[nodiscard]] const WideString& get_identifier() const;
+    [[nodiscard]] auto get_identifier() const -> const WideString&;
 
-    [[nodiscard]] Box<Token> clone() const override;
+    [[nodiscard]] auto clone() const -> Box<Token> override;
 
-    [[nodiscard]] WideString to_string() const override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] bool operator==(const Token &other) const override;
+    [[nodiscard]] auto operator==(const Token &other) const -> bool override;
   };
 }
