@@ -19,5 +19,7 @@ namespace goos::ast {
     [[nodiscard]] Box<Statement> clone() const override;
 
     [[nodiscard]] meta::Mutability get_mutability() const;
+
+    [[nodiscard]] bool operator==(const Statement &statement) const override;
   };
 }

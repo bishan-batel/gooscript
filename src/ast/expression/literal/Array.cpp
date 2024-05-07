@@ -30,4 +30,19 @@ namespace goos::ast::expression {
 
     return crab::make_box<Array>(std::move(cloned));
   }
+
+  bool Array::operator==(const Statement &statement) const {
+    auto other_opt{crab::ref::cast<Array>(statement)};
+
+    if (other_opt.is_none()) return false;
+
+    const Array &array = other_opt.take_unchecked();
+
+    if (array.values.size() != values.size()) return false;
+
+    for (usize i = 0; i < values.size(); i++) {
+      if (*values[i] != *array.values[i]) return false;
+    }
+    return true;
+  }
 }

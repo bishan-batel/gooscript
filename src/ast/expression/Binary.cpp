@@ -27,4 +27,12 @@ namespace goos::ast::expression {
   Box<Expression> Binary::clone_expr() const {
     return crab::make_box<Binary>(lhs->clone_expr(), op, rhs->clone_expr());
   }
+
+  bool Binary::operator==(const Statement &statement) const {
+    auto other_opt = crab::ref::cast<Binary>(statement);
+    if (other_opt.is_none()) return false;
+
+    const Binary &other = other_opt.take_unchecked();
+    return other.op == op and other.get_lhs() == lhs and other.get_rhs() == rhs;
+  }
 }

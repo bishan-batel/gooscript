@@ -15,4 +15,11 @@ namespace goos::ast::expression {
   }
 
   Box<Expression> Boolean::clone_expr() const { return crab::make_box<Boolean>(state); }
+
+  bool Boolean::operator==(const Statement &statement) const {
+    if (auto other{crab::ref::cast<Boolean>(statement)}) {
+      return other.take_unchecked()->state == state;
+    }
+    return false;
+  }
 }

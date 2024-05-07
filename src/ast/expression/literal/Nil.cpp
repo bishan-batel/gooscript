@@ -10,4 +10,8 @@ namespace goos::ast::expression {
   }
 
   Box<Expression> Nil::clone_expr() const { return crab::make_box<Nil>(); }
+
+  bool Nil::operator==(const Statement &statement) const {
+    return crab::ref::cast<Nil>(statement).is_some();
+  }
 } // goos

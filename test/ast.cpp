@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <utility>
 
 #include "ast/expression/compound/If.hpp"
 #include "ast/expression/compound/ScopeBlock.hpp"
@@ -18,6 +19,12 @@
 #include "ast/expression/Unary.hpp"
 #include "ast/statements/Eval.hpp"
 #include "ast/statements/Return.hpp"
+#include "ast/statements/VariableDeclaration.hpp"
+#include "parser/TokenStream.hpp"
+#include "parser/pass/statement/block.hpp"
+
+using namespace goos;
+using namespace goos::ast;
 
 TEST_CASE("AST Into String", "[ast_string]") {
   using namespace goos::ast;
@@ -46,4 +53,92 @@ TEST_CASE("AST Into String", "[ast_string]") {
   SECTION("Eval") { TEST_CLONE(L"eval (unit)", Eval, expr) }
   SECTION("Return") { TEST_CLONE(L"return unit", Return, expr) }
   SECTION("Nil") { TEST_CLONE(L"nil", Nil) }
+
+  #undef expr
+  #undef TEST_CLONE
+}
+
+template<usize N>
+auto parse(WideString source, std::array<Box<Statement>, N> statements) {
+  Vec<Box<Statement>> vec{};
+
+  for (auto &a: statements) {
+    vec.push_back(std::move(a));
+  }
+
+  const expression::ScopeBlock expr{std::move(vec)};
+
+  const SourceFile file = SourceFile::create(std::move(source));
+  parser::TokenStream stream{lexer::Lexer::tokenize(file).take_unchecked()};
+
+  Box<expression::ScopeBlock> block = parser::pass::block_top_level(stream).take_unchecked();
+  REQUIRE(expr == *block);
+}
+
+template<usize N>
+auto scope(std::array<Box<Statement>, N> statements) {
+  Vec<Box<Statement>> vec{};
+
+  for (auto &a: statements) {
+    vec.push_back(std::move(a));
+  }
+
+  return Box<Statement>::wrap_unchecked(new expression::ScopeBlock{std::move(vec)});
+}
+
+#define DECL_VARIABLE(name, mut) Box<Statement>::wrap_unchecked(new VariableDeclaration {name, meta::Mutability:: mut})
+#define DECL_VARIABLE(name, mut) Box<Statement>::wrap_unchecked(new VariableDeclaration {name, meta::Mutability:: mut})
+
+#define SCOPE(...) scope(std::array{__VA_ARGS__})
+
+TEST_CASE("variables") {
+  parse(
+    L"let a;",
+    std::array{
+      DECL_VARIABLE(L"a", IMMUTABLE)
+    }
+  );
+
+  parse(
+    L"let a; let b; let c;",
+    std::array{
+      DECL_VARIABLE(L"a", IMMUTABLE),
+      DECL_VARIABLE(L"b", IMMUTABLE),
+      DECL_VARIABLE(L"c", IMMUTABLE)
+    }
+  );
+
+  REQUIRE_THROWS(parse( L"let ", std::array{ DECL_VARIABLE(L"a", IMMUTABLE) } ));
+
+  parse(
+    L" let a; { let b; let c; };",
+    std::array{
+      DECL_VARIABLE(L"a", IMMUTABLE),
+      SCOPE(
+        DECL_VARIABLE(L"b", IMMUTABLE),
+        DECL_VARIABLE(L"c", IMMUTABLE)
+      )
+    }
+  );
+
+  parse(
+    L" let a; { let b; let c; };",
+    std::array{
+      DECL_VARIABLE(L"a", IMMUTABLE),
+      SCOPE(
+        DECL_VARIABLE(L"b", IMMUTABLE),
+        DECL_VARIABLE(L"c", IMMUTABLE)
+      )
+    }
+  );
+
+  parse(
+    L"{  };",
+    std::array{scope<0>({})}
+  );
+
+  parse(
+    L"{ {}; };",
+    std::array{scope<1>({scope<0>({})})}
+  );
 }

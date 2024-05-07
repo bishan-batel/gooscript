@@ -30,12 +30,12 @@ namespace goos::parser {
     return curr() == token;
   }
 
-  bool TokenStream::is_curr(const lexer::Operator &token) const {
-    return token::Operator{token} == curr();
+  bool TokenStream::is_curr(const lexer::Operator &op) const {
+    return token::Operator{op} == curr();
   }
 
-  bool TokenStream::is_curr(const lexer::Keyword &token) const {
-    return token::Keyword{token} == curr();
+  bool TokenStream::is_curr(const lexer::Keyword &keyword) const {
+    return token::Keyword{keyword} == curr();
   }
 
   bool TokenStream::try_consume(const lexer::Operator op) {
@@ -69,6 +69,16 @@ namespace goos::parser {
     return crab::err(
       error<err::ExpectedToken>(std::format("Expected a Keyword {}", str::convert(msg.str())), curr().clone())
     );
+  }
+
+  Result<lexer::Keyword> TokenStream::consume_keyword(const lexer::Keyword allowed) {
+    std::array arr{allowed};
+    return consume_keyword(std::span{arr});
+  }
+
+  Result<lexer::Operator> TokenStream::consume_operator(const lexer::Operator allowed) {
+    std::array arr{allowed};
+    return consume_operator(std::span{arr});
   }
 
   Result<lexer::Operator> TokenStream::consume_operator(const Span<lexer::Operator> allowed) {

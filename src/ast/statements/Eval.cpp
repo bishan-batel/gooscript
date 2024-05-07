@@ -16,4 +16,11 @@ namespace goos::ast {
   }
 
   Box<Statement> Eval::clone() const { return crab::make_box<Eval>(expression->clone_expr()); }
+
+  bool Eval::operator==(const Statement &statement) const {
+    if (auto other{crab::ref::cast<Eval>(statement)}) {
+      return *expression == *other.take_unchecked()->expression;
+    }
+    return false;
+  }
 }

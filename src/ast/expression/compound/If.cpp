@@ -27,4 +27,15 @@ namespace goos::ast::expression {
       else_then->clone_expr()
     );
   }
+
+  bool If::operator==(const Statement &statement) const {
+    if (auto other = crab::ref::cast<If>(statement)) {
+      const auto &[condition, then, else_then] = *other.get_unchecked();
+      return
+          *this->condition == *condition and
+          *this->then == *then and
+          *this->else_then == *else_then;
+    }
+    return false;
+  }
 } // namespace goos::ast::expression

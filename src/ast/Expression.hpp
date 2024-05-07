@@ -16,6 +16,6 @@ namespace goos::ast {
 
     [[nodiscard]] virtual Box<Expression> clone_expr() const = 0;
 
-    [[nodiscard]] Box<Statement> clone() const override final;
+    [[nodiscard]] Box<Statement> clone() const final;
   };
 }

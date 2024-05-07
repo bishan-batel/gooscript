@@ -12,4 +12,8 @@ namespace goos::ast::expression {
   }
 
   Box<Expression> Unit::clone_expr() const { return crab::make_box<Unit>(); }
+
+  bool Unit::operator==(const Statement &statement) const {
+    return crab::ref::cast<Unit>(statement).is_some();
+  }
 }

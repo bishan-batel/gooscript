@@ -18,4 +18,11 @@ namespace goos::ast::expression {
   Box<Expression> StringLiteral::clone_expr() const {
     return crab::make_box<StringLiteral>(literal);
   }
+
+  bool StringLiteral::operator==(const Statement &statement) const {
+    if (auto other = crab::ref::cast<StringLiteral>(statement)) {
+      return other.take_unchecked()->literal == literal;
+    }
+    return false;
+  }
 }

@@ -20,5 +20,7 @@ namespace goos::ast {
     [[nodiscard]] WideString to_string() const override;
 
     [[nodiscard]] Box<Statement> clone() const override;
+
+    [[nodiscard]] bool operator==(const Statement &statement) const override;
   };
 }

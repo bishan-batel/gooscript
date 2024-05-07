@@ -28,13 +28,21 @@ namespace goos::parser {
   using OptionalResult = Result<Option<Box<T>>>;
 
   /**
-   * A pass that must evaluate to a valid AST expression
+   * @brief A pass that must evaluate to a valid AST expression
    */
   template<typename T>
   using MustEvalPass = std::function<MustEvalResult<T>(TokenStream &)>;
 
+  /**
+   * @brief A pass that is able to evaluate to a valid AST expression, must safely handle any errors.
+   */
   template<typename T>
   using OptionalPass = std::function<OptionalResult<T>(TokenStream &)>;
+
+  template<typename F>
+  concept is_optional_pass = std::is_invocable_v<F, TokenStream&> and requires(F f, TokenStream &stream) {
+    OptionalPass<std::remove_reference_t<decltype(f(stream).take_unchecked())>>{f};
+  };
 
   class TokenStream {
     lexer::TokenList list;
@@ -42,55 +50,111 @@ namespace goos::parser {
     token::EndOfFile eof;
 
   public:
-    inline static const Vec<OptionalPass<Box<ast::Statement>>> TOP_LEVEL_PASSES;
-
     explicit TokenStream(lexer::TokenList list);
 
-    [[nodiscard]] const token::Token& curr() const;
+    /**
+     * Returns the current token
+     */
+    [[nodiscard]]
+    auto curr() const -> const token::Token&;
 
-    const token::Token& next(usize i = 1);
+    /**
+     * @brief Advances by i times and returns the new current token
+     * @param i How much to advance
+     */
+    auto next(usize i = 1) -> const token::Token&;
 
+    /**
+     * @brief Queries if the current token is of type T
+     * @tparam T Type to check
+     */
     template<typename T> requires std::is_base_of_v<token::Token, T>
-    [[nodiscard]] bool is_curr() const {
-      return crab::ref::cast<T>(curr()).is_some();
-    }
+    [[nodiscard]]
+    auto is_curr() const -> bool;
 
-    [[nodiscard]] bool is_curr(const token::Token &token) const;
+    /**
+     * @brief Queries if the current token is equal to the given, note this is strict / deep equality
+     */
+    [[nodiscard]]
+    auto is_curr(const token::Token &token) const -> bool;
 
-    [[nodiscard]] bool is_curr(const lexer::Operator &token) const;
+    /**
+     * @brief Queries if the current token is the specified operator
+     */
+    [[nodiscard]]
+    auto is_curr(const lexer::Operator &op) const -> bool;
 
-    [[nodiscard]] bool is_curr(const lexer::Keyword &token) const;
+    /**
+     * @brief Queries if the current token is the specified keyword
+     */
+    [[nodiscard]]
+    auto is_curr(const lexer::Keyword &keyword) const -> bool;
 
+    /**
+     * @brief Attempts to take the current token of type T, return it,
+     * and then move the stream to the next token. The token will not be consumed
+     * if it is not of type T and this function will return None
+     */
     template<typename T> requires std::is_base_of_v<token::Token, T>
-    [[nodiscard]] Option<Ref<T>> try_consume() {
-      Option<Ref<T>> casted = crab::ref::cast<T>(curr());
-      if (casted) next();
-      return casted;
-    }
+    [[nodiscard]]
+    auto try_consume() -> Option<Ref<T>>;
 
-    [[nodiscard]] bool try_consume(lexer::Operator op);
+    /**
+     * @brief Attempts to take the current token if it is the given operator, return it,
+     * and then move the stream to the next token. If the token is not of type operator or is not
+     * the specified operator, it will return None.
+     */
+    [[nodiscard]]
+    auto try_consume(lexer::Operator op) -> bool;
 
-    [[nodiscard]] bool try_consume(lexer::Keyword word);
+    /**
+     * @brief Attempts to take the current token if it is the given operator, return it,
+     * and then move the stream to the next token. If the token is not of type operator or is not
+     * the specified operator, it will return None.
+     */
+    [[nodiscard]]
+    auto try_consume(lexer::Keyword word) -> bool;
 
     [[nodiscard]]
-    Result<lexer::Keyword> consume_keyword(Span<lexer::Keyword> allowed = {});
+    auto consume_keyword(Span<lexer::Keyword> allowed) -> Result<lexer::Keyword>;
 
     [[nodiscard]]
-    Result<lexer::Operator> consume_operator(Span<lexer::Operator> allowed = {});
+    auto consume_keyword(lexer::Keyword allowed) -> Result<lexer::Keyword>;
 
     [[nodiscard]]
-    Result<WideString> consume_identifier();
+    auto consume_operator(Span<lexer::Operator> allowed) -> Result<lexer::Operator>;
 
-    [[nodiscard]] bool is_eof() const;
+    [[nodiscard]]
+    auto consume_operator(lexer::Operator allowed) -> Result<lexer::Operator>;
+
+    [[nodiscard]]
+    auto consume_identifier() -> Result<WideString>;
+
+    [[nodiscard]] auto is_eof() const -> bool;
 
     template<typename T, typename... Args> requires
       std::is_base_of_v<err::ErrorBase, T>
-    err::Error error(Args &&... args) {
-      return err::Error{crab::make_box<T, Args...>(std::forward<Args>(args)...)};
-    }
+    auto error(Args &&... args) -> err::Error;
 
-    err::Error unexpected(String expected);
+    auto unexpected(String expected) -> err::Error;
 
-    err::Error unexpected(String expected, Box<token::Token> received);
+    auto unexpected(String expected, Box<token::Token> received) -> err::Error;
   };
+
+  template<typename T> requires std::is_base_of_v<token::Token, T>
+  auto TokenStream::is_curr() const -> bool {
+    return crab::ref::cast<T>(curr()).is_some();
+  }
+
+  template<typename T> requires std::is_base_of_v<token::Token, T>
+  auto TokenStream::try_consume() -> Option<Ref<T>> {
+    Option<Ref<T>> casted = crab::ref::cast<T>(curr());
+    if (casted) next();
+    return casted;
+  }
+
+  template<typename T, typename... Args> requires std::is_base_of_v<err::ErrorBase, T>
+  auto TokenStream::error(Args &&... args) -> err::Error {
+    return err::Error{crab::make_box<T, Args...>(std::forward<Args>(args)...)};
+  }
 }

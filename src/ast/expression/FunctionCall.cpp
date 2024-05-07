@@ -32,4 +32,19 @@ namespace goos::ast::expression {
 
     return crab::make_box<FunctionCall>(function->clone_expr(), std::move(arguments_clone));
   }
+
+  bool FunctionCall::operator==(const Statement &statement) const {
+    Option<Ref<FunctionCall>> other_opt = crab::ref::cast<FunctionCall>(statement);
+    if (other_opt.is_none()) return false;
+
+    const FunctionCall &function = other_opt.take_unchecked();
+
+    if (function.arguments.size() != arguments.size()) return false;
+    if (*function.function != *this->function) return false;
+
+    for (usize i = 0; i < arguments.size(); i++) {
+      if (*arguments[i] != *function.arguments[i]) return false;
+    }
+    return true;
+  }
 }

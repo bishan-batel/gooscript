@@ -17,7 +17,7 @@ namespace goos::parser::err {
 
   String ExpectedToken::what() const {
     const String normal_str = std::wstring_convert<std::codecvt_utf8<widechar>>().to_bytes(where().to_string());
-    return fmt::format("Expected {}, Received {}", expected_type, normal_str);
+    return fmt::format("Expected {}, Received '{}'", expected_type, normal_str);
   }
 
   const String& ExpectedToken::get_expected() const { return expected_type; }

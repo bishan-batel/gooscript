@@ -19,4 +19,12 @@ namespace goos::ast::expression {
   Box<Expression> Unary::clone_expr() const {
     return crab::make_box<Unary>(op, expr->clone_expr());
   }
+
+  bool Unary::operator==(const Statement &statement) const {
+    auto other_opt = crab::ref::cast<Unary>(statement);
+    if (other_opt.is_none()) return false;
+
+    const Unary &other = other_opt.take_unchecked();
+    return other.op == op and *other.expr == *expr;
+  }
 }

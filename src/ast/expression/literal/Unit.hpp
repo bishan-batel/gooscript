@@ -15,6 +15,8 @@ public:
   [[nodiscard]] WideString to_string() const override;
 
   [[nodiscard]] Box<Expression> clone_expr() const override;
+
+  [[nodiscard]] bool operator==(const Statement &statement) const override;
 };
 
 }

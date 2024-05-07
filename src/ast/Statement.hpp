@@ -25,10 +25,16 @@ namespace goos::ast {
 
     virtual ~Statement() = default;
 
+    [[nodiscard]] virtual bool operator==(const Statement &statement) const = 0;
+
+    [[nodiscard]] bool operator!=(const Statement &statement) const;
+
     template<typename T> requires std::is_base_of_v<Statement, T>
     Option<Ref<T>> try_as() const {
       return crab::ref::from_ptr(dynamic_cast<const T*>(this));
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Statement& statement);
 
     [[nodiscard]] virtual WideString to_string() const = 0;
 

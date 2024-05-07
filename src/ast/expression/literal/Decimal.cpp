@@ -19,4 +19,11 @@ namespace goos::ast::expression {
   Box<Expression> Decimal::clone_expr() const {
     return crab::make_box<Decimal>(literal);
   }
+
+  bool Decimal::operator==(const Statement &statement) const {
+    if (auto other = crab::ref::cast<Decimal>(statement)) {
+      return other.take_unchecked()->literal == literal;
+    }
+    return false;
+  }
 }

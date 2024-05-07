@@ -15,4 +15,11 @@ namespace goos::ast::expression {
   }
 
   Box<Expression> Integer::clone_expr() const { return crab::make_box<Integer>(number); }
+
+  bool Integer::operator==(const Statement &statement) const {
+    if (auto other = crab::ref::cast<Integer>(statement)) {
+      return other.take_unchecked()->number == number;
+    }
+    return false;
+  }
 }

@@ -81,6 +81,11 @@ set(SOURCE_FILES
         src/source/IoError.hpp
         "src/utils/str.cpp"
         src/utils/str.hpp
+        src/parser/pass/expression/expression.hpp
+        src/ast/statements/VariableDeclaration.cpp
+        src/ast/statements/VariableDeclaration.hpp
+        src/meta/Mutability.cpp
+        src/meta/Mutability.hpp
 )
 
 

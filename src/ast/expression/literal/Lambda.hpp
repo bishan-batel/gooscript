@@ -25,5 +25,7 @@ namespace goos::ast::expression {
     [[nodiscard]] const Expression& get_body() const;
 
     [[nodiscard]] Box<Expression> clone_expr() const override;
+
+    [[nodiscard]] bool operator==(const Statement &statement) const override;
   };
 }
