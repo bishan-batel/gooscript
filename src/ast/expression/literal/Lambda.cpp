@@ -5,19 +5,20 @@
 #include "Lambda.hpp"
 
 #include <sstream>
-#include <fmt/compile.h>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
-  Lambda::Lambda(Vec<String> params, Box<Expression> body)
+  Lambda::Lambda(Vec<WideString> params, Box<Expression> body)
     : params{std::move(params)}, body{std::move(body)} {}
 
-  String Lambda::to_string() const {
-    std::stringstream stream{};
+  WideString Lambda::to_string() const {
+    WideStringStream stream{};
 
     for (const auto &param: params) {
-      stream << fmt::format("{}, ", param);
+      stream << fmt::format(L"{}, ", param);
     }
-    return fmt::format("fn ({}) = {}", stream.str(), body->to_string());
+    return fmt::format(L"fn ({}) = {}", stream.str(), body->to_string());
   }
 
   const Expression& Lambda::get_body() const { return body; }
@@ -26,5 +27,5 @@ namespace goos::ast::expression {
     return crab::make_box<Lambda>(params, body->clone_expr());
   }
 
-  const Vec<String>& Lambda::get_params() const { return params; }
+  const Vec<WideString>& Lambda::get_params() const { return params; }
 }

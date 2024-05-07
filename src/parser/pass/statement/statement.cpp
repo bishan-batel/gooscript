@@ -4,9 +4,18 @@
 
 #include "statement.hpp"
 
+#include "ast/expression/literal/Unit.hpp"
+#include "ast/statements/Eval.hpp"
+
 namespace goos::parser::pass {
-  OptionalResult<ast::Statement> statement([[maybe_unused]] TokenStream &stream) {
+  MustEvalResult<ast::Statement> statement([[maybe_unused]] TokenStream &stream) {
+    if (stream.is_eof()) {
+      return crab::err(stream.unexpected("Statement"));
+    }
+
     // TODO
-    return OptionalResult<ast::Statement>(crab::none);
+    return MustEvalResult<ast::Statement>(
+      crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())
+    );
   }
 }

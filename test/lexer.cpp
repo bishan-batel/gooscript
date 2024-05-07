@@ -8,18 +8,19 @@
 #include "token/Identifier.hpp"
 #include "token/Integer.hpp"
 #include "token/StringLiteral.hpp"
+#include "utils/str.hpp"
 
 using namespace goos;
 using namespace crab;
 
 #define WORD(word) crab::make_box<goos::token::Keyword>(lexer::Keyword:: word)
-#define IDENT(name) crab::make_box<goos::token::Identifier>(#name)
+#define IDENT(name) crab::make_box<goos::token::Identifier>(str::convert(#name))
 #define NUMF(num) crab::make_box<goos::token::Decimal>(static_cast<f64>(num))
 #define NUMI(num) crab::make_box<goos::token::Integer>(static_cast<i64>(num))
 #define STR(str) crab::make_box<goos::token::StringLiteral>(str)
 
-auto parse(lexer::TokenList &list, const StringView source) {
-  list = std::move(lexer::Lexer::tokenize(Rc{String{source}}).get_unchecked());
+auto parse(lexer::TokenList &list, const WideStringView source) {
+  list = std::move(lexer::Lexer::tokenize(SourceFile::create(WideString{source})).get_unchecked());
 }
 
 template<typename... Args>
@@ -42,12 +43,12 @@ TEST_CASE("Lexer", "[lexer]") {
   lexer::TokenList toks;
 
   SECTION("Whitespace") {
-    REQUIRE_NOTHROW(parse(toks, "   \n \t \r\r\r \n \t "));
+    REQUIRE_NOTHROW(parse(toks, L"   \n \t \r\r\r \n \t "));
     REQUIRE(toks.empty());
   }
 
   SECTION("Identifier") {
-    REQUIRE_NOTHROW(parse(toks, " me\t\t when \n\rthe bruh\n huh "));
+    REQUIRE_NOTHROW(parse(toks, L" me\t\t when \n\rthe bruh\n huh "));
 
     matches(
       toks,
@@ -60,7 +61,7 @@ TEST_CASE("Lexer", "[lexer]") {
   }
 
   SECTION("Keyword") {
-    REQUIRE_NOTHROW(parse(toks, " me let match var VAR what huh"));
+    REQUIRE_NOTHROW(parse(toks, L" me let match var VAR what huh"));
 
     matches(
       toks,
@@ -76,24 +77,24 @@ TEST_CASE("Lexer", "[lexer]") {
     REQUIRE_NOTHROW(
       parse(
         toks,
-        "module "
-        "use "
-        "let "
-        "var "
-        "if "
-        "else "
-        "then "
-        "unless "
-        "while "
-        "until "
-        "for "
-        "do "
-        "in "
-        "nil "
-        "match "
-        "default "
-        "fn "
-        "return "
+        L"module "
+        L"use "
+        L"let "
+        L"var "
+        L"if "
+        L"else "
+        L"then "
+        L"unless "
+        L"while "
+        L"until "
+        L"for "
+        L"do "
+        L"in "
+        L"nil "
+        L"match "
+        L"default "
+        L"fn "
+        L"return "
       )
     );
 
@@ -121,7 +122,7 @@ TEST_CASE("Lexer", "[lexer]") {
   }
 
   SECTION("Number") {
-    REQUIRE_NOTHROW(parse(toks, R"(42 42. 42.02what)"));
+    REQUIRE_NOTHROW(parse(toks, LR"(42 42. 42.02what)"));
 
     matches(
       toks,
@@ -131,7 +132,7 @@ TEST_CASE("Lexer", "[lexer]") {
       IDENT(what)
     );
 
-    REQUIRE_NOTHROW(parse(toks, R"(huh let42 let 42. 42.02what)"));
+    REQUIRE_NOTHROW(parse(toks, LR"(huh let42 let 42. 42.02what)"));
 
     matches(
       toks,
@@ -149,13 +150,13 @@ TEST_CASE("Lexer", "[lexer]") {
       REQUIRE_NOTHROW(
         parse(
           toks,
-          R"( "huh" "me when the"42 )")
+          LR"( "huh" "me when the"42 )")
       );
 
       matches(
         toks,
-        STR("huh"),
-        STR("me when the"),
+        STR(L"huh"),
+        STR(L"me when the"),
         NUMI(42)
       );
     }
@@ -164,28 +165,27 @@ TEST_CASE("Lexer", "[lexer]") {
       REQUIRE_THROWS(
         parse(
           toks,
-          R"( "huh" "me when the )")
+          LR"( "huh" "me when the )")
       );
 
       REQUIRE_THROWS(
         parse(
           toks,
-          R"( huh""what" )")
+          LR"( huh""what" )")
       );
 
       REQUIRE_NOTHROW(
         parse(
           toks,
-          R"( huh"""what" )")
+          LR"( huh"""what" )")
       );
 
       matches(
         toks,
         IDENT(huh),
-        STR(""),
-        STR("what")
+        STR(L""),
+        STR(L"what")
       );
     }
-
   }
 }

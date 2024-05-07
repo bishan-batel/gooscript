@@ -30,7 +30,7 @@ namespace goos::ast {
       return crab::ref::from_ptr(dynamic_cast<const T*>(this));
     }
 
-    [[nodiscard]] virtual String to_string() const = 0;
+    [[nodiscard]] virtual WideString to_string() const = 0;
 
     [[nodiscard]] virtual Box<Statement> clone() const = 0;
   };

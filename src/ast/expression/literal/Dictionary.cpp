@@ -11,8 +11,8 @@ namespace goos::ast::expression {
 
   const Vec<Dictionary::Pair>& Dictionary::get_pairs() const { return pairs; }
 
-  String Dictionary::to_string() const {
-    std::stringstream stream{};
+  WideString Dictionary::to_string() const {
+    WideStringStream stream{};
 
     stream << '{';
     for (const auto &[key, value]: pairs) {

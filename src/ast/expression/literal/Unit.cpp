@@ -7,8 +7,8 @@
 namespace goos::ast::expression {
   Unit::Unit() = default;
 
-  String Unit::to_string() const {
-    return "unit";
+  WideString Unit::to_string() const {
+    return L"unit";
   }
 
   Box<Expression> Unit::clone_expr() const { return crab::make_box<Unit>(); }

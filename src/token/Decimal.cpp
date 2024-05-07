@@ -3,6 +3,7 @@
 //
 
 #include "Decimal.hpp"
+#include <fmt/xchar.h>
 
 namespace goos::token {
   Decimal::Decimal(const f64 num) : number{num} {}
@@ -11,8 +12,8 @@ namespace goos::token {
 
   Box<Token> Decimal::clone() const { return crab::make_box<Decimal>(number); }
 
-  String Decimal::to_string() const {
-    return fmt::format("{}D", number);
+  WideString Decimal::to_string() const {
+    return fmt::format(L"{}D", number);
   }
 
   bool Decimal::operator==(const Token &other) const {

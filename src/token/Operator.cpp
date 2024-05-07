@@ -13,8 +13,8 @@ namespace goos::token {
     return crab::make_box<Operator>(op);
   }
 
-  String Operator::to_string() const {
-    return String{lexer::OPERATOR_TO_STR_MAP.at(op)};
+  WideString Operator::to_string() const {
+    return WideString{lexer::OPERATOR_TO_STR_MAP.at(op)};
   }
 
   bool Operator::operator==(const Token &other) const {

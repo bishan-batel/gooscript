@@ -14,7 +14,7 @@ namespace goos::ast::expression {
   public:
     FunctionCall(Box<Expression> function, Vec<Box<Expression>> arguments);
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
     [[nodiscard]] Box<Expression> clone_expr() const override;
   };

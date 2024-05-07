@@ -3,7 +3,8 @@
 //
 
 #include "Unary.hpp"
-#include <fmt/compile.h>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
   Unary::Unary(const lexer::Operator op, Box<Expression> expr)
@@ -11,8 +12,8 @@ namespace goos::ast::expression {
 
   const Expression& Unary::get_expression() const { return expr; }
 
-  String Unary::to_string() const {
-    return fmt::format("{} ({})", lexer::OPERATOR_TO_STR_MAP.at(op), expr->to_string());
+  WideString Unary::to_string() const {
+    return fmt::format(L"{} ({})", lexer::OPERATOR_TO_STR_MAP.at(op), expr->to_string());
   }
 
   Box<Expression> Unary::clone_expr() const {

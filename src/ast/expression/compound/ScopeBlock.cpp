@@ -6,9 +6,10 @@
 
 #include <sstream>
 
-#include "../../../../build/Release/_deps/fmt-src/include/fmt/format.h"
 #include "ast/expression/literal/Unit.hpp"
 #include "ast/statements/Eval.hpp"
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
   ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements)
@@ -17,14 +18,14 @@ namespace goos::ast::expression {
   ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements, Box<Eval> eval)
     : statements{std::move(statements)}, eval{std::move(eval)} {}
 
-  String ScopeBlock::to_string() const {
-    std::stringstream stream{};
+  WideString ScopeBlock::to_string() const {
+    WideStringStream stream{};
 
     for (const auto &statement: statements) {
       stream << statement->to_string() << ";\n";
     }
 
-    return fmt::format("scope {{ {} }}", stream.str());
+    return fmt::format(L"block {{ {} }}", stream.str());
   }
 
   Box<Expression> ScopeBlock::clone_expr() const {

@@ -22,7 +22,7 @@ namespace goos::ast::expression {
 
     [[nodiscard]] const Vec<Pair>& get_pairs() const;
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
     [[nodiscard]] Box<Expression> clone_expr() const override;
   };

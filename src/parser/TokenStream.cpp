@@ -11,6 +11,7 @@
 
 #include "token/EndOfFile.hpp"
 #include "token/Identifier.hpp"
+#include "utils/str.hpp"
 
 namespace goos::parser {
   TokenStream::TokenStream(lexer::TokenList list) : list{std::move(list)} {}
@@ -56,7 +57,7 @@ namespace goos::parser {
       return crab::ok(word.get_unchecked()->get_word());
     }
 
-    std::stringstream msg;
+    WideStringStream msg;
 
     if (not allowed.empty()) {
       msg << ": ";
@@ -65,15 +66,17 @@ namespace goos::parser {
       }
     }
 
-    return crab::err(error<err::ExpectedToken>(std::format("Expected a Keyword {}", msg.str()), curr().clone()));
+    return crab::err(
+      error<err::ExpectedToken>(std::format("Expected a Keyword {}", str::convert(msg.str())), curr().clone())
+    );
   }
 
-  Result<lexer::Operator> TokenStream::consume_operator(Span<lexer::Operator> allowed) {
+  Result<lexer::Operator> TokenStream::consume_operator(const Span<lexer::Operator> allowed) {
     if (auto op = try_consume<token::Operator>()) {
       return crab::ok(op.get_unchecked()->get_op());
     }
 
-    std::stringstream msg;
+    WideStringStream msg;
 
     if (not allowed.empty()) {
       msg << ": ";
@@ -82,10 +85,12 @@ namespace goos::parser {
       }
     }
 
-    return crab::err(error<err::ExpectedToken>(std::format("Expected an operator {}", msg.str()), curr().clone()));
+    return crab::err(
+      error<err::ExpectedToken>(std::format("Expected an operator {}", str::convert(msg.str())), curr().clone())
+    );
   }
 
-  Result<String> TokenStream::consume_identifier() {
+  Result<WideString> TokenStream::consume_identifier() {
     if (auto identifier = try_consume<token::Identifier>()) {
       return crab::ok(identifier.get_unchecked()->get_identifier());
     }

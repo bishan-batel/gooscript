@@ -18,7 +18,7 @@ namespace goos::ast::expression {
 
     explicit ScopeBlock(Vec<Box<Statement>> statements, Box<Eval> eval);
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
     [[nodiscard]] Box<Expression> clone_expr() const override;
   };

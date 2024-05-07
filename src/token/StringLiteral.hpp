@@ -7,16 +7,16 @@
 
 namespace goos::token {
   class StringLiteral final : public Token {
-    String literal;
+    WideString literal;
 
   public:
-    explicit StringLiteral(StringView string);
+    explicit StringLiteral(WideString string);
 
     [[nodiscard]] Box<Token> clone() const override;
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
-    [[nodiscard]] StringView get_string() const;
+    [[nodiscard]] const WideString& get_string() const;
 
     [[nodiscard]] bool operator==(const Token &other) const override;
   };

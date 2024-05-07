@@ -12,7 +12,7 @@ class Unit final : public Expression {
 public:
   Unit();
 
-  [[nodiscard]] String to_string() const override;
+  [[nodiscard]] WideString to_string() const override;
 
   [[nodiscard]] Box<Expression> clone_expr() const override;
 };

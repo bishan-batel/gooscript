@@ -3,15 +3,16 @@
 //
 
 #include "StringLiteral.hpp"
-#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
-  StringLiteral::StringLiteral(String literal) : literal(std::move(literal)) {}
+  StringLiteral::StringLiteral(WideString literal) : literal(std::move(literal)) {}
 
-  const String& StringLiteral::get_string() const { return literal; }
+  const WideString& StringLiteral::get_string() const { return literal; }
 
-  String StringLiteral::to_string() const {
-    return fmt::format("\"{}\"", literal);
+  WideString StringLiteral::to_string() const {
+    return fmt::format(L"\"{}\"", literal);
   }
 
   Box<Expression> StringLiteral::clone_expr() const {

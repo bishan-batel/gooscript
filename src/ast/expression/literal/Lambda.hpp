@@ -9,18 +9,18 @@
 
 namespace goos::ast::expression {
   class Lambda final : public Expression {
-    Vec<String> params;
+    Vec<WideString> params;
     Box<Expression> body;
 
   public:
     explicit Lambda(
-      Vec<String> params,
+      Vec<WideString> params,
       Box<Expression> body
     );
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
-    [[nodiscard]] const Vec<String>& get_params() const;
+    [[nodiscard]] const Vec<WideString>& get_params() const;
 
     [[nodiscard]] const Expression& get_body() const;
 

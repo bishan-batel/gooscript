@@ -106,7 +106,6 @@ dictionary = {
 # }
 
 #
-
 return pokemon;
 
 let iterator = fn(lower_bound, upper_bound) {
@@ -120,6 +119,8 @@ let iterator = fn(lower_bound, upper_bound) {
     },
   };
 };
+
+echo "";
 
 class Iterator {
 };
@@ -167,9 +168,12 @@ let a = match huh {
   default => log("huh")
 };
 
-let a = Vec2.new();
+let a = Vec2:new();
 
 if true then log();
+
+if true then {
+};
 
 if true {
   let a = if true then 10 else 0;
@@ -189,8 +193,14 @@ add_animation {
 };
 
 add_animation("Huh") fn {
-
 };
+
+
+let arg = 
+  upper = 10,
+  lower = 100
+};
+
 
 #
 # functions, if, unless 

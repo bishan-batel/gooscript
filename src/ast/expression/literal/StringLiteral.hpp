@@ -7,14 +7,14 @@
 
 namespace goos::ast::expression {
   class StringLiteral final : public Expression {
-    String literal;
+    WideString literal;
 
   public:
-    explicit StringLiteral(String literal);
+    explicit StringLiteral(WideString literal);
 
-    [[nodiscard]] const String& get_string() const;
+    [[nodiscard]] const WideString& get_string() const;
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
     [[nodiscard]] Box<Expression> clone_expr() const override;
   };

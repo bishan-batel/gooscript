@@ -6,15 +6,16 @@
 
 #include <sstream>
 #include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
   Array::Array(Vec<Box<Expression>> values) : values{std::move(values)} {}
 
-  String Array::to_string() const {
-    std::stringstream stream{};
+  WideString Array::to_string() const {
+    WideStringStream stream{};
     stream << '[';
     for (const auto &value: values) {
-      stream << fmt::format("{}, ", value->to_string());
+      stream << fmt::format(L"{}, ", value->to_string());
     }
     stream << ']';
     return stream.str();

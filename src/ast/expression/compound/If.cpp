@@ -5,14 +5,15 @@
 #include "If.hpp"
 
 #include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
   If::If(Box<Expression> condition, Box<Expression> then, Box<Expression> else_then)
     : condition{std::move(condition)}, then{std::move(then)}, else_then{std::move(else_then)} {}
 
-  String If::to_string() const {
+  WideString If::to_string() const {
     return fmt::format(
-      "if {} then {{ {} }} else {{ {} }}",
+      L"if {} then {{ {} }} else {{ {} }}",
       condition->to_string(),
       then->to_string(),
       else_then->to_string()

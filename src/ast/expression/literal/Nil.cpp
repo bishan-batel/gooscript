@@ -5,8 +5,8 @@
 #include "Nil.hpp"
 
 namespace goos::ast::expression {
-  String Nil::to_string() const {
-    return "nil";
+  WideString Nil::to_string() const {
+    return L"nil";
   }
 
   Box<Expression> Nil::clone_expr() const { return crab::make_box<Nil>(); }

@@ -12,6 +12,7 @@
 #include <fmt/compile.h>
 #include <token/Keyword.hpp>
 #include <token/Operator.hpp>
+#include <utility>
 
 #include "Keyword.hpp"
 #include "Operator.hpp"
@@ -19,6 +20,7 @@
 #include "token/Identifier.hpp"
 #include "token/Integer.hpp"
 #include "token/StringLiteral.hpp"
+#include "utils/str.hpp"
 
 namespace goos::lexer {
   StringView Error::to_string(const Type type) {
@@ -34,57 +36,50 @@ namespace goos::lexer {
     return {};
   }
 
-  Error::Error(const Type type, const Rc<String> &section, const Range<> range)
-    : section{section},
+  Error::Error(const Type type, SourceFile section, const Range<> range)
+    : section{std::move(section)},
       slice{range},
-      type{type},
-      msg{
+      type{type} {}
+
+  String Error::what() const {
+    const String converted{str::convert(section.slice(slice.lower_bound(), slice.upper_bound()))};
+    return
         std::format(
           "\"{}\", \n{}",
-          section.as_ref()->substr(range.lower_bound(), range.upper_bound() - range.lower_bound()),
+          converted,
           to_string(type)
-        )
-      } {}
-
-  StringView Error::what() const { return msg; }
+        );
+  }
 
   Error::Type Error::get_type() const { return type; }
 
-  Lexer::Lexer(const Rc<String> &content) : content{content} {}
+  Lexer::Lexer(SourceFile content) : content{std::move(content)} {}
 
   Error Lexer::error(const Error::Type type, const usize begin) const {
-    return Error{type, content, crab::range(begin, std::min(content.as_ref()->size(), position))};
+    return Error{type, content, crab::range(begin, position)};
   }
 
   void Lexer::push(Box<Token> token) {
     tokens.push_back(std::move(token));
   }
 
-  char Lexer::curr() const {
-    return is_eof() ? '\0' : content.as_ref()->at(position);
+  widechar Lexer::curr() const {
+    return is_eof() ? L'\0' : content.get_char(position);
   }
 
-  bool Lexer::is_curr(const char c) const {
+  bool Lexer::is_curr(const widechar c) const {
     return curr() == c;
   }
 
-  char Lexer::next(const usize n) {
+  widechar Lexer::next(const usize n) {
     position += n;
     return curr();
   }
 
-  bool Lexer::is_eof() const { return position >= content.as_ref()->size(); }
+  bool Lexer::is_eof() const { return position >= content.length(); }
 
-  StringView Lexer::substr(const Range<> range) const {
-    auto constraint{[this](auto n) { return std::min(n, content.as_ref()->size()); }};
-    return StringView{*content.as_ref()}.substr(
-      constraint(range.lower_bound()),
-      constraint(range.upper_bound()) - constraint(range.lower_bound())
-    );
-  }
-
-  Result<TokenList> Lexer::tokenize(const Rc<String> &content) {
-    Lexer lexer{content};
+  Result<TokenList> Lexer::tokenize(SourceFile content) {
+    Lexer lexer{std::move(content)};
 
     while (not lexer.is_eof()) {
       const std::array<std::function<Result<bool>()>, 5> passes{
@@ -127,18 +122,20 @@ namespace goos::lexer {
   }
 
   Result<bool> Lexer::number_literal() {
-    if (not std::isdigit(curr())) {
+    if (not token::DIGIT_CHARS.contains(curr())) {
       return crab::ok(false);
     }
 
     const usize begin = position;
 
+    constexpr widechar dot{L'.'};
+
     bool has_dot = false;
-    while (std::isdigit(next()) or (not has_dot and is_curr('.'))) {
-      has_dot |= is_curr('.');
+    while (token::DIGIT_CHARS.contains(next()) or (not has_dot and is_curr(dot))) {
+      has_dot |= is_curr(dot);
     }
 
-    const String num_str{substr(crab::range_inclusive(begin, position))};
+    const WideString num_str{content.slice(crab::range_inclusive(begin, position))};
 
     if (has_dot) {
       emplace<token::Decimal>(std::stod(num_str));
@@ -150,13 +147,13 @@ namespace goos::lexer {
   }
 
   Result<bool> Lexer::string_literal() {
-    if (not is_curr('"')) return crab::ok(false);
+    if (not is_curr(L'"')) return crab::ok(false);
 
-    const usize begin = position + 1;
+    const usize begin = position;
 
-    std::stringstream literal;
-    while (not is_eof() and next() != '"') {
-      if (curr() != '\\') {
+    WideStringStream literal;
+    while (not is_eof() and next() != L'"') {
+      if (curr() != L'\\') {
         literal << curr();
         continue;
       }
@@ -164,17 +161,17 @@ namespace goos::lexer {
 
       #define CASE(x, y)  case x: {literal << y; continue; }
       switch (curr()) {
-        CASE('0', '\0')
-        CASE('n', '\n')
-        CASE('r', '\r')
-        CASE('v', '\v')
-        CASE('t', '\t')
-        CASE('b', '\b')
-        CASE('f', '\f')
-        CASE('\'', '\'')
-        CASE('"', '"')
-        CASE('\\', '\\')
-        case '\n': { continue; }
+        CASE(L'0', L'\0')
+        CASE(L'n', L'\n')
+        CASE(L'r', L'\r')
+        CASE(L'v', L'\v')
+        CASE(L't', L'\t')
+        CASE(L'b', L'\b')
+        CASE(L'f', L'\f')
+        CASE(L'\'', L'\'')
+        CASE(L'"', L'"')
+        CASE(L'\\', L'\\')
+        case L'\n': { continue; }
 
         default:
           return err(error(Error::Type::INVALID_ESCAPED_STRING, begin));
@@ -198,7 +195,7 @@ namespace goos::lexer {
     const usize begin = position;
 
     for (const auto &[string, op]: STR_TO_OPERATOR_MAP) {
-      if (string != substr(crab::range_inclusive(begin, position))) {
+      if (string != content.slice(crab::range_inclusive(begin, position))) {
         continue;
       }
 
@@ -213,7 +210,7 @@ namespace goos::lexer {
   }
 
   Result<bool> Lexer::identifier() {
-    if (token::INVALID_IDENTIFIER_CHARS.contains(curr()) or std::isdigit(curr())) {
+    if (token::INVALID_IDENTIFIER_CHARS.contains(curr()) or token::DIGIT_CHARS.contains(curr())) {
       return crab::ok(false);
     }
 
@@ -224,7 +221,7 @@ namespace goos::lexer {
       c = next();
     }
 
-    String word{substr(crab::range(begin, position))};
+    WideString word{content.slice(crab::range(begin, position))};
 
     if (auto keyword = identifier_to_keyword(word)) {
       emplace<token::Keyword>(keyword.get_unchecked());

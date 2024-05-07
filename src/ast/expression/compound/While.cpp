@@ -4,6 +4,7 @@
 
 #include "While.hpp"
 #include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
   While::While(Box<Expression> condition, Box<Expression> body)
@@ -13,8 +14,8 @@ namespace goos::ast::expression {
 
   const Expression& While::get_body() const { return body; }
 
-  String While::to_string() const {
-    return fmt::format("while {} {{ {} }}", condition->to_string(), body->to_string());
+  WideString While::to_string() const {
+    return fmt::format(L"while {} {{ {} }}", condition->to_string(), body->to_string());
   }
 
   Box<Expression> While::clone_expr() const {

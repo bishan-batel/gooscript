@@ -6,5 +6,5 @@
 #include "parser/TokenStream.hpp"
 
 namespace goos::parser::pass {
-  [[nodiscard]] OptionalResult<ast::Statement> statement(TokenStream &stream);
+  [[nodiscard]] MustEvalResult<ast::Statement> statement(TokenStream &stream);
 }

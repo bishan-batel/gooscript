@@ -25,40 +25,40 @@ namespace goos::lexer {
     EVAL
   };
 
-  inline static const Dictionary<StringView, Keyword> STR_TO_KEYWORD_TABLE{
-    {"module", Keyword::MODULE},
-    {"use", Keyword::USE},
+  inline static const Dictionary<WideStringView, Keyword> STR_TO_KEYWORD_TABLE{
+    {L"module", Keyword::MODULE},
+    {L"use", Keyword::USE},
 
-    {"let", Keyword::LET},
-    {"const", Keyword::LET},
+    {L"let", Keyword::LET},
+    {L"const", Keyword::LET},
 
-    {"var", Keyword::VAR},
+    {L"var", Keyword::VAR},
 
-    {"if", Keyword::IF},
-    {"else", Keyword::ELSE},
-    {"then", Keyword::THEN},
-    {"unless", Keyword::UNLESS},
-    {"while", Keyword::WHILE},
-    {"break", Keyword::WHILE},
-    {"continue", Keyword::WHILE},
-    {"until", Keyword::UNTIL},
-    {"for", Keyword::FOR},
-    {"do", Keyword::DO},
-    {"in", Keyword::IN},
-    {"nil", Keyword::NIL},
+    {L"if", Keyword::IF},
+    {L"else", Keyword::ELSE},
+    {L"then", Keyword::THEN},
+    {L"unless", Keyword::UNLESS},
+    {L"while", Keyword::WHILE},
+    {L"break", Keyword::WHILE},
+    {L"continue", Keyword::WHILE},
+    {L"until", Keyword::UNTIL},
+    {L"for", Keyword::FOR},
+    {L"do", Keyword::DO},
+    {L"in", Keyword::IN},
+    {L"nil", Keyword::NIL},
 
-    {"null", Keyword::NIL},
+    {L"null", Keyword::NIL},
 
-    {"match", Keyword::MATCH},
-    {"default", Keyword::DEFAULT},
-    {"fn", Keyword::FN},
-    {"return", Keyword::RETURN},
-    {"eval", Keyword::EVAL},
+    {L"match", Keyword::MATCH},
+    {L"default", Keyword::DEFAULT},
+    {L"fn", Keyword::FN},
+    {L"return", Keyword::RETURN},
+    {L"eval", Keyword::EVAL},
   };
 
   static const auto KEYWORD_TO_STR_MAP{
     [] {
-      Dictionary<Keyword, StringView> map;
+      Dictionary<Keyword, WideStringView> map;
       for (const auto &[k, v]: STR_TO_KEYWORD_TABLE) {
         map.emplace(v, k);
       }
@@ -66,5 +66,5 @@ namespace goos::lexer {
     }()
   };
 
-  [[nodiscard]] Option<Keyword> identifier_to_keyword(std::string_view name);
+  [[nodiscard]] Option<Keyword> identifier_to_keyword(WideStringView name);
 } // namespace lexer

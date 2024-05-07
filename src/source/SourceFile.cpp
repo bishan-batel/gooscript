@@ -30,6 +30,26 @@ namespace goos {
 
   const WideString& SourceFile::get_contents() const { return contents; }
 
+  WideStringView SourceFile::slice(const Range<> range) const {
+    return slice(range.lower_bound(), range.upper_bound());
+  }
+
+  WideStringView SourceFile::slice(const usize from, const usize to) const {
+    return WideStringView{*contents}.substr(clamp_index(from), clamp_index(to - from));
+  }
+
+  usize SourceFile::clamp_index(const usize i) const {
+    return std::min(i, contents->size());
+  }
+
+  widechar SourceFile::get_char(const usize position) const {
+    return contents->at(clamp_index(position));
+  }
+
+  usize SourceFile::length() const {
+    return contents->size();
+  }
+
   SourceFile::SourceFile(String name, WideString contents)
     : name{crab::some(std::move(name))}, contents{std::move(contents)} {}
 
@@ -38,5 +58,9 @@ namespace goos {
 
   SourceFile SourceFile::create(String name, WideString contents) {
     return SourceFile{std::move(name), std::move(contents)};
+  }
+
+  SourceFile SourceFile::create(WideString contents) {
+    return SourceFile{std::move(contents)};
   }
 } // goos

@@ -26,6 +26,8 @@ namespace goos::token {
 
     [[nodiscard]] StringView get_slice() const;
 
-    [[nodiscard]] virtual String to_string() const = 0;
+    [[nodiscard]] virtual WideString to_string() const = 0;
+
+    friend std::ostream& operator <<(std::ostream &os, const Token &token);
   };
 } // namespace lexer

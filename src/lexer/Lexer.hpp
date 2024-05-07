@@ -10,6 +10,7 @@
 #include <fmt/format.h>
 #include "range.hpp"
 #include "result.hpp"
+#include "source/SourceFile.hpp"
 
 namespace goos::lexer {
   class Error final : public crab::Error {
@@ -23,16 +24,14 @@ namespace goos::lexer {
     static auto to_string(Type type) -> StringView;
 
   private:
-    Rc<String> section;
+    SourceFile section;
     Range<> slice;
     Type type;
 
-    String msg;
-
   public:
-    Error(Type type, const Rc<String> &section, Range<> range);
+    Error(Type type, SourceFile section, Range<> range);
 
-    [[nodiscard]] auto what() const -> StringView override;
+    [[nodiscard]] String what() const override;
 
     [[nodiscard]] auto get_type() const -> Type;
   };
@@ -44,15 +43,15 @@ namespace goos::lexer {
 
   using TokenList = Vec<Box<token::Token>>;
 
-  static const Set<char> WHITESPACE_CHARS{' ', '\t', '\n', '\r'};
+  static const Set<widechar> WHITESPACE_CHARS{L' ', L'\t', L'\n', L'\r'};
 
   class Lexer {
     using Token = token::Token;
     usize position = 0;
-    Rc<String> content;
+    SourceFile content;
     TokenList tokens{};
 
-    explicit Lexer(const Rc<String> &content);
+    explicit Lexer(SourceFile content);
 
     [[nodiscard]] Error error(Error::Type, usize begin) const;
 
@@ -63,18 +62,16 @@ namespace goos::lexer {
       push(crab::make_box<T>(args...));
     }
 
-    [[nodiscard]] char curr() const;
+    [[nodiscard]] widechar curr() const;
 
-    [[nodiscard]] bool is_curr(char c) const;
+    [[nodiscard]] bool is_curr(widechar c) const;
 
-    char next(usize n = 1);
+    widechar next(usize n = 1);
 
     [[nodiscard]] bool is_eof() const;
 
-    [[nodiscard]] StringView substr(Range<> range) const;
-
   public:
-    static Result<TokenList> tokenize(const Rc<String> &content);
+    static Result<TokenList> tokenize(SourceFile content);
 
   private:
     [[nodiscard]] Result<bool> whitespace();

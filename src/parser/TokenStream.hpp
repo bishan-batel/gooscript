@@ -79,7 +79,7 @@ namespace goos::parser {
     Result<lexer::Operator> consume_operator(Span<lexer::Operator> allowed = {});
 
     [[nodiscard]]
-    Result<String> consume_identifier();
+    Result<WideString> consume_identifier();
 
     [[nodiscard]] bool is_eof() const;
 

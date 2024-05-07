@@ -3,17 +3,18 @@
 //
 
 #include "StringLiteral.hpp"
+#include <fmt/xchar.h>
 
 namespace goos::token {
-  StringLiteral::StringLiteral(const StringView string) : literal(string) {}
+  StringLiteral::StringLiteral(WideString string) : literal(std::move(string)) {}
 
   Box<Token> StringLiteral::clone() const { return crab::make_box<StringLiteral>(literal); }
 
-  String StringLiteral::to_string() const {
-    return fmt::format("\"{}\"", literal);
+  WideString StringLiteral::to_string() const {
+    return fmt::format(L"\"{}\"", literal);
   }
 
-  StringView StringLiteral::get_string() const { return literal; }
+  const WideString& StringLiteral::get_string() const { return literal; }
 
   bool StringLiteral::operator==(const Token &other) const {
     if (Option<Ref<StringLiteral>> ref = crab::ref::cast<StringLiteral>(other)) {

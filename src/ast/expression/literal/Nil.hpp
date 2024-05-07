@@ -10,7 +10,7 @@ namespace goos::ast::expression {
   public:
     Nil() = default;
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
     [[nodiscard]] Box<Expression> clone_expr() const override;
   };

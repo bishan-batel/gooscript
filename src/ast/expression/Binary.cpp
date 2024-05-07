@@ -4,7 +4,8 @@
 
 #include "Binary.hpp"
 
-#include <fmt/compile.h>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
   Binary::Binary(Box<Expression> lhs, const lexer::Operator op, Box<Expression> rhs)
@@ -14,9 +15,9 @@ namespace goos::ast::expression {
 
   const Expression& Binary::get_rhs() const { return rhs; }
 
-  String Binary::to_string() const {
+  WideString Binary::to_string() const {
     return fmt::format(
-      "({}) {} ({})",
+      L"({}) {} ({})",
       lhs->to_string(),
       lexer::OPERATOR_TO_STR_MAP.at(op),
       rhs->to_string()

@@ -79,6 +79,8 @@ set(SOURCE_FILES
         src/source/SourceFile.hpp
         src/source/IoError.cpp
         src/source/IoError.hpp
+        "src/utils/str.cpp"
+        src/utils/str.hpp
 )
 
 

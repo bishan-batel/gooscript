@@ -4,13 +4,14 @@
 
 #include "Boolean.hpp"
 
-#include <fmt/compile.h>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
   bool Boolean::get_state() const { return state; }
 
-  String Boolean::to_string() const {
-    return fmt::format("{}", state);
+  WideString Boolean::to_string() const {
+    return fmt::format(L"{}", state);
   }
 
   Box<Expression> Boolean::clone_expr() const { return crab::make_box<Boolean>(state); }

@@ -3,16 +3,17 @@
 //
 
 #include "Identifier.hpp"
+#include <fmt/xchar.h>
 
 namespace goos::token {
-  Identifier::Identifier(String word) : identifier{std::move(word)} {}
+  Identifier::Identifier(WideString word) : identifier{std::move(word)} {}
 
-  const String& Identifier::get_identifier() const { return identifier; }
+  const WideString& Identifier::get_identifier() const { return identifier; }
 
   Box<Token> Identifier::clone() const { return crab::make_box<Identifier>(identifier); }
 
-  String Identifier::to_string() const {
-    return fmt::format("{}", identifier);
+  WideString Identifier::to_string() const {
+    return fmt::format(L"{}", identifier);
   }
 
   bool Identifier::operator==(const Token &other) const {

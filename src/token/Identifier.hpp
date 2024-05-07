@@ -7,59 +7,56 @@
 
 #include "Token.hpp"
 
-using schar = i8;
-using uchar = u8;
-
 namespace goos::token {
-  static const Set<uchar> INVALID_IDENTIFIER_CHARS{
-    '[',
-    ']',
-    '(',
-    ')',
-    '!',
-    '@',
-    '#',
-    '$',
-    '%',
-    '^',
-    '&',
-    '*',
-    '(',
-    ')',
-    '-',
-    '+',
-    '{',
-    '}',
-    '<',
-    '>',
-    ',',
-    '.',
-    '`',
-    '~',
-    '/',
-    '\\',
-    ';',
-    ':',
-    '\'',
-    '"',
-    '\t',
-    '\n',
-    '\r',
-    '\0',
-    ' ',
+  inline static const Set<widechar> INVALID_IDENTIFIER_CHARS{
+    L'[',
+    L']',
+    L'(',
+    L')',
+    L'!',
+    L'@',
+    L'#',
+    L'$',
+    L'%',
+    L'^',
+    L'&',
+    L'*',
+    L'(',
+    L')',
+    L'-',
+    L'+',
+    L'{',
+    L'}',
+    L'<',
+    L'>',
+    L',',
+    L'.',
+    L'`',
+    L'~',
+    L'/',
+    L'\\',
+    L';',
+    L':',
+    L'\'',
+    L'"',
+    L'\t',
+    L'\n',
+    L'\r',
+    L'\0',
+    L' ',
   };
 
   class Identifier final : public Token {
-    String identifier;
+    WideString identifier;
 
   public:
-    explicit Identifier(String word);
+    explicit Identifier(WideString word);
 
-    [[nodiscard]] const String& get_identifier() const;
+    [[nodiscard]] const WideString& get_identifier() const;
 
     [[nodiscard]] Box<Token> clone() const override;
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
     [[nodiscard]] bool operator==(const Token &other) const override;
   };

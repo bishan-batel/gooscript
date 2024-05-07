@@ -4,15 +4,16 @@
 
 #include "Decimal.hpp"
 
-#include <fmt/compile.h>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::ast::expression {
   Decimal::Decimal(const f64 literal): literal{literal} {}
 
   f64 Decimal::get_number() const { return literal; }
 
-  String Decimal::to_string() const {
-    return fmt::format("{}D", literal);
+  WideString Decimal::to_string() const {
+    return fmt::format(L"{}D", literal);
   }
 
   Box<Expression> Decimal::clone_expr() const {

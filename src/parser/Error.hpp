@@ -11,14 +11,29 @@
 namespace goos::parser::err {
   class ErrorBase {
     Box<token::Token> token;
-    String msg;
 
   public:
-    explicit ErrorBase(Box<token::Token> token, String msg);
+    explicit ErrorBase(Box<token::Token> token);
 
+    ErrorBase(const ErrorBase &) = delete;
+
+    ErrorBase(ErrorBase &&) = delete;
+
+    virtual ~ErrorBase() = default;
+
+    ErrorBase& operator=(const ErrorBase &) = delete;
+
+    ErrorBase& operator=(ErrorBase &&) = delete;
+
+    /**
+     * The token that was being read when this error was returned.
+     */
     [[nodiscard]] const token::Token& where() const;
 
-    [[nodiscard]] StringView what() const;
+    /**
+     * String message of the error, for debug purpouses
+     */
+    [[nodiscard]] virtual String what() const = 0;
   };
 
   class Error final : crab::Error {
@@ -28,8 +43,7 @@ namespace goos::parser::err {
     explicit Error(Box<ErrorBase> error)
       : error{std::move(error)} {}
 
-  private:
-    [[nodiscard]] StringView what() const override { return error->what(); }
+    [[nodiscard]] String what() const override { return error->what(); }
   };
 
   class ExpectedToken final : public ErrorBase {
@@ -37,6 +51,8 @@ namespace goos::parser::err {
 
   public:
     ExpectedToken(String expected_type, Box<token::Token> receieved);
+
+    [[nodiscard]] String what() const override;
 
     [[nodiscard]] const String& get_expected() const;
   };

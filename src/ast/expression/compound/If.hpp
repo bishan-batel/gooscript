@@ -13,7 +13,7 @@ namespace goos ::ast ::expression {
   public:
     If(Box<Expression> condition, Box<Expression> then, Box<Expression> else_then);
 
-    [[nodiscard]] String to_string() const override;
+    [[nodiscard]] WideString to_string() const override;
 
     [[nodiscard]] Box<Expression> clone_expr() const override;
   };

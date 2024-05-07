@@ -10,8 +10,8 @@ Box<goos::token::Token> goos::token::EndOfFile::clone() const {
   return crab::make_box<EndOfFile>();
 }
 
-String goos::token::EndOfFile::to_string() const {
-  return "EOF";
+WideString goos::token::EndOfFile::to_string() const {
+  return L"EOF";
 }
 
 bool goos::token::EndOfFile::operator==(const Token &other) const {
