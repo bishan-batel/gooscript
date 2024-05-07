@@ -1,0 +1,28 @@
+
+let N = 100;
+
+var n = 0;
+
+while N < 10 {
+  let fizz = n mod 3;
+  let buzz = n mod 5;
+
+  if not (fizz or buzz) {
+    log("{N}");
+  }
+
+  n += 1;
+}
+
+
+
+
+let a = 0;
+let b = 0;
+let c = 0;
+
+let {
+  a = 0,
+  b = 0,
+  c = 0
+};
