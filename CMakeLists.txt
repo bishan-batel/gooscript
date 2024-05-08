@@ -103,6 +103,7 @@ set(SOURCE_FILES
 
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 # add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")

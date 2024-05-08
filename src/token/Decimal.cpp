@@ -8,7 +8,6 @@
 namespace goos::token {
   Decimal::Decimal(const f64 num) : number{num} {}
 
-
   auto Decimal::get_number() const -> f64 { return number; }
 
   auto Decimal::clone() const -> Box<Token> { return crab::make_box<Decimal>(number); }
