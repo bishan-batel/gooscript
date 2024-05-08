@@ -60,6 +60,7 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DCMAKE_CXX_FLAGS_INIT="-Wall -Wextra -Wpedantic -Werror"
+        -GNinja
         -S ${{ github.workspace }}
 
     - name: Build
