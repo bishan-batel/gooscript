@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "ast/expression/IdentifierBinding.hpp"
 #include "ast/expression/literal/Decimal.hpp"
 #include "ast/expression/literal/Integer.hpp"
 #include "ast/expression/literal/Nil.hpp"
@@ -20,4 +21,6 @@ namespace goos::parser::pass::expr {
   auto unit(TokenStream &stream) -> OptionalResult<ast::expression::Unit>;
 
   auto null(TokenStream &stream) -> OptionalResult<ast::expression::Nil>;
+
+  auto identifier_binding(TokenStream &stream) -> OptionalResult<ast::expression::IdentifierBinding>;
 }

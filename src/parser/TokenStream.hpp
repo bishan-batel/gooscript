@@ -143,6 +143,8 @@ namespace goos::parser {
     [[nodiscard]] auto get_token(usize position) const -> const token::Token&;
 
     [[nodiscard]] auto get_string(Range<> tok_range) const -> WideString;
+
+    auto backpedal(usize i = 1) -> void;
   };
 
   template<typename T> requires std::is_base_of_v<token::Token, T>

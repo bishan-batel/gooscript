@@ -141,4 +141,8 @@ namespace goos::parser {
 
     return stream.str();
   }
+
+  auto TokenStream::backpedal(usize i) -> void {
+    position -= i;
+  }
 }

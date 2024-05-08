@@ -84,5 +84,6 @@ namespace goos::parser::pass::expr {
     meta::transmute(string),
     meta::transmute(unit),
     meta::transmute(null),
+    meta::transmute(identifier_binding),
   };
 }

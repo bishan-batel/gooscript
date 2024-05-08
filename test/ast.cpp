@@ -86,37 +86,37 @@ auto scope(std::array<Box<Statement>, N> statements) {
   return Box<Statement>::wrap_unchecked(new expression::ScopeBlock{std::move(vec)});
 }
 
-#define DECL_VARIABLE(name, mut) Box<Statement>::wrap_unchecked(new VariableDeclaration {name, meta::Mutability:: mut})
-#define DECL_VARIABLE(name, mut) Box<Statement>::wrap_unchecked(new VariableDeclaration {name, meta::Mutability:: mut})
+#define UNIT crab::make_box<expression::Unit>()
+#define DECL_VARIABLE(name, mut, expr) Box<Statement>::wrap_unchecked(new VariableDeclaration {name, meta::Mutability:: mut, expr})
 
 #define SCOPE(...) scope(std::array{__VA_ARGS__})
 
 TEST_CASE("variables") {
   parse(
-    L"let a;",
+    L"let a = 0;",
     std::array{
-      DECL_VARIABLE(L"a", IMMUTABLE)
+      DECL_VARIABLE(L"a", IMMUTABLE, UNIT)
     }
   );
 
   parse(
     L"let a; let b; let c;",
     std::array{
-      DECL_VARIABLE(L"a", IMMUTABLE),
-      DECL_VARIABLE(L"b", IMMUTABLE),
-      DECL_VARIABLE(L"c", IMMUTABLE)
+      DECL_VARIABLE(L"a", IMMUTABLE, UNIT),
+      DECL_VARIABLE(L"b", IMMUTABLE, UNIT),
+      DECL_VARIABLE(L"c", IMMUTABLE, UNIT)
     }
   );
 
-  REQUIRE_THROWS(parse( L"let ", std::array{ DECL_VARIABLE(L"a", IMMUTABLE) } ));
+  REQUIRE_THROWS(parse( L"let ", std::array{ DECL_VARIABLE(L"a", IMMUTABLE, UNIT) } ));
 
   parse(
     L" let a; do { let b; let c; };",
     std::array{
-      DECL_VARIABLE(L"a", IMMUTABLE),
+      DECL_VARIABLE(L"a", IMMUTABLE, UNIT),
       SCOPE(
-        DECL_VARIABLE(L"b", IMMUTABLE),
-        DECL_VARIABLE(L"c", IMMUTABLE)
+        DECL_VARIABLE(L"b", IMMUTABLE, UNIT),
+        DECL_VARIABLE(L"c", IMMUTABLE, UNIT)
       )
     }
   );
@@ -124,10 +124,10 @@ TEST_CASE("variables") {
   parse(
     L" let a; do { let b; let c; };",
     std::array{
-      DECL_VARIABLE(L"a", IMMUTABLE),
+      DECL_VARIABLE(L"a", IMMUTABLE, UNIT),
       SCOPE(
-        DECL_VARIABLE(L"b", IMMUTABLE),
-        DECL_VARIABLE(L"c", IMMUTABLE)
+        DECL_VARIABLE(L"b", IMMUTABLE, UNIT),
+        DECL_VARIABLE(L"c", IMMUTABLE, UNIT)
       )
     }
   );

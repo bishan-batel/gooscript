@@ -4,6 +4,7 @@
 #include "literals.hpp"
 
 #include "token/Decimal.hpp"
+#include "token/Identifier.hpp"
 #include "token/Integer.hpp"
 #include "token/StringLiteral.hpp"
 
@@ -52,5 +53,14 @@ namespace goos::parser::pass::expr {
       return crab::ok(crab::some(crab::make_box<ast::expression::Nil>()));
     }
     return crab::ok<Option<Box<ast::expression::Nil>>>(crab::none);
+  }
+
+  auto identifier_binding(TokenStream &stream) -> OptionalResult<ast::expression::IdentifierBinding> {
+    if (auto identifier = stream.try_consume<token::Identifier>()) {
+      auto binding =
+          crab::make_box<ast::expression::IdentifierBinding>(identifier.take_unchecked()->get_identifier());
+      return crab::ok(crab::some(std::move(binding)));
+    }
+    return crab::ok<Option<Box<ast::expression::IdentifierBinding>>>(crab::none);
   }
 }

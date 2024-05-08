@@ -1,0 +1,52 @@
+{
+  "eval": {
+    "expression": {
+      "type": "unit"
+    },
+    "type": "eval"
+  },
+  "statements": [
+    {
+      "eval": {
+        "expression": {
+          "type": "unit"
+        },
+        "type": "eval"
+      },
+      "statements": [
+        {
+          "mutability": "let",
+          "initial": 0,
+          "name": "a",
+          "type": "declvar"
+        },
+        {
+          "mutability": "let",
+          "initial": {
+            "ident": "ongod",
+            "type": "identifier"
+          },
+          "name": "a",
+          "type": "declvar"
+        },
+        {
+          "rhs": 42,
+          "lhs": {
+            "ident": "a",
+            "type": "identifier"
+          },
+          "op": "="
+        },
+        {
+          "expression": {
+            "ident": "a",
+            "type": "identifier"
+          },
+          "type": "return"
+        }
+      ],
+      "type": "scope"
+    }
+  ],
+  "type": "scope"
+}
