@@ -10,8 +10,12 @@
 #include "json/Object.hpp"
 
 namespace goos::ast {
-  VariableDeclaration::VariableDeclaration(WideString name, const meta::Mutability mutability)
-    : name{std::move(name)}, mutability{mutability} {}
+  VariableDeclaration::VariableDeclaration(
+    WideString name,
+    const meta::Mutability mutability,
+    Box<Expression> initializer
+  )
+    : name{std::move(name)}, mutability{mutability}, initializer{std::move(initializer)} {}
 
   auto VariableDeclaration::to_string() const -> WideString {
     WideStringView ty{};
@@ -30,12 +34,14 @@ namespace goos::ast {
   }
 
   auto VariableDeclaration::clone() const -> Box<Statement> {
-    return crab::make_box<VariableDeclaration>(name, mutability);
+    return crab::make_box<VariableDeclaration>(name, mutability, initializer->clone_expr());
   }
 
   auto VariableDeclaration::get_mutability() const -> meta::Mutability {
     return mutability;
   }
+
+  auto VariableDeclaration::get_initializer() const -> const Expression& { return initializer; }
 
   auto VariableDeclaration::operator==(const Statement &statement) const -> bool {
     if (Option<Ref<VariableDeclaration>> opt = crab::ref::cast<VariableDeclaration>(statement)) {
@@ -50,6 +56,7 @@ namespace goos::ast {
     auto obj = crab::make_box<json::Object>();
     obj->put(L"type", L"declvar");
     obj->put(L"name", name);
+    obj->put(L"initial", initializer->json());
 
     WideStringView ty{};
     switch (mutability) {
