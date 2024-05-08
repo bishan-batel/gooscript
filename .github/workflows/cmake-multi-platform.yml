@@ -48,7 +48,7 @@ jobs:
 
     - name: Build
       run: |
-        sudo apt install clang-23
+        sudo apt install clang++-23
     
     
     - name: Set reusable strings
