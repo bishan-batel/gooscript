@@ -45,12 +45,14 @@ namespace goos::json {
 
   auto Object::write(std::wostream &os) const -> void {
     os << '{';
+    usize count = 0;
+
     for (const auto &[key, v]: pairs()) {
       os << '"';
       escape(os, key);
       os << "\":";
       v->write(os);
-      os << ',';
+      if (++count < values.size()) os << ',';
     }
     os << '}';
   }

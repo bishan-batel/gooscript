@@ -11,7 +11,7 @@
 namespace goos {
   auto SourceFile::from_file(const std::filesystem::path &path) -> Result<SourceFile, io::Error> {
     errno = 0;
-    const std::ifstream stream{path};
+    const std::wifstream stream{path};
 
     if (stream.bad()) return err(io::Error{errno});;
 

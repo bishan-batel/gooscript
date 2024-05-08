@@ -132,7 +132,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src ${cr
 
 target_link_libraries(${PROJECT_NAME} PRIVATE crab fmt)
 
-add_subdirectory(cmd)
+add_subdirectory(command)
 add_subdirectory(test)
 
 #add_custom_target(pch COMMAND clang++ -std=gnu++23 -x c++-header

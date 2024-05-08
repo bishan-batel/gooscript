@@ -17,9 +17,12 @@ namespace goos::json {
 
   auto Array::write(std::wostream &os) const -> void {
     os << '[';
+
+    usize count = 0;
     for (const auto &value: values) {
       value->write(os);
-      os << ',';
+
+      if (++count < values.size()) os << ',';
     }
     os << ']';
   }
