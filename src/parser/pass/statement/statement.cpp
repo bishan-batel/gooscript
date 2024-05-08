@@ -51,10 +51,36 @@ namespace goos::parser::pass {
 
     WideString name{name_result.take_unchecked()};
 
-    if (stream.is_curr(lexer::Operator::ASSIGN)) {
-      crab::todo<unit>();
+    Box<ast::Expression> initializer{crab::make_box<ast::expression::Unit>()};
+
+    if (stream.try_consume(lexer::Operator::ASSIGN)) {
+      MustEvalResult<ast::Expression> result = expr::expression(stream);
+      if (result.is_err()) return crab::err(result.take_err_unchecked());
+      initializer = result.take_unchecked();
     }
 
-    return crab::ok(crab::some(crab::make_box<ast::VariableDeclaration>(name, mutability)));
+    return crab::ok(crab::some(crab::make_box<ast::VariableDeclaration>(name, mutability, std::move(initializer))));
+  }
+
+  auto return_statement(TokenStream &stream) -> OptionalResult<ast::Return> {
+    if (not stream.try_consume(lexer::Keyword::RETURN)) {
+      return OptionalResult<ast::Return>{crab::none};
+    }
+
+    MustEvalResult<ast::Expression> expr = expr::expression(stream);
+    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+
+    return crab::ok(crab::some(crab::make_box<ast::Return>(expr.take_unchecked())));
+  }
+
+  auto eval(TokenStream &stream) -> OptionalResult<ast::Eval> {
+    if (not stream.try_consume(lexer::Keyword::EVAL)) {
+      return OptionalResult<ast::Eval>{crab::none};
+    }
+
+    MustEvalResult<ast::Expression> expr = expr::expression(stream);
+    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+
+    return crab::ok(crab::some(crab::make_box<ast::Eval>(expr.take_unchecked())));
   }
 }

@@ -24,13 +24,14 @@ let some_function = fn some_function() {
 let some_function = fn() {};
 
 
-const 
-
 # The new way of defining a function such as that is:
 fn some_function() {
 }
 
 let a = fn() { };
+
+
+method get() { }
 
 impl Player {
   fn new() {
