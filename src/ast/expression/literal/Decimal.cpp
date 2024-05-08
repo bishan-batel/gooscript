@@ -7,6 +7,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Number.hpp"
+
 namespace goos::ast::expression {
   Decimal::Decimal(const f64 literal): literal{literal} {}
 
@@ -25,5 +27,9 @@ namespace goos::ast::expression {
       return other.take_unchecked()->literal == literal;
     }
     return false;
+  }
+
+  auto Decimal::json() const -> Box<json::Value> {
+    return crab::make_box<json::Number>(literal);
   }
 }

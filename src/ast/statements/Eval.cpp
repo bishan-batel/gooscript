@@ -6,6 +6,8 @@
 #include <fmt/xchar.h>
 #include "Eval.hpp"
 
+#include "json/Object.hpp"
+
 namespace goos::ast {
   Eval::Eval(Box<Expression> expr): expression{std::move(expr)} {}
 
@@ -22,5 +24,12 @@ namespace goos::ast {
       return *expression == *other.take_unchecked()->expression;
     }
     return false;
+  }
+
+  auto Eval::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", L"eval");
+    obj->put(L"expression", expression->json());
+    return obj;
   }
 }

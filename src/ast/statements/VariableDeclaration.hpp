@@ -21,5 +21,7 @@ namespace goos::ast {
     [[nodiscard]] auto get_mutability() const -> meta::Mutability;
 
     [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
+
+    [[nodiscard]] auto json() const -> Box<json::Value> override;
   };
 }

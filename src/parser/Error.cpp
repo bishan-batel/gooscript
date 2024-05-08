@@ -7,6 +7,8 @@
 
 #include <codecvt>
 
+#include "utils/str.hpp"
+
 namespace goos::parser::err {
   ErrorBase::ErrorBase(Box<token::Token> token) : token{std::move(token)} {}
 
@@ -21,4 +23,14 @@ namespace goos::parser::err {
   }
 
   auto ExpectedToken::get_expected() const -> const String& { return expected_type; }
+
+  ExpectedExpression::ExpectedExpression(Box<token::Token> from, Box<token::Token> to)
+    : ErrorBase{(std::move(to))}, from{std::move(from)} {}
+
+  auto ExpectedExpression::what() const -> String {
+    return fmt::format(
+      "Expected Expression, but received Statement: '{}'",
+      str::convert(where().to_string())
+    );
+  }
 }

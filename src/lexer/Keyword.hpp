@@ -18,6 +18,7 @@ namespace goos::lexer {
     DO,
     IN,
     NIL,
+    UNIT,
     MATCH,
     DEFAULT,
     FN,
@@ -45,6 +46,7 @@ namespace goos::lexer {
     {L"for", Keyword::FOR},
     {L"do", Keyword::DO},
     {L"in", Keyword::IN},
+    {L"unit", Keyword::UNIT},
     {L"nil", Keyword::NIL},
 
     {L"null", Keyword::NIL},

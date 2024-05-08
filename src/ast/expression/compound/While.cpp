@@ -7,6 +7,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Object.hpp"
+
 namespace goos::ast::expression {
   While::While(Box<Expression> condition, Box<Expression> body)
     : condition{std::move(condition)}, body{std::move(body)} {}
@@ -29,5 +31,14 @@ namespace goos::ast::expression {
       return *this->condition == *condition and *this->body == *body;
     }
     return false;
+  }
+
+  auto While::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+
+    obj->put(L"type", L"while");
+    obj->put(L"condition", condition->json());
+    obj->put(L"do", body->json());
+    return obj;
   }
 } // namespace goos::ast::expression

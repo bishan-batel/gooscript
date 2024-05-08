@@ -7,6 +7,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Object.hpp"
+
 namespace goos::ast {
   Return::Return(Box<Expression> expr) : expression{std::move(expr)} {}
 
@@ -23,5 +25,12 @@ namespace goos::ast {
       return *expression == *other.take_unchecked()->expression;
     }
     return false;
+  }
+
+  auto Return::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", L"return");
+    obj->put(L"expression", expression->json());
+    return obj;
   }
 } // namespace goos::ast

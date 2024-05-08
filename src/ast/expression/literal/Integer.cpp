@@ -7,6 +7,9 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Number.hpp"
+#include "json/Object.hpp"
+
 namespace goos::ast::expression {
   Integer::Integer(const i64 number): number{number} {}
 
@@ -21,5 +24,9 @@ namespace goos::ast::expression {
       return other.take_unchecked()->number == number;
     }
     return false;
+  }
+
+  auto Integer::json() const -> Box<json::Value> {
+    return crab::make_box<json::Number>(number);
   }
 }

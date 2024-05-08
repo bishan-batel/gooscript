@@ -5,7 +5,7 @@
 
 namespace goos::token {
   class Token {
-    StringView slice;
+    WideStringView slice;
 
   public:
     Token(const Token &) = delete;
@@ -24,7 +24,7 @@ namespace goos::token {
 
     [[nodiscard]] virtual auto clone() const -> Box<Token> = 0;
 
-    [[nodiscard]] auto get_slice() const -> StringView;
+    [[nodiscard]] auto get_slice() const -> WideStringView;
 
     [[nodiscard]] virtual auto to_string() const -> WideString = 0;
 

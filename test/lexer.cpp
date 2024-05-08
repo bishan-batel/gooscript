@@ -95,6 +95,7 @@ TEST_CASE("Lexer", "[lexer]") {
         L"default "
         L"fn "
         L"return "
+        L"unit"
       )
     );
 
@@ -117,7 +118,8 @@ TEST_CASE("Lexer", "[lexer]") {
       WORD(MATCH),
       WORD(DEFAULT),
       WORD(FN),
-      WORD(RETURN)
+      WORD(RETURN),
+      WORD(UNIT)
     );
   }
 

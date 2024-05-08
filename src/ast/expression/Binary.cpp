@@ -7,6 +7,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Object.hpp"
+
 namespace goos::ast::expression {
   Binary::Binary(Box<Expression> lhs, const lexer::Operator op, Box<Expression> rhs)
     : lhs(std::move(lhs)), rhs(std::move(rhs)), op(op) {}
@@ -38,5 +40,13 @@ namespace goos::ast::expression {
 
     const Binary &other = other_opt.take_unchecked();
     return other.op == op and other.get_lhs() == lhs and other.get_rhs() == rhs;
+  }
+
+  auto Binary::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"op", WideString{lexer::OPERATOR_TO_STR_MAP.at(op)});
+    obj->put(L"lhs", lhs->json());
+    obj->put(L"rhs", rhs->json());
+    return obj;
   }
 }

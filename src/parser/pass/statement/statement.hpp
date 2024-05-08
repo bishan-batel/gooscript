@@ -3,13 +3,20 @@
 //
 
 #pragma once
+#include "../expression/expression.hpp"
 #include "ast/statements/VariableDeclaration.hpp"
 #include "parser/TokenStream.hpp"
 #include "parser/pass/statement/block.hpp"
 
 namespace goos::parser::pass {
+  /**
+   * @brief Pass for parsing any statemennt, this function must evaluate to a valid statement or an Error.
+   */
   [[nodiscard]] auto statement(TokenStream &stream) -> MustEvalResult<ast::Statement>;
 
+  /**
+   * @brief Pass for parsing a variable declaration statement, this function is able to return None when non applicable
+   */
   [[nodiscard]] auto variable_declare(TokenStream &stream) -> OptionalResult<ast::VariableDeclaration>;
 
   namespace meta {
@@ -29,7 +36,7 @@ namespace goos::parser::pass {
   }
 
   inline static const std::array STATEMENT_PASSES{
+    meta::transmute(block),
     meta::transmute(variable_declare),
-    meta::transmute(block)
   };
 }

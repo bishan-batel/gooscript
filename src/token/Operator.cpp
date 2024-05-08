@@ -3,6 +3,8 @@
 //
 
 #include "Operator.hpp"
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
 namespace goos::token {
   Operator::Operator(const lexer::Operator op) : op(op) {}
@@ -14,7 +16,7 @@ namespace goos::token {
   }
 
   auto Operator::to_string() const -> WideString {
-    return WideString{lexer::OPERATOR_TO_STR_MAP.at(op)};
+    return fmt::format(L"Operator {{'{}'}}", lexer::OPERATOR_TO_STR_MAP.at(op));
   }
 
   auto Operator::operator==(const Token &other) const -> bool {

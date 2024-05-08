@@ -17,6 +17,8 @@ public:
   [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
 
   [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
+
+  [[nodiscard]] auto json() const -> Box<json::Value> override;
 };
 
 }

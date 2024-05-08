@@ -10,6 +10,8 @@
 
 #include <ref.hpp>
 
+#include "json/Value.hpp"
+
 namespace goos::ast {
   class Statement {
   public:
@@ -30,11 +32,13 @@ namespace goos::ast {
     [[nodiscard]] auto operator!=(const Statement &statement) const -> bool;
 
     template<typename T> requires std::is_base_of_v<Statement, T>
-    auto try_as() const -> Option<Ref<T>> ;
+    auto try_as() const -> Option<Ref<T>>;
 
     friend auto operator<<(std::ostream &os, const Statement &statement) -> std::ostream&;
 
     [[nodiscard]] virtual auto to_string() const -> WideString = 0;
+
+    [[nodiscard]] virtual auto json() const -> Box<json::Value> = 0;
 
     [[nodiscard]] virtual auto clone() const -> Box<Statement> = 0;
   };

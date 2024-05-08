@@ -8,6 +8,10 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Array.hpp"
+#include "json/Object.hpp"
+#include "literal/Array.hpp"
+
 namespace goos::ast::expression {
   FunctionCall::FunctionCall(Box<Expression> function, Vec<Box<Expression>> arguments)
     : function{std::move(function)},
@@ -46,5 +50,21 @@ namespace goos::ast::expression {
       if (*arguments[i] != *function.arguments[i]) return false;
     }
     return true;
+  }
+
+  auto FunctionCall::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", L"funcall");
+
+    obj->put(L"function", function->json());
+
+    auto args = crab::make_box<json::Array>();
+    for (const auto &p: arguments) {
+      args->push(p->json());
+    }
+
+    obj->put(L"args", std::move(args));
+
+    return obj;
   }
 }

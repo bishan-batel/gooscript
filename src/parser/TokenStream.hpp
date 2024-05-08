@@ -137,6 +137,12 @@ namespace goos::parser {
     auto unexpected(String expected) -> err::Error;
 
     auto unexpected(String expected, Box<token::Token> received) -> err::Error;
+
+    [[nodiscard]] auto get_position() const -> usize;
+
+    [[nodiscard]] auto get_token(usize position) const -> const token::Token&;
+
+    [[nodiscard]] auto get_string(Range<> tok_range) const -> WideString;
   };
 
   template<typename T> requires std::is_base_of_v<token::Token, T>
@@ -146,9 +152,12 @@ namespace goos::parser {
 
   template<typename T> requires std::is_base_of_v<token::Token, T>
   auto TokenStream::try_consume() -> Option<Ref<T>> {
-    Option<Ref<T>> casted = crab::ref::cast<T>(curr());
-    if (casted) next();
-    return casted;
+    if (Option<Ref<T>> casted{crab::ref::cast<T>(curr())}; casted.is_some()) {
+      next();
+      return casted;
+    }
+
+    return crab::none;
   }
 
   template<typename T, typename... Args> requires std::is_base_of_v<err::ErrorBase, T>

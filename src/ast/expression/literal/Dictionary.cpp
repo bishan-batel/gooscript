@@ -6,6 +6,10 @@
 
 #include <sstream>
 
+#include "json/Array.hpp"
+#include "json/Object.hpp"
+#include "json/Text.hpp"
+
 namespace goos::ast::expression {
   Dictionary::Dictionary(Vec<Pair> pairs): pairs{std::move(pairs)} {}
 
@@ -54,5 +58,21 @@ namespace goos::ast::expression {
       }
     }
     return true;
+  }
+
+  auto Dictionary::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+
+    auto arr = crab::make_box<json::Array>();
+    for (const auto &[k, v]: pairs) {
+      auto pair = crab::make_box<json::Object>();
+      pair->put(L"key", k->json());
+      pair->put(L"value", v->json());
+      arr->push(std::move(pair));
+    }
+
+    obj->put(L"type", crab::make_box<json::Text>(L"dictioanry"));
+    obj->put(L"values", std::move(arr));
+    return obj;
   }
 }

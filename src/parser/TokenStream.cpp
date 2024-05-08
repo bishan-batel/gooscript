@@ -17,8 +17,7 @@ namespace goos::parser {
   TokenStream::TokenStream(lexer::TokenList list) : list{std::move(list)} {}
 
   auto TokenStream::curr() const -> const token::Token& {
-    if (is_eof()) return eof;
-    return list[position];
+    return get_token(position);
   }
 
   auto TokenStream::next(const usize i) -> const token::Token& {
@@ -40,14 +39,18 @@ namespace goos::parser {
 
   auto TokenStream::try_consume(const lexer::Operator op) -> bool {
     if (auto tok = try_consume<token::Operator>()) {
-      return tok.get_unchecked()->get_op() == op;
+      const bool valid = tok.get_unchecked()->get_op() == op;
+      if (not valid) position--;
+      return valid;
     }
     return false;
   }
 
   auto TokenStream::try_consume(const lexer::Keyword word) -> bool {
     if (auto tok = try_consume<token::Keyword>()) {
-      return tok.get_unchecked()->get_word() == word;
+      const bool valid = tok.get_unchecked()->get_word() == word;
+      if (not valid) position--;
+      return valid;
     }
     return false;
   }
@@ -118,5 +121,24 @@ namespace goos::parser {
 
   auto TokenStream::unexpected(String expected, Box<token::Token> received) -> err::Error {
     return error<err::ExpectedToken>(std::move(expected), std::move(received));
+  }
+
+  auto TokenStream::get_position() const -> usize {
+    return position;
+  }
+
+  auto TokenStream::get_token(const usize position) const -> const token::Token& {
+    if (position < list.size()) return list[position];
+    return eof;
+  }
+
+  auto TokenStream::get_string(const Range<> tok_range) const -> WideString {
+    WideStringStream stream{};
+
+    for (const usize i: tok_range) {
+      stream << get_token(i).get_slice();
+    }
+
+    return stream.str();
   }
 }

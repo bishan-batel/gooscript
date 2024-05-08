@@ -3,8 +3,11 @@
 //
 
 #pragma once
+#include <range.hpp>
 #include <result.hpp>
 #include <token/Token.hpp>
+
+#include "source/SourceFile.hpp"
 
 namespace goos::parser::err {
   class ErrorBase {
@@ -53,5 +56,14 @@ namespace goos::parser::err {
     [[nodiscard]] auto what() const -> String override;
 
     [[nodiscard]] auto get_expected() const -> const String&;
+  };
+
+  class ExpectedExpression final : public ErrorBase {
+    Box<token::Token> from;
+
+  public:
+    ExpectedExpression(Box<token::Token> from, Box<token::Token> to);
+
+    [[nodiscard]] auto what() const -> String override;
   };
 }

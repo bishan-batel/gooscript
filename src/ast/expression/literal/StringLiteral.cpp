@@ -6,6 +6,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Text.hpp"
+
 namespace goos::ast::expression {
   StringLiteral::StringLiteral(WideString literal) : literal(std::move(literal)) {}
 
@@ -24,5 +26,9 @@ namespace goos::ast::expression {
       return other.take_unchecked()->literal == literal;
     }
     return false;
+  }
+
+  auto StringLiteral::json() const -> Box<json::Value> {
+    return crab::make_box<json::Text>(literal);
   }
 }

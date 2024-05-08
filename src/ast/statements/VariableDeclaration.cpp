@@ -7,6 +7,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Object.hpp"
+
 namespace goos::ast {
   VariableDeclaration::VariableDeclaration(WideString name, const meta::Mutability mutability)
     : name{std::move(name)}, mutability{mutability} {}
@@ -42,5 +44,26 @@ namespace goos::ast {
     }
 
     return false;
+  }
+
+  auto VariableDeclaration::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", L"declvar");
+    obj->put(L"name", name);
+
+    WideStringView ty{};
+    switch (mutability) {
+      case meta::Mutability::CONSTANT:
+        ty = L"const";
+        break;
+      case meta::Mutability::IMMUTABLE:
+        ty = L"let";
+        break;
+      case meta::Mutability::MUTABLE:
+        ty = L"let mut";
+        break;
+    };
+    obj->put(L"mutability", WideString{ty});
+    return obj;
   }
 }

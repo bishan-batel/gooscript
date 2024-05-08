@@ -4,6 +4,9 @@
 
 #include "Unit.hpp"
 
+#include "json/Object.hpp"
+#include "json/Text.hpp"
+
 namespace goos::ast::expression {
   Unit::Unit() = default;
 
@@ -15,5 +18,11 @@ namespace goos::ast::expression {
 
   auto Unit::operator==(const Statement &statement) const -> bool {
     return crab::ref::cast<Unit>(statement).is_some();
+  }
+
+  auto Unit::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", crab::make_box<json::Text>(L"unit"));
+    return obj;
   }
 }

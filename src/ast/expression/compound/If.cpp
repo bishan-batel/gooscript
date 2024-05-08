@@ -7,6 +7,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Object.hpp"
+
 namespace goos::ast::expression {
   If::If(Box<Expression> condition, Box<Expression> then, Box<Expression> else_then)
     : condition{std::move(condition)}, then{std::move(then)}, else_then{std::move(else_then)} {}
@@ -37,5 +39,16 @@ namespace goos::ast::expression {
           *this->else_then == *else_then;
     }
     return false;
+  }
+
+  auto If::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+
+    obj->put(L"type", L"if");
+    obj->put(L"condition", condition->json());
+    obj->put(L"then", then->json());
+    obj->put(L"else", else_then->json());
+
+    return obj;
   }
 } // namespace goos::ast::expression

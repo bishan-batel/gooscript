@@ -3,7 +3,7 @@
 #include "utils/str.hpp"
 
 namespace goos::token {
-  auto Token::get_slice() const -> StringView {
+  auto Token::get_slice() const -> WideStringView {
     return slice;
   }
 

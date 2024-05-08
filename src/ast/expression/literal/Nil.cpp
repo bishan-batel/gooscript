@@ -4,6 +4,9 @@
 
 #include "Nil.hpp"
 
+#include "json/Object.hpp"
+#include "json/Text.hpp"
+
 namespace goos::ast::expression {
   auto Nil::to_string() const -> WideString {
     return L"nil";
@@ -13,5 +16,11 @@ namespace goos::ast::expression {
 
   auto Nil::operator==(const Statement &statement) const -> bool {
     return crab::ref::cast<Nil>(statement).is_some();
+  }
+
+  auto Nil::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", crab::make_box<json::Text>(L"nil"));
+    return obj;
   }
 } // goos

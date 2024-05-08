@@ -6,6 +6,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Object.hpp"
+
 namespace goos::ast::expression {
   Unary::Unary(const lexer::Operator op, Box<Expression> expr)
     : expr{std::move(expr)}, op{op} {}
@@ -26,5 +28,12 @@ namespace goos::ast::expression {
 
     const Unary &other = other_opt.take_unchecked();
     return other.op == op and *other.expr == *expr;
+  }
+
+  auto Unary::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"op", WideString{lexer::OPERATOR_TO_STR_MAP.at(op)});
+    obj->put(L"expr", expr->json());
+    return obj;
   }
 }

@@ -11,6 +11,10 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Array.hpp"
+#include "json/Object.hpp"
+#include "json/Text.hpp"
+
 namespace goos::ast::expression {
   Lambda::Lambda(Vec<WideString> params, Box<Expression> body)
     : params{std::move(params)}, body{std::move(body)} {}
@@ -45,6 +49,21 @@ namespace goos::ast::expression {
       if (params[i] != lambda.params[i]) return false;
     }
     return true;
+  }
+
+  auto Lambda::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", L"declfun");
+
+    auto args = crab::make_box<json::Array>();
+    for (const auto &p: params) {
+      args->push(crab::make_box<json::Text>(p));
+    }
+
+    obj->put(L"params", std::move(args));
+    obj->put(L"body", body->json());
+
+    return obj;
   }
 
   auto Lambda::get_params() const -> const Vec<WideString>& {

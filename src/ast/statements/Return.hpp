@@ -19,5 +19,7 @@ namespace goos::ast {
       [[nodiscard]] auto clone() const -> Box<Statement> override;
 
       [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
+
+      [[nodiscard]] auto json() const -> Box<json::Value> override;
   };
 } // namespace goos::ast

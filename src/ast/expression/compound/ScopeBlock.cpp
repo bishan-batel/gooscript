@@ -13,6 +13,9 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Array.hpp"
+#include "json/Object.hpp"
+
 namespace goos::ast::expression {
   ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements)
     : statements{std::move(statements)}, eval{crab::make_box<Eval>(crab::make_box<Unit>())} {}
@@ -24,8 +27,10 @@ namespace goos::ast::expression {
     WideStringStream stream{};
 
     for (const auto &statement: statements) {
-      stream << statement->to_string() << ";\n";
+      stream << statement->to_string() << "; ";
     }
+
+    stream << eval->to_string() << ";";
 
     return fmt::format(L"block {{ {} }}", stream.str());
   }
@@ -54,5 +59,20 @@ namespace goos::ast::expression {
       if (*statements[i] != *other.statements[i]) return false;
     }
     return true;
+  }
+
+  auto ScopeBlock::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", L"scope");
+
+    auto arr = crab::make_box<json::Array>();
+    for (const auto &statement: statements) {
+      arr->push(statement->json());
+    }
+
+    obj->put(L"statements", std::move(arr));
+    obj->put(L"eval", eval->json());
+
+    return obj;
   };
 }

@@ -7,6 +7,8 @@
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
+#include "json/Text.hpp"
+
 namespace goos::ast::expression {
   auto Boolean::get_state() const -> bool {
     return state;
@@ -25,5 +27,10 @@ namespace goos::ast::expression {
       return other.take_unchecked()->state == state;
     }
     return false;
+  }
+
+  auto Boolean::json() const -> Box<json::Value> {
+    // TODO boolean literal
+    return crab::make_box<json::Text>(state ? L"true" : L"false");
   }
 }

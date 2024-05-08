@@ -86,6 +86,19 @@ set(SOURCE_FILES
         src/ast/statements/VariableDeclaration.hpp
         src/meta/Mutability.cpp
         src/meta/Mutability.hpp
+        src/parser/pass/expression/expression.cpp
+        src/parser/pass/expression/literals.hpp
+        src/parser/pass/expression/literals.cpp
+        src/json/Value.cpp
+        src/json/Value.hpp
+        src/json/Object.cpp
+        src/json/Object.hpp
+        src/json/Number.cpp
+        src/json/Number.hpp
+        src/json/Text.cpp
+        src/json/Text.hpp
+        src/json/Array.cpp
+        src/json/Array.hpp
 )
 
 
@@ -118,6 +131,8 @@ CPMAddPackage("gh:fmtlib/fmt#10.2.1")
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src ${crab_SOURCE_DIR}/include)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE crab fmt)
+
+add_subdirectory(cmd)
 add_subdirectory(test)
 
 #add_custom_target(pch COMMAND clang++ -std=gnu++23 -x c++-header

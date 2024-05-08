@@ -44,7 +44,7 @@ TEST_CASE("AST Into String", "[ast_string]") {
   SECTION("StringLiteral") { TEST_CLONE(LR"("what")", expression::StringLiteral, L"what") }
   SECTION("Lambda") { TEST_CLONE(L"fn () = unit", Lambda, {}, u.clone_expr()) }
   SECTION("If") { TEST_CLONE(L"if unit then { unit } else { unit }", If, expr, expr, expr) }
-  SECTION("ScopeBlock") { TEST_CLONE(L"block {  }", ScopeBlock, {}) }
+  SECTION("ScopeBlock") { TEST_CLONE(L"block { eval (unit); }", ScopeBlock, {}) }
   SECTION("While") { TEST_CLONE(L"while unit { unit }", While, expr, expr) }
   SECTION("Binary") { TEST_CLONE(L"(unit) and (unit)", Binary, expr, goos::lexer::Operator::AND, expr); }
   SECTION("Unary") { TEST_CLONE(L"not (unit)", Unary, goos::lexer::Operator::NOT, expr); }
@@ -111,7 +111,7 @@ TEST_CASE("variables") {
   REQUIRE_THROWS(parse( L"let ", std::array{ DECL_VARIABLE(L"a", IMMUTABLE) } ));
 
   parse(
-    L" let a; { let b; let c; };",
+    L" let a; do { let b; let c; };",
     std::array{
       DECL_VARIABLE(L"a", IMMUTABLE),
       SCOPE(
@@ -122,7 +122,7 @@ TEST_CASE("variables") {
   );
 
   parse(
-    L" let a; { let b; let c; };",
+    L" let a; do { let b; let c; };",
     std::array{
       DECL_VARIABLE(L"a", IMMUTABLE),
       SCOPE(
@@ -133,12 +133,12 @@ TEST_CASE("variables") {
   );
 
   parse(
-    L"{  };",
+    L"do {  };",
     std::array{scope<0>({})}
   );
 
   parse(
-    L"{ {}; };",
+    L"do { do{}; };",
     std::array{scope<1>({scope<0>({})})}
   );
 }

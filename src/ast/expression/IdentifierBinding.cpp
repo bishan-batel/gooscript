@@ -5,6 +5,8 @@
 #include "IdentifierBinding.hpp"
 #include <fmt/format.h>
 
+#include "json/Object.hpp"
+
 namespace goos::ast::expression {
   IdentifierBinding::IdentifierBinding(WideString identifier) : identifier{std::move(identifier)} {}
 
@@ -21,5 +23,12 @@ namespace goos::ast::expression {
       return other.take_unchecked()->identifier == identifier;
     }
     return false;
+  }
+
+  auto IdentifierBinding::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+    obj->put(L"type", L"identifier");
+    obj->put(L"ident", identifier);
+    return obj;
   }
 }

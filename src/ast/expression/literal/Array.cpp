@@ -3,10 +3,13 @@
 //
 
 #include "Array.hpp"
+#include "json/Array.hpp"
 
 #include <sstream>
 #include <fmt/format.h>
 #include <fmt/xchar.h>
+
+#include "json/Object.hpp"
 
 namespace goos::ast::expression {
   Array::Array(Vec<Box<Expression>> values) : values{std::move(values)} {}
@@ -44,5 +47,17 @@ namespace goos::ast::expression {
       if (*values[i] != *array.values[i]) return false;
     }
     return true;
+  }
+
+  auto Array::json() const -> Box<json::Value> {
+    auto obj = crab::make_box<json::Object>();
+
+    obj->put(L"type", L"array");
+
+    auto arr = crab::make_box<json::Array>();
+    for (const auto &v: values) {
+      arr->push(v->json());
+    }
+    return obj;
   }
 }
