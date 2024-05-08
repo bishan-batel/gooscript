@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#set(CMAKE_CXX_STANDARD 23)
+#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(gooscript VERSION 1.0)
 
@@ -79,7 +79,7 @@ set(SOURCE_FILES
         src/source/SourceFile.hpp
         src/source/IoError.cpp
         src/source/IoError.hpp
-        "src/utils/str.cpp"
+        src/utils/str.cpp
         src/utils/str.hpp
         src/parser/pass/expression/expression.hpp
         src/ast/statements/VariableDeclaration.cpp
