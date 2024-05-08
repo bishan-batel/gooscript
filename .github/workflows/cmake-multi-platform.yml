@@ -74,4 +74,4 @@ jobs:
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: |
-        ./bin/gooscript-tests -r xml -d yes --order lex
+        ./bin/gooscript-tests 
