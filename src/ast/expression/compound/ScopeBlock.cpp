@@ -49,14 +49,14 @@ namespace goos::ast::expression {
     auto other_result = crab::ref::cast<ScopeBlock>(statement);
     if (other_result.is_none()) return false;
 
-    const ScopeBlock &other = other_result.take_unchecked();
+    const Ref<ScopeBlock> other{other_result.take_unchecked()};
 
-    if (statements.size() != other.statements.size()) return false;
+    if (statements.size() != other->statements.size()) return false;
 
-    if (*eval != *other.eval) return false;
+    if (*eval != *other->eval) return false;
 
     for (usize i = 0; i < statements.size(); i++) {
-      if (*statements[i] != *other.statements[i]) return false;
+      if (*statements[i] != *other->statements[i]) return false;
     }
     return true;
   }

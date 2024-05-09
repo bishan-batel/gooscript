@@ -38,8 +38,8 @@ namespace goos::ast::expression {
     auto other_opt = crab::ref::cast<Binary>(statement);
     if (other_opt.is_none()) return false;
 
-    const Binary &other = other_opt.take_unchecked();
-    return other.op == op and other.get_lhs() == lhs and other.get_rhs() == rhs;
+    const Ref<Binary> other{other_opt.take_unchecked()};
+    return other->op == op and other->get_lhs() == lhs and other->get_rhs() == rhs;
   }
 
   auto Binary::json() const -> Box<json::Value> {

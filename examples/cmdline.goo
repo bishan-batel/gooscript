@@ -5,6 +5,5 @@ do {
   let a = ongod;
   a = 42;
 
-
   return a;
 };

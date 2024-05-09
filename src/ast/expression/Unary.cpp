@@ -26,8 +26,8 @@ namespace goos::ast::expression {
     auto other_opt = crab::ref::cast<Unary>(statement);
     if (other_opt.is_none()) return false;
 
-    const Unary &other = other_opt.take_unchecked();
-    return other.op == op and *other.expr == *expr;
+    const Ref<Unary> other{other_opt.take_unchecked()};
+    return other->op == op and *other->expr == *expr;
   }
 
   auto Unary::json() const -> Box<json::Value> {

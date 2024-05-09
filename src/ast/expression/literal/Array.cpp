@@ -39,12 +39,12 @@ namespace goos::ast::expression {
 
     if (other_opt.is_none()) return false;
 
-    const Array &array = other_opt.take_unchecked();
+    const Ref<Array> array{other_opt.take_unchecked()};
 
-    if (array.values.size() != values.size()) return false;
+    if (array->values.size() != values.size()) return false;
 
     for (usize i = 0; i < values.size(); i++) {
-      if (*values[i] != *array.values[i]) return false;
+      if (*values[i] != *array->values[i]) return false;
     }
     return true;
   }

@@ -41,13 +41,13 @@ namespace goos::ast::expression {
     Option<Ref<FunctionCall>> other_opt = crab::ref::cast<FunctionCall>(statement);
     if (other_opt.is_none()) return false;
 
-    const FunctionCall &function = other_opt.take_unchecked();
+    const Ref<FunctionCall> function{other_opt.take_unchecked()};
 
-    if (function.arguments.size() != arguments.size()) return false;
-    if (*function.function != *this->function) return false;
+    if (function->arguments.size() != arguments.size()) return false;
+    if (*function->function != *this->function) return false;
 
     for (usize i = 0; i < arguments.size(); i++) {
-      if (*arguments[i] != *function.arguments[i]) return false;
+      if (*arguments[i] != *function->arguments[i]) return false;
     }
     return true;
   }

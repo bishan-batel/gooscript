@@ -40,13 +40,13 @@ namespace goos::ast::expression {
     auto other_opt = crab::ref::cast<Lambda>(statement);
     if (other_opt.is_none()) return false;
 
-    const Lambda &lambda = other_opt.take_unchecked();
+    const Ref<Lambda> lambda{other_opt.take_unchecked()};
 
-    if (lambda.params.size() != params.size()) return false;
-    if (*lambda.body != *body) return false;
+    if (lambda->params.size() != params.size()) return false;
+    if (*lambda->body != *body) return false;
 
     for (usize i = 0; i < params.size(); i++) {
-      if (params[i] != lambda.params[i]) return false;
+      if (params[i] != lambda->params[i]) return false;
     }
     return true;
   }

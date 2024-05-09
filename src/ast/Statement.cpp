@@ -8,10 +8,12 @@
 
 #include "utils/str.hpp"
 
-auto goos::ast::Statement::operator!=(const Statement &statement) const -> bool {
-  return !(*this == statement);
-}
+namespace goos::ast {
+  auto Statement::operator!=(const Statement &statement) const -> bool {
+    return !(*this == statement);
+  }
 
-auto goos::ast::operator<<(std::ostream &os, const Statement &statement) -> std::ostream& {
-  return os << str::convert(statement.to_string());
+  auto operator<<(std::ostream &os, const Statement &statement) -> std::ostream& {
+    return os << str::convert(statement.to_string());
+  }
 }
