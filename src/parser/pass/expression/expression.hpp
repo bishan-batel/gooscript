@@ -78,7 +78,7 @@ namespace goos::parser::pass::expr {
 
   // Optional Factor Passes
 
-  inline static const std::array FACTOR_PASSES{
+  inline static const std::vector FACTOR_PASSES{
     meta::transmute(decimal),
     meta::transmute(integer),
     meta::transmute(string),

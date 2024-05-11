@@ -27,6 +27,6 @@ namespace goos::ast::expression {
   }
 
   auto Integer::json() const -> Box<json::Value> {
-    return crab::make_box<json::Number>(number);
+    return crab::make_box<json::Number>(static_cast<f32>(number));
   }
 }
