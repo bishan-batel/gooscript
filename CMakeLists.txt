@@ -114,7 +114,7 @@ if (MSVC)
     add_link_options(/WX)
 else ()
     # Clang and GCC
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+    add_compile_options(-std=c++23 -Wall -Wextra -Wpedantic -Werror)
 endif ()
 
 # add_executable(${PROJECT_NAME} ${SOURCE_FILES})
