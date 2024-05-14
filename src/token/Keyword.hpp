@@ -11,7 +11,7 @@ namespace goos::token {
     lexer::Keyword word;
 
   public:
-    explicit Keyword(lexer::Keyword word);
+    Keyword(SourceFile file, Range<> range, lexer::Keyword word);
 
     [[nodiscard]] auto get_word() const -> lexer::Keyword;
 

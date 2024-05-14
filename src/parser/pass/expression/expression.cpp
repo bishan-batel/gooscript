@@ -7,21 +7,49 @@
 #include <token/Operator.hpp>
 
 #include "ast/expression/Binary.hpp"
-#include "ast/expression/Unary.hpp"
-#include "ast/expression/literal/Decimal.hpp"
-#include "ast/expression/literal/Unit.hpp"
+#include "ast/expression/FunctionCall.hpp"
 
 namespace goos::parser::pass::expr {
   auto factor(TokenStream &stream) -> MustEvalResult<ast::Expression> {
     for (const auto &pass: FACTOR_PASSES) {
       OptionalResult<ast::Expression> result{pass(stream)};
-      if (result.is_err()) return crab::err(result.take_err_unchecked());
 
-      if (Option<Box<ast::Expression>> expr{result.take_unchecked()}) {
-        return crab::ok(expr.take_unchecked());
+      if (result.is_err())
+        return crab::err(result.take_err_unchecked());
+
+      Option<Box<ast::Expression>> option{result.take_unchecked()};
+      if (option.is_none()) continue;
+
+      Box<ast::Expression> expr = option.take_unchecked();
+
+      // Function Call
+      if (stream.try_consume(lexer::Operator::PAREN_OPEN)) {
+        Vec<Box<ast::Expression>> arguments;
+        while (not stream.is_curr(lexer::Operator::PAREN_CLOSE)) {
+          // consume parameter
+          auto param{expression(stream)};
+          if (param.is_err()) return crab::err(param.take_err_unchecked());
+          arguments.push_back(param.take_unchecked());
+
+          // if no comma then list is at the end
+          if (not stream.try_consume(lexer::Operator::COMMA)) {
+            break;
+          }
+        }
+
+        if (auto err = stream.consume_operator(lexer::Operator::PAREN_CLOSE); err.is_err()) {
+          return crab::err(err.take_err_unchecked());
+        }
+
+        return crab::ok(
+          Box<ast::Expression>{crab::make_box<ast::expression::FunctionCall>(std::move(expr), std::move(arguments))}
+        );
       }
+
+      // just a normal expression
+      return crab::ok(std::move(expr));
     }
-    return crab::err(stream.unexpected("Unknown"));
+    return crab::err(stream.unexpected("Expression"));
   }
 
   auto consume_binary_expression(TokenStream &stream, const usize op_index) -> MustEvalResult<ast::Expression> {
@@ -37,7 +65,8 @@ namespace goos::parser::pass::expr {
 
     // parse left hand side
     auto result{parse()};
-    if (result.is_err()) return crab::err(result.take_err_unchecked());
+    if (result.is_err())
+      return crab::err(result.take_err_unchecked());
 
     Box<ast::Expression> lhs{result.take_unchecked()};
 
@@ -46,11 +75,13 @@ namespace goos::parser::pass::expr {
 
     while (not stream.is_eof()) {
       auto op_option{crab::ref::cast<token::Operator>(stream.curr())};
-      if (op_option.is_none()) break;
+      if (op_option.is_none())
+        break;
 
       const lexer::Operator op{op_option.take_unchecked()->get_op()};
 
-      if (not operators.contains(op)) break;
+      if (not operators.contains(op))
+        break;
 
       // skip over operator
       stream.next();
@@ -59,7 +90,8 @@ namespace goos::parser::pass::expr {
 
       MustEvalResult<ast::Expression> rhs{parse()};
 
-      if (rhs.is_err()) return crab::err(rhs.take_err_unchecked());
+      if (rhs.is_err())
+        return crab::err(rhs.take_err_unchecked());
 
       lhs = crab::make_box<ast::expression::Binary>(
         std::move(lhs),

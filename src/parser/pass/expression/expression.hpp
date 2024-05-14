@@ -3,11 +3,10 @@
 //
 
 #pragma once
+#include "conditionals.hpp"
 #include "literals.hpp"
+#include "../statement/block.hpp"
 #include "ast/Expression.hpp"
-#include "ast/expression/literal/Decimal.hpp"
-#include "ast/expression/literal/Integer.hpp"
-#include "ast/expression/literal/StringLiteral.hpp"
 #include "parser/TokenStream.hpp"
 
 namespace goos::parser::pass::expr {
@@ -65,11 +64,13 @@ namespace goos::parser::pass::expr {
     auto transmute(F f) -> OptionalPass<ast::Expression> {
       return [f](TokenStream &stream) -> OptionalResult<ast::Expression> {
         auto result{f(stream)};
-        if (result.is_err()) return crab::err(result.take_err_unchecked());
+        if (result.is_err())
+          return crab::err(result.take_err_unchecked());
 
         auto opt = result.take_unchecked();
 
-        if (opt.is_none()) return crab::ok<Option<Box<ast::Expression>>>(crab::none);
+        if (opt.is_none())
+          return crab::ok<Option<Box<ast::Expression>>>(crab::none);
 
         return crab::ok<Option<Box<ast::Expression>>>(crab::some(Box<ast::Expression>{opt.take_unchecked()}));
       };
@@ -79,6 +80,10 @@ namespace goos::parser::pass::expr {
   // Optional Factor Passes
 
   inline static const std::vector FACTOR_PASSES{
+    meta::transmute(block),
+    meta::transmute(if_condition),
+    meta::transmute(while_loop),
+    meta::transmute(for_loop),
     meta::transmute(decimal),
     meta::transmute(integer),
     meta::transmute(string),

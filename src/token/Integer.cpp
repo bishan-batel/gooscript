@@ -6,11 +6,13 @@
 #include <fmt/xchar.h>
 
 namespace goos::token {
-  Integer::Integer(const i64 number) : number{number} {}
+
+  Integer::Integer(SourceFile file, const Range<> range, const i64 number)
+    : Token{std::move(file), range}, number{number} {}
 
   auto Integer::get_number() const -> i64 { return number; }
 
-  auto Integer::clone() const -> Box<Token> { return crab::make_box<Integer>(number); }
+  auto Integer::clone() const -> Box<Token> { return crab::make_box<Integer>(get_file(), get_range(), number); }
 
   auto Integer::to_string() const -> WideString { return fmt::format(L"{}", number); }
 

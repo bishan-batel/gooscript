@@ -10,7 +10,7 @@ namespace goos::token {
     f64 number;
 
   public:
-    explicit Decimal(f64 num);
+    Decimal(SourceFile file, Range<> range, f64 number);
 
     [[nodiscard]] auto get_number() const -> f64;
 

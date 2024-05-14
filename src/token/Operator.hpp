@@ -11,7 +11,7 @@ namespace goos::token {
     lexer::Operator op;
 
   public:
-    explicit Operator(lexer::Operator op);
+    Operator(SourceFile file, Range<> range, lexer::Operator op);
 
     [[nodiscard]] auto get_op() const -> lexer::Operator;
 

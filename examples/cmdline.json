@@ -7,6 +7,37 @@
   },
   "statements": [
     {
+      "mutability": "let",
+      "initial": {
+        "type": "nil"
+      },
+      "name": "b",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let",
+      "initial": {
+        "eval": {
+          "expression": {
+            "rhs": {
+              "ident": "x",
+              "type": "identifier"
+            },
+            "lhs": {
+              "ident": "x",
+              "type": "identifier"
+            },
+            "op": "*"
+          },
+          "type": "eval"
+        },
+        "statements": [],
+        "type": "scope"
+      },
+      "name": "a",
+      "type": "declvar"
+    },
+    {
       "eval": {
         "expression": {
           "type": "unit"
@@ -17,32 +48,44 @@
         {
           "mutability": "let",
           "initial": 0,
-          "name": "a",
+          "name": "number",
           "type": "declvar"
         },
         {
-          "mutability": "let",
-          "initial": {
-            "ident": "ongod",
+          "args": [
+            {
+              "else": {
+                "eval": {
+                  "expression": "false",
+                  "type": "eval"
+                },
+                "statements": [],
+                "type": "scope"
+              },
+              "then": {
+                "eval": {
+                  "expression": "true",
+                  "type": "eval"
+                },
+                "statements": [],
+                "type": "scope"
+              },
+              "condition": {
+                "rhs": 1,
+                "lhs": {
+                  "ident": "number",
+                  "type": "identifier"
+                },
+                "op": "=="
+              },
+              "type": "if"
+            }
+          ],
+          "function": {
+            "ident": "print",
             "type": "identifier"
           },
-          "name": "a",
-          "type": "declvar"
-        },
-        {
-          "rhs": 42,
-          "lhs": {
-            "ident": "a",
-            "type": "identifier"
-          },
-          "op": "="
-        },
-        {
-          "expression": {
-            "ident": "a",
-            "type": "identifier"
-          },
-          "type": "return"
+          "type": "funcall"
         }
       ],
       "type": "scope"

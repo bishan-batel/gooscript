@@ -6,11 +6,12 @@
 #include <fmt/xchar.h>
 
 namespace goos::token {
-  Decimal::Decimal(const f64 num) : number{num} {}
+  Decimal::Decimal(SourceFile file, const Range<> range, const f64 number)
+    : Token{std::move(file), range}, number{number} {}
 
   auto Decimal::get_number() const -> f64 { return number; }
 
-  auto Decimal::clone() const -> Box<Token> { return crab::make_box<Decimal>(number); }
+  auto Decimal::clone() const -> Box<Token> { return crab::make_box<Decimal>(get_file(), get_range(), number); }
 
   auto Decimal::to_string() const -> WideString {
     return fmt::format(L"{}D", number);

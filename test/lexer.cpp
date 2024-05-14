@@ -3,6 +3,7 @@
 
 #include <lexer/Lexer.hpp>
 #include <token/Keyword.hpp>
+#include <token/Operator.hpp>
 
 #include "token/Decimal.hpp"
 #include "token/Identifier.hpp"
@@ -13,11 +14,12 @@
 using namespace goos;
 using namespace crab;
 
-#define WORD(word) crab::make_box<goos::token::Keyword>(lexer::Keyword:: word)
-#define IDENT(name) crab::make_box<goos::token::Identifier>(str::convert(#name))
-#define NUMF(num) crab::make_box<goos::token::Decimal>(static_cast<f64>(num))
-#define NUMI(num) crab::make_box<goos::token::Integer>(static_cast<i64>(num))
-#define STR(str) crab::make_box<goos::token::StringLiteral>(str)
+#define WORD(word) crab::make_box<goos::token::Keyword>(SourceFile::create(WideString{L" "}), crab::range<usize>(0, 0),lexer::Keyword:: word)
+#define IDENT(name) crab::make_box<goos::token::Identifier>(SourceFile::create(WideString{L" "}), crab::range<usize>(0, 0),str::convert(#name))
+#define NUMF(num) crab::make_box<goos::token::Decimal>(SourceFile::create(WideString{L" "}), crab::range<usize>(0, 0), static_cast<f64>(num))
+#define NUMI(num) crab::make_box<goos::token::Integer>(SourceFile::create(WideString{L" "}), crab::range<usize>(0, 0), static_cast<i64>(num))
+#define STR(str) crab::make_box<goos::token::StringLiteral>(SourceFile::create(WideString{L" "}), crab::range<usize>(0, 0), str)
+#define OP(op) crab::make_box<goos::token::Operator>(SourceFile::create(WideString{L" "}), crab::range<usize>(0, 0), lexer::Operator:: op)
 
 auto parse(lexer::TokenList &list, const WideStringView source) {
   list = std::move(lexer::Lexer::tokenize(SourceFile::create(WideString{source})).get_unchecked());
@@ -57,6 +59,52 @@ TEST_CASE("Lexer", "[lexer]") {
       IDENT(the),
       IDENT(bruh),
       IDENT(huh)
+    );
+  }
+
+  SECTION("Operator") {
+    REQUIRE_NOTHROW(
+      parse(toks, L"= and or not != %= *= /= += -= |= &= == >= <= << >> => ^ | & > < + - * / % ; : ( ) [ ] { } ")
+    );
+
+    matches(
+      toks,
+      OP(ASSIGN),
+      OP(AND),
+      OP(OR),
+      OP(NOT),
+      OP(NOT_EQUALS),
+      OP(MOD_ASSIGN),
+      OP(MUL_ASSIGN),
+      OP(DIV_ASSIGN),
+      OP(ADD_ASSIGN),
+      OP(SUB_ASSIGN),
+      OP(BIT_OR_ASSIGN),
+      OP(BIT_AND_ASSIGN),
+      OP(EQUALS),
+      OP(GREATER_OR_EQUALS),
+      OP(LESS_OR_EQUALS),
+      OP(SHIFT_LEFT),
+      OP(SHIFT_RIGHT),
+      OP(ARROW),
+      OP(XOR),
+      OP(BIT_OR),
+      OP(BIT_AND),
+      OP(GREATER),
+      OP(LESS),
+      OP(ADD),
+      OP(SUB),
+      OP(MUL),
+      OP(DIV),
+      OP(MOD),
+      OP(SEMICOLON),
+      OP(COMMA),
+      OP(PAREN_OPEN),
+      OP(PAREN_CLOSE),
+      OP(BRACKET_OPEN),
+      OP(BRACKET_CLOSE),
+      OP(CURLY_OPEN),
+      OP(CURLY_CLOSE)
     );
   }
 

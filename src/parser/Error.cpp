@@ -13,18 +13,31 @@ namespace goos::parser::err {
   auto ErrorBase::where() const -> const token::Token & { return token; }
 
   ExpectedToken::ExpectedToken(String expected_type, Box<token::Token> receieved)
-      : ErrorBase{std::move(receieved)}, expected_type{std::move(expected_type)} {}
+    : ErrorBase{std::move(receieved)}, expected_type{std::move(expected_type)} {}
 
   auto ExpectedToken::what() const -> String {
-    return fmt::format("Expected {}, Received '{}'", expected_type, str::convert(where().to_string()));
+    const auto [line, column] = where().get_line_and_column();
+    return fmt::format(
+        "Expected {}, Received '{}' ({}:{})",
+        expected_type,
+        str::convert(where().to_string()),
+        line,
+        column
+        );
   }
 
   auto ExpectedToken::get_expected() const -> const String & { return expected_type; }
 
   ExpectedExpression::ExpectedExpression(Box<token::Token> from, Box<token::Token> to)
-      : ErrorBase{(std::move(to))}, from{std::move(from)} {}
+    : ErrorBase{(std::move(to))}, from{std::move(from)} {}
 
   auto ExpectedExpression::what() const -> String {
-    return fmt::format("Expected Expression, but received Statement: '{}'", str::convert(where().to_string()));
+    const auto [line, column] = where().get_line_and_column();
+    return fmt::format(
+        "Expected Expression, but received Statement: '{}' ({}:{})",
+        str::convert(where().to_string()),
+        line,
+        column
+        );
   }
 } // namespace goos::parser::err

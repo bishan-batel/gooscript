@@ -104,6 +104,8 @@ set(SOURCE_FILES
         src/json/Text.hpp
         src/json/Array.cpp
         src/json/Array.hpp
+        src/parser/pass/expression/conditionals.hpp
+        src/parser/pass/expression/conditonals.cpp
 )
 
 

@@ -4,10 +4,11 @@
 
 #include "EndOfFile.hpp"
 
-goos::token::EndOfFile::EndOfFile() = default;
+goos::token::EndOfFile::EndOfFile(SourceFile file)
+  : Token{std::move(file), crab::range(get_file().length() - 1, get_file().length())} {}
 
 auto goos::token::EndOfFile::clone() const -> Box<Token> {
-  return crab::make_box<EndOfFile>();
+  return crab::make_box<EndOfFile>(get_file());
 }
 
 auto goos::token::EndOfFile::to_string() const -> WideString {

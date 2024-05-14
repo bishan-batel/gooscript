@@ -13,96 +13,76 @@
 // TODO final block evaluation:
 
 namespace goos::parser::pass {
-  auto block(TokenStream &stream) -> OptionalResult<ast::Statement> {
-    // Block must begin with a open curly brace
+  auto block(TokenStream &stream) -> OptionalResult<ast::expression::ScopeBlock> {
     if (not stream.try_consume(lexer::Keyword::DO)) {
-      return OptionalResult<ast::Statement>(crab::none);
+      return OptionalResult<ast::expression::ScopeBlock>(crab::none);
     }
 
     if (auto err = stream.consume_operator(lexer::Operator::CURLY_OPEN); err.is_err()) {
       return crab::err(err.take_err_unchecked());
     }
 
-    Vec<Box<ast::Statement>> statements{};
-    Box<ast::Eval> eval{crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())};
-
-    while (not stream.try_consume(lexer::Operator::CURLY_CLOSE) and not stream.is_eof()) {
-      const auto &start_tok = stream.curr();
-
-      auto result = statement(stream);
-      // early return if error
-      if (result.is_err()) return crab::err(result.take_err_unchecked());
-
-      // semicolon implies next / no evaluation
-      if (stream.try_consume(lexer::Operator::SEMICOLON)) {
-        statements.push_back(result.take_unchecked());
-        continue;
-      }
-
-      // No semi colon, this must mean evaluation
-
-      // Require closing right after
-      if (auto err = stream.consume_operator(lexer::Operator::CURLY_CLOSE); err.is_err()) {
-        return crab::err(err.take_err_unchecked());
-      }
-
-      auto statement_box = result.take_unchecked();
-
-      // if last statement is an expression, it can be used as evaluation
-      if (Option<Ref<ast::Expression>> expr = statement_box->try_as<ast::Expression>()) {
-        eval = crab::make_box<ast::Eval>(expr.take_unchecked()->clone_expr());
-        break;
-      }
-
-      return crab::err(stream.error<err::ExpectedExpression>(start_tok.clone(), stream.curr().clone()));
-    }
-
-    // make a scope block & cast it to a basic statement;
-    Box<ast::Statement> block_statement{
-      crab::make_box<ast::expression::ScopeBlock>(std::move(statements), std::move(eval))
+    auto list{
+      statements_list(
+        stream,
+        [](TokenStream &s) { return s.try_consume(lexer::Operator::CURLY_CLOSE); }
+      )
     };
-    return crab::ok(crab::some(std::move(block_statement)));
+
+    // if failed to read propogate error
+    if (list.is_err()) return crab::err(list.take_err_unchecked());
+
+    return crab::ok(crab::some(list.take_unchecked()));
   }
 
   auto block_top_level(TokenStream &stream) -> MustEvalResult<ast::expression::ScopeBlock> {
-    Vec<Box<ast::Statement>> statements{};
+    auto list{
+      statements_list(
+        stream,
+        [](const TokenStream &s) { return s.is_eof(); }
+      )
+    };
 
+    // if failed to read propogate error
+    if (list.is_err()) return crab::err(list.take_err_unchecked());
+
+    return crab::ok(list.take_unchecked());
+  }
+
+  auto statements_list(
+    TokenStream &stream,
+    const std::function<bool(TokenStream &)> &try_consume_end
+  ) -> Result<Box<ast::expression::ScopeBlock>> {
+    // Block must begin with a open curly brace
+
+    Vec<Box<ast::Statement>> statements{};
     Box<ast::Eval> eval{crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())};
 
-    while (not stream.is_eof()) {
-      const auto &start_tok = stream.curr();
+    while (not try_consume_end(stream) and not stream.is_eof()) {
+      // const auto &start_tok = stream.curr();
 
       auto result = statement(stream);
       // early return if error
-      if (result.is_err()) return crab::err(result.take_err_unchecked());
+      if (result.is_err()) {
+        return crab::err(result.take_err_unchecked());
+      }
 
-      // semicolon implies next / no evaluation
-      if (stream.try_consume(lexer::Operator::SEMICOLON)) {
-        statements.push_back(result.take_unchecked());
+      Box<ast::Statement> statement = result.take_unchecked();
+
+      // optionally consume a semicolon / denoter for no evaluation
+      if (stream.try_consume(lexer::Operator::SEMICOLON) or not try_consume_end(stream)) {
+        statements.push_back(std::move(statement));
         continue;
       }
 
-      // No semi colon, this must mean evaluation
-
-      // Require closing right after
-      if (not stream.try_consume<token::EndOfFile>()) {
-        return crab::err(
-          stream.error<err::ExpectedToken>("Expected end of file after evaluation statement.", stream.curr().clone())
-        );
-      }
-
-      auto statement_box = result.take_unchecked();
-
       // if last statement is an expression, it can be used as evaluation
-      if (Option<Ref<ast::Expression>> expr = statement_box->try_as<ast::Expression>()) {
+      if (Option<Ref<ast::Expression>> expr = statement->try_as<ast::Expression>()) {
         eval = crab::make_box<ast::Eval>(expr.take_unchecked()->clone_expr());
-        break;
       }
 
-      return crab::err(stream.error<err::ExpectedExpression>(start_tok.clone(), stream.curr().clone()));
+      break;
     }
 
-    // make a scope block & cast it to a basic statement;
     return crab::ok(crab::make_box<ast::expression::ScopeBlock>(std::move(statements), std::move(eval)));
   }
 }

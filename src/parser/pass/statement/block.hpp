@@ -10,10 +10,15 @@ namespace goos::parser::pass {
   /**
    * @brief Attempts to parse a block statement from a stream, if applicable
    */
-  [[nodiscard]] auto block(TokenStream &stream) -> OptionalResult<ast::Statement>;
+  [[nodiscard]] auto block(TokenStream &stream) -> OptionalResult<ast::expression::ScopeBlock>;
 
   /**
    * @brief Parses a block statement from the stream, assuming top level.
    */
   [[nodiscard]] auto block_top_level(TokenStream &stream) -> MustEvalResult<ast::expression::ScopeBlock>;
+
+  [[nodiscard]] auto statements_list(
+    TokenStream &stream,
+    const std::function<bool(TokenStream &)> &try_consume_end
+  ) -> Result<Box<ast::expression::ScopeBlock>>;
 }

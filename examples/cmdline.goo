@@ -1,9 +1,15 @@
+let b = nil
 
+let a = do { x * x }
 
 do {
-  let a = 0;
-  let a = ongod;
-  a = 42;
 
-  return a;
+
+  let number = 0
+
+  print(if number == 1 { "true" } else { "false" })
+
+  return a
 };
+
+

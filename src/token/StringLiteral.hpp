@@ -10,7 +10,7 @@ namespace goos::token {
     WideString literal;
 
   public:
-    explicit StringLiteral(WideString string);
+    StringLiteral(SourceFile file, Range<> range, WideString literal);
 
     [[nodiscard]] auto clone() const -> Box<Token> override;
 

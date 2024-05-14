@@ -14,13 +14,14 @@
 #include "utils/str.hpp"
 
 namespace goos::parser {
-  TokenStream::TokenStream(lexer::TokenList list) : list{std::move(list)} {}
+  TokenStream::TokenStream(lexer::TokenList list)
+    : list{std::move(list)}, eof{this->list[0]->get_file(),} {}
 
-  auto TokenStream::curr() const -> const token::Token& {
+  auto TokenStream::curr() const -> const token::Token & {
     return get_token(position);
   }
 
-  auto TokenStream::next(const usize i) -> const token::Token& {
+  auto TokenStream::next(const usize i) -> const token::Token & {
     position += i;
     return curr();
   }
@@ -30,17 +31,18 @@ namespace goos::parser {
   }
 
   auto TokenStream::is_curr(const lexer::Operator &op) const -> bool {
-    return token::Operator{op} == curr();
+    return token::Operator{eof.get_file(), eof.get_range(), op} == curr();
   }
 
   auto TokenStream::is_curr(const lexer::Keyword &keyword) const -> bool {
-    return token::Keyword{keyword} == curr();
+    return token::Keyword{eof.get_file(), eof.get_range(), keyword} == curr();
   }
 
   auto TokenStream::try_consume(const lexer::Operator op) -> bool {
     if (auto tok = try_consume<token::Operator>()) {
       const bool valid = tok.get_unchecked()->get_op() == op;
-      if (not valid) position--;
+      if (not valid)
+        position--;
       return valid;
     }
     return false;
@@ -49,7 +51,8 @@ namespace goos::parser {
   auto TokenStream::try_consume(const lexer::Keyword word) -> bool {
     if (auto tok = try_consume<token::Keyword>()) {
       const bool valid = tok.get_unchecked()->get_word() == word;
-      if (not valid) position--;
+      if (not valid)
+        position--;
       return valid;
     }
     return false;
@@ -70,8 +73,8 @@ namespace goos::parser {
     }
 
     return crab::err(
-      error<err::ExpectedToken>(std::format("Expected a Keyword {}", str::convert(msg.str())), curr().clone())
-    );
+        error<err::ExpectedToken>(std::format("Expected a Keyword {}", str::convert(msg.str())), curr().clone())
+        );
   }
 
   auto TokenStream::consume_keyword(const lexer::Keyword allowed) -> Result<lexer::Keyword> {
@@ -99,8 +102,8 @@ namespace goos::parser {
     }
 
     return crab::err(
-      error<err::ExpectedToken>(std::format("Expected an operator {}", str::convert(msg.str())), curr().clone())
-    );
+        error<err::ExpectedToken>(std::format("Expected an operator {}", str::convert(msg.str())), curr().clone())
+        );
   }
 
   auto TokenStream::consume_identifier() -> Result<WideString> {
@@ -127,8 +130,9 @@ namespace goos::parser {
     return position;
   }
 
-  auto TokenStream::get_token(const usize position) const -> const token::Token& {
-    if (position < list.size()) return list[position];
+  auto TokenStream::get_token(const usize position) const -> const token::Token & {
+    if (position < list.size())
+      return list[position];
     return eof;
   }
 
@@ -142,7 +146,7 @@ namespace goos::parser {
     return stream.str();
   }
 
-  auto TokenStream::backpedal(usize i) -> void {
+  auto TokenStream::backpedal(const usize i) -> void {
     position -= i;
   }
 }

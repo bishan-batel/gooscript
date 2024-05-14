@@ -47,7 +47,7 @@ namespace goos::lexer {
   class Lexer {
     using Token = token::Token;
     usize position = 0;
-    SourceFile content;
+    SourceFile file;
     TokenList tokens{};
 
     explicit Lexer(SourceFile content);

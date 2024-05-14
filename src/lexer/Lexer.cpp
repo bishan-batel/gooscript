@@ -50,10 +50,10 @@ namespace goos::lexer {
 
   auto Error::get_type() const -> Error::Type { return type; }
 
-  Lexer::Lexer(SourceFile content) : content{std::move(content)} {}
+  Lexer::Lexer(SourceFile content) : file{std::move(content)} {}
 
   auto Lexer::error(const Error::Type type, const usize begin) const -> Error {
-    return Error{type, content, crab::range(begin, position)};
+    return Error{type, file, crab::range(begin, position)};
   }
 
   auto Lexer::push(Box<Token> token) -> void {
@@ -61,7 +61,7 @@ namespace goos::lexer {
   }
 
   auto Lexer::curr() const -> widechar {
-    return is_eof() ? L'\0' : content.get_char(position);
+    return is_eof() ? L'\0' : file.get_char(position);
   }
 
   auto Lexer::is_curr(const widechar c) const -> bool {
@@ -73,7 +73,7 @@ namespace goos::lexer {
     return curr();
   }
 
-  auto Lexer::is_eof() const -> bool { return position >= content.length(); }
+  auto Lexer::is_eof() const -> bool { return position >= file.length(); }
 
   auto Lexer::tokenize(SourceFile content) -> Result<TokenList> {
     Lexer lexer{std::move(content)};
@@ -81,9 +81,9 @@ namespace goos::lexer {
     while (not lexer.is_eof()) {
       const std::array<std::function<Result<bool>()>, 5> passes{
         [&] { return lexer.whitespace(); },
+        [&] { return lexer.operator_tok(); },
         [&] { return lexer.number_literal(); },
         [&] { return lexer.string_literal(); },
-        [&] { return lexer.operator_tok(); },
         [&] { return lexer.identifier(); }
       };
 
@@ -103,7 +103,8 @@ namespace goos::lexer {
         }
       }
 
-      if (found_working_pass) continue;
+      if (found_working_pass)
+        continue;
 
       return err(lexer.error(Error::Type::UNKNOWN_CHARACTER, begin));
     }
@@ -112,7 +113,8 @@ namespace goos::lexer {
   }
 
   auto Lexer::whitespace() -> Result<bool> {
-    if (not WHITESPACE_CHARS.contains(curr())) return crab::ok(false);
+    if (not WHITESPACE_CHARS.contains(curr()))
+      return crab::ok(false);
 
     next();
     return crab::ok(true);
@@ -132,19 +134,21 @@ namespace goos::lexer {
       has_dot |= is_curr(dot);
     }
 
-    const WideString num_str{content.slice(crab::range_inclusive(begin, position))};
+    const Range<> text_range{crab::range_inclusive(begin, position)};
+    const WideString num_str{file.slice(text_range)};
 
     if (has_dot) {
-      emplace<token::Decimal>(std::stod(num_str));
+      emplace<token::Decimal>(file, text_range, std::stod(num_str));
     } else {
-      emplace<token::Integer>(std::stoll(num_str));
+      emplace<token::Integer>(file, text_range, std::stoll(num_str));
     }
 
     return crab::ok(true);
   }
 
   auto Lexer::string_literal() -> Result<bool> {
-    if (not is_curr(L'"')) return crab::ok(false);
+    if (not is_curr(L'"'))
+      return crab::ok(false);
 
     const usize begin = position;
 
@@ -183,7 +187,7 @@ namespace goos::lexer {
 
     next();
 
-    emplace<token::StringLiteral>(literal.str());
+    emplace<token::StringLiteral>(file, crab::range_inclusive(begin, position), literal.str());
 
     return crab::ok(true);
   }
@@ -192,13 +196,13 @@ namespace goos::lexer {
     const usize begin = position;
 
     for (const auto &[string, op]: STR_TO_OPERATOR_MAP) {
-      if (string != content.slice(crab::range_inclusive(begin, position))) {
+      if (string != file.slice(crab::range(begin, begin + string.length()))) {
         continue;
       }
 
       next(string.length());
 
-      emplace<token::Operator>(op);
+      emplace<token::Operator>(file, crab::range_inclusive(begin, position), op);
 
       return crab::ok(true);
     }
@@ -218,12 +222,13 @@ namespace goos::lexer {
       c = next();
     }
 
-    WideString word{content.slice(crab::range(begin, position))};
+    const Range<> text_range{crab::range(begin, position)};
+    WideString word{file.slice(text_range)};
 
     if (auto keyword = identifier_to_keyword(word)) {
-      emplace<token::Keyword>(keyword.get_unchecked());
+      emplace<token::Keyword>(file, text_range, keyword.get_unchecked());
     } else {
-      emplace<token::Identifier>(std::move(word));
+      emplace<token::Identifier>(file, text_range, std::move(word));
     }
     return crab::ok(true);
   }

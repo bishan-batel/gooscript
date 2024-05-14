@@ -48,9 +48,9 @@ namespace goos::lexer {
     {L"do", Keyword::DO},
     {L"in", Keyword::IN},
     {L"unit", Keyword::UNIT},
-    {L"nil", Keyword::NIL},
-
+    {L"none", Keyword::NIL},
     {L"null", Keyword::NIL},
+    {L"nil", Keyword::NIL},
 
     {L"match", Keyword::MATCH},
     {L"default", Keyword::DEFAULT},

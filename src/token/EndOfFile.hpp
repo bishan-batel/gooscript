@@ -8,7 +8,7 @@
 namespace goos::token {
   class EndOfFile final : public Token {
   public:
-    explicit EndOfFile();
+    explicit EndOfFile(SourceFile file);
 
     [[nodiscard]] auto clone() const -> Box<Token> override;
 

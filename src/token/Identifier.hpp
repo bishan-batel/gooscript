@@ -50,7 +50,7 @@ namespace goos::token {
     WideString identifier;
 
   public:
-    explicit Identifier(WideString word);
+    Identifier(SourceFile file, Range<> range, WideString identifier);
 
     [[nodiscard]] auto get_identifier() const -> const WideString&;
 

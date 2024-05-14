@@ -23,7 +23,7 @@ namespace goos::token {
     i64 number;
 
   public:
-    explicit Integer(i64 number);
+    Integer(SourceFile file, Range<> range, i64 number);
 
     [[nodiscard]] auto get_number() const -> i64;
 

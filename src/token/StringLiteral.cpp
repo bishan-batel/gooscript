@@ -6,15 +6,20 @@
 #include <fmt/xchar.h>
 
 namespace goos::token {
-  StringLiteral::StringLiteral(WideString string) : literal(std::move(string)) {}
 
-  auto StringLiteral::clone() const -> Box<Token> { return crab::make_box<StringLiteral>(literal); }
+  StringLiteral::StringLiteral(SourceFile file, const Range<> range, WideString literal)
+    : Token{std::move(file), range},
+      literal{std::move(literal)} {}
+
+  auto StringLiteral::clone() const -> Box<Token> {
+    return crab::make_box<StringLiteral>(get_file(), get_range(), literal);
+  }
 
   auto StringLiteral::to_string() const -> WideString {
     return fmt::format(L"\"{}\"", literal);
   }
 
-  auto StringLiteral::get_string() const -> const WideString& { return literal; }
+  auto StringLiteral::get_string() const -> const WideString & { return literal; }
 
   auto StringLiteral::operator==(const Token &other) const -> bool {
     if (Option<Ref<StringLiteral>> ref = crab::ref::cast<StringLiteral>(other)) {
