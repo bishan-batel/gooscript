@@ -64,7 +64,7 @@ TEST_CASE("Lexer", "[lexer]") {
 
   SECTION("Operator") {
     REQUIRE_NOTHROW(
-      parse(toks, L"= and or not != %= *= /= += -= |= &= == >= <= << >> => ^ | & > < + - * / % ; : ( ) [ ] { } ")
+      parse(toks, L"= and or not != %= *= /= += -= |= &= == >= <= << >> => ^ | & > < + - * / % ; : , ( ) [ ] { } ")
     );
 
     matches(
@@ -98,6 +98,7 @@ TEST_CASE("Lexer", "[lexer]") {
       OP(DIV),
       OP(MOD),
       OP(SEMICOLON),
+      OP(COLON),
       OP(COMMA),
       OP(PAREN_OPEN),
       OP(PAREN_CLOSE),
