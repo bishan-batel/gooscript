@@ -79,8 +79,9 @@ namespace goos::lexer {
     Lexer lexer{std::move(content)};
 
     while (not lexer.is_eof()) {
-      const std::array<std::function<Result<bool>()>, 5> passes{
+      const std::array<std::function<Result<bool>()>, 6> passes{
         [&] { return lexer.whitespace(); },
+        [&] { return lexer.comment(); },
         [&] { return lexer.operator_tok(); },
         [&] { return lexer.number_literal(); },
         [&] { return lexer.string_literal(); },
@@ -113,11 +114,34 @@ namespace goos::lexer {
   }
 
   auto Lexer::whitespace() -> Result<bool> {
-    if (not WHITESPACE_CHARS.contains(curr()))
+    if (not WHITESPACE_CHARS.contains(curr())) {
       return crab::ok(false);
+    }
 
-    next();
+    while (WHITESPACE_CHARS.contains(curr())) {
+      next();
+    }
     return crab::ok(true);
+  }
+
+  auto Lexer::comment() -> Result<bool> {
+    const WideStringView slice{file.slice(crab::range(position, position + 2))};
+
+    constexpr WideStringView begin_multiline{L"/*"}, end_multiline{L"*/"};
+
+    if (is_curr('#') or slice == L"//") {
+      while (not is_eof() and not is_curr(L'\n')) next();
+      return crab::ok(true);
+    }
+
+    if (slice == begin_multiline) {
+      while (not is_eof() and file.slice(position, position + end_multiline.length()) != end_multiline)
+        next();
+      next(end_multiline.length());
+      return crab::ok(true);
+    }
+
+    return crab::ok(false);
   }
 
   auto Lexer::number_literal() -> Result<bool> {

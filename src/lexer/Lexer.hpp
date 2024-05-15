@@ -75,6 +75,8 @@ namespace goos::lexer {
   private:
     [[nodiscard]] auto whitespace() -> Result<bool>;
 
+    [[nodiscard]] auto comment() -> Result<bool>;
+
     [[nodiscard]] auto number_literal() -> Result<bool>;
 
     [[nodiscard]] auto string_literal() -> Result<bool>;
