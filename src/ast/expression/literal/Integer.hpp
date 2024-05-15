@@ -12,6 +12,8 @@ namespace goos::ast::expression {
   public:
     explicit Integer(i64 number);
 
+    [[nodiscard]] auto get_number() const -> i64 ;
+
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
@@ -19,5 +21,7 @@ namespace goos::ast::expression {
     [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
+
+    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> override;
   };
 }

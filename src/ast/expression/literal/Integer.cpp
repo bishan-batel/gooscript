@@ -13,6 +13,8 @@
 namespace goos::ast::expression {
   Integer::Integer(const i64 number): number{number} {}
 
+  auto Integer::get_number() const -> i64 { return number; }
+
   auto Integer::to_string() const -> WideString {
     return fmt::format(L"{}", number);
   }
@@ -28,5 +30,9 @@ namespace goos::ast::expression {
 
   auto Integer::json() const -> Box<json::Value> {
     return crab::make_box<json::Number>(static_cast<f32>(number));
+  }
+
+  auto Integer::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_integer(*this);
   }
 }

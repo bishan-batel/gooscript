@@ -75,4 +75,8 @@ namespace goos::ast::expression {
     obj->put(L"values", std::move(arr));
     return obj;
   }
+
+  auto Dictionary::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_dictionary(*this);
+  }
 }

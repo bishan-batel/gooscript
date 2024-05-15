@@ -18,9 +18,9 @@
 
 namespace goos::ast::expression {
   ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements)
-    : statements{std::move(statements)}, eval{crab::make_box<Eval>(crab::make_box<Unit>())} {}
+    : statements{std::move(statements)}, eval{crab::make_box<Unit>()} {}
 
-  ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements, Box<Eval> eval)
+  ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements, Box<Expression> eval)
     : statements{std::move(statements)}, eval{std::move(eval)} {}
 
   auto ScopeBlock::to_string() const -> WideString {
@@ -74,5 +74,13 @@ namespace goos::ast::expression {
     obj->put(L"eval", eval->json());
 
     return obj;
-  };
+  }
+
+  auto ScopeBlock::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_scope(*this);
+  }
+
+  auto ScopeBlock::get_statements() const -> const Vec<Box<Statement>>& { return statements; }
+
+  auto ScopeBlock::get_eval() const -> const Expression& { return eval; };
 }

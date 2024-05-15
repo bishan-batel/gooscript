@@ -31,4 +31,8 @@ namespace goos::ast::expression {
   auto StringLiteral::json() const -> Box<json::Value> {
     return crab::make_box<json::Text>(literal);
   }
+
+  auto StringLiteral::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_string_literal(*this);
+  }
 }

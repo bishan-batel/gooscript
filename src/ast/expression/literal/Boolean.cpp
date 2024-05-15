@@ -33,4 +33,8 @@ namespace goos::ast::expression {
     // TODO boolean literal
     return crab::make_box<json::Text>(state ? L"true" : L"false");
   }
+
+  auto Boolean::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_boolean(*this);
+  }
 }

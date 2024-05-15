@@ -62,4 +62,8 @@ namespace goos::ast::expression {
     obj->put(L"elements", std::move(arr));
     return obj;
   }
+
+  auto Array::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_array(*this);
+  }
 }

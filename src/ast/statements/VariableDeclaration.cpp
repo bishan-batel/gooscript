@@ -73,4 +73,8 @@ namespace goos::ast {
     obj->put(L"mutability", WideString{ty});
     return obj;
   }
+
+  auto VariableDeclaration::accept(IVisitor &visitor) const -> void {
+    return visitor.visit_variable_declaration(*this);
+  }
 }

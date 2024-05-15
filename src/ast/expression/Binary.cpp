@@ -21,6 +21,10 @@ namespace goos::ast::expression {
     return rhs;
   }
 
+  auto Binary::get_op() const -> const lexer::Operator& {
+    return op;
+  }
+
   auto Binary::to_string() const -> WideString {
     return fmt::format(
       L"({}) {} ({})",
@@ -48,5 +52,9 @@ namespace goos::ast::expression {
     obj->put(L"lhs", lhs->json());
     obj->put(L"rhs", rhs->json());
     return obj;
+  }
+
+  auto Binary::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_binary(*this);
   }
 }

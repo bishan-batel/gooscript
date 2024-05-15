@@ -25,4 +25,8 @@ namespace goos::ast::expression {
     obj->put(L"type", crab::make_box<json::Text>(L"unit"));
     return obj;
   }
+
+  auto Unit::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_unit(*this);
+  }
 }

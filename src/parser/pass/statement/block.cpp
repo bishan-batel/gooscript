@@ -55,7 +55,7 @@ namespace goos::parser::pass {
     // Block must begin with a open curly brace
 
     Vec<Box<ast::Statement>> statements{};
-    Box<ast::Eval> eval{crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())};
+    Box<ast::Expression> eval{crab::make_box<ast::expression::Unit>()};
 
     while (not try_consume_end(stream) and not stream.is_eof()) {
       // const auto &start_tok = stream.curr();
@@ -76,7 +76,7 @@ namespace goos::parser::pass {
 
       // if last statement is an expression, it can be used as evaluation
       if (Option<Ref<ast::Expression>> expr = statement->try_as<ast::Expression>()) {
-        eval = crab::make_box<ast::Eval>(expr.take_unchecked()->clone_expr());
+        eval = expr.take_unchecked()->clone_expr();
       }
 
       break;

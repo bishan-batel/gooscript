@@ -41,4 +41,8 @@ namespace goos::ast::expression {
     obj->put(L"do", body->json());
     return obj;
   }
+
+  auto While::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_while(*this);
+  }
 } // namespace goos::ast::expression

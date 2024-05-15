@@ -19,6 +19,8 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto get_rhs() const -> const Expression&;
 
+    [[nodiscard]] auto get_op() const -> const lexer::Operator&;
+
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
@@ -26,5 +28,7 @@ namespace goos::ast::expression {
     [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
+
+    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> override;
   };
 }

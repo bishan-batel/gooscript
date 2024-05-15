@@ -23,4 +23,8 @@ namespace goos::ast::expression {
     obj->put(L"type", crab::make_box<json::Text>(L"nil"));
     return obj;
   }
+
+  auto Nil::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_nil(*this);
+  }
 } // goos

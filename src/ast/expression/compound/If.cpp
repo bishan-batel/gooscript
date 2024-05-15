@@ -51,4 +51,8 @@ namespace goos::ast::expression {
 
     return obj;
   }
+
+  auto If::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_if(*this);
+  }
 } // namespace goos::ast::expression

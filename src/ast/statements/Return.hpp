@@ -21,5 +21,7 @@ namespace goos::ast {
       [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
 
       [[nodiscard]] auto json() const -> Box<json::Value> override;
+
+      auto accept(IVisitor &visitor) const -> void override;
   };
 } // namespace goos::ast

@@ -5,7 +5,7 @@
 #pragma once
 #include "ast/Expression.hpp"
 
-namespace goos ::ast ::expression {
+namespace goos::ast::expression {
   class If final : public Expression {
     Box<Expression> condition, then, else_then;
 
@@ -19,5 +19,7 @@ namespace goos ::ast ::expression {
     [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
+
+    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> override;
   };
 } // namespace goos::ast::expression

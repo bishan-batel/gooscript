@@ -31,4 +31,8 @@ namespace goos::ast::expression {
     obj->put(L"ident", identifier);
     return obj;
   }
+
+  auto IdentifierBinding::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_identifier_binding(*this);
+  }
 }

@@ -32,4 +32,8 @@ namespace goos::ast::expression {
   auto Decimal::json() const -> Box<json::Value> {
     return crab::make_box<json::Number>(literal);
   }
+
+  auto Decimal::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_decimal(*this);
+  }
 }

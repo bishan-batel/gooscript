@@ -106,6 +106,14 @@ set(SOURCE_FILES
         src/json/Array.hpp
         src/parser/pass/expression/conditionals.hpp
         src/parser/pass/expression/conditionals.cpp
+        src/runtime/Intepreter.cpp
+        src/runtime/Intepreter.hpp
+        src/runtime/data/Value.cpp
+        src/runtime/data/Value.hpp
+        src/runtime/data/Nil.cpp
+        src/runtime/data/Nil.hpp
+        src/runtime/data/Integer.cpp
+        src/runtime/data/Integer.hpp
 )
 
 

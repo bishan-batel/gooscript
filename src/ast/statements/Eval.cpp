@@ -32,4 +32,8 @@ namespace goos::ast {
     obj->put(L"expression", expression->json());
     return obj;
   }
+
+  auto Eval::accept(IVisitor &visitor) const -> void {
+    return visitor.visit_eval(*this);
+  }
 }

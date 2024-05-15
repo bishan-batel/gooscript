@@ -66,6 +66,10 @@ namespace goos::ast::expression {
     return obj;
   }
 
+  auto Lambda::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+    return visitor.visit_lambda(*this);
+  }
+
   auto Lambda::get_params() const -> const Vec<WideString>& {
     return params;
   }

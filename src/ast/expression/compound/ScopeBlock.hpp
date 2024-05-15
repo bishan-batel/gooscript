@@ -11,12 +11,12 @@
 namespace goos::ast::expression {
   class ScopeBlock final : public Expression {
     Vec<Box<Statement>> statements;
-    Box<Eval> eval;
+    Box<Expression> eval;
 
   public:
     explicit ScopeBlock(Vec<Box<Statement>> statements);
 
-    explicit ScopeBlock(Vec<Box<Statement>> statements, Box<Eval> eval);
+    explicit ScopeBlock(Vec<Box<Statement>> statements, Box<Expression> eval);
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
@@ -25,5 +25,11 @@ namespace goos::ast::expression {
     [[nodiscard]] auto operator==(const Statement &statement) const -> bool override;
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
+
+    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> override;
+
+    [[nodiscard]] auto get_statements() const -> const Vec<Box<Statement>>&;
+
+    [[nodiscard]] auto get_eval() const -> const Expression&;
   };
 }
