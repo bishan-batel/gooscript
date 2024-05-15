@@ -14,7 +14,12 @@ auto main(i32 argc, const char *argv[]) -> i32 {
   }
 
   const goos::SourceFile file = goos::SourceFile::from_file(argv[1]).take_unchecked();
-  goos::parser::TokenStream stream{goos::lexer::Lexer::tokenize(file).take_unchecked()};
+  goos::lexer::TokenList list{goos::lexer::Lexer::tokenize(file).take_unchecked()};
+
+  for (const auto &tok: list) {
+    std::wcout << tok->to_string() << std::endl;
+  }
+  goos::parser::TokenStream stream{std::move(list)};
 
   auto result = goos::parser::pass::block_top_level(stream).take_unchecked();
 
