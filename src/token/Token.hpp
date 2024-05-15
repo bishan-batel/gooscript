@@ -30,7 +30,7 @@ namespace goos::token {
 
     [[nodiscard]] auto get_range() const -> const Range<>&;
 
-    [[nodiscard]] auto get_slice() const -> WideStringView;
+    [[nodiscard]] auto get_slice() const -> WideString;
 
     [[nodiscard]] virtual auto to_string() const -> WideString = 0;
 

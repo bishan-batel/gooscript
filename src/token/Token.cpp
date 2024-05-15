@@ -5,15 +5,15 @@
 namespace goos::token {
   Token::Token(SourceFile file, const Range<> range) : file{std::move(file)}, range{range} {}
 
-  auto Token::get_file() const -> const SourceFile & {
+  auto Token::get_file() const -> const SourceFile& {
     return file;
   }
 
-  auto Token::get_range() const -> const Range<> & {
+  auto Token::get_range() const -> const Range<>& {
     return range;
   }
 
-  auto Token::get_slice() const -> WideStringView {
+  auto Token::get_slice() const -> WideString {
     return file.slice(range);
   }
 
@@ -31,7 +31,7 @@ namespace goos::token {
     return std::make_pair(line, column);
   }
 
-  auto operator<<(std::ostream &os, const Token &token) -> std::ostream & {
+  auto operator<<(std::ostream &os, const Token &token) -> std::ostream& {
     return os << str::convert(token.to_string());
   }
 }

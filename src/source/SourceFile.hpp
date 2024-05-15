@@ -35,14 +35,16 @@ namespace goos {
 
     [[nodiscard]] auto get_contents() const -> const WideString&;
 
-    [[nodiscard]] auto slice(Range<> range) const -> WideStringView;
+    [[nodiscard]] auto slice(Range<> range) const -> WideString;
 
-    [[nodiscard]] auto slice(usize from, usize to) const -> WideStringView;
+    [[nodiscard]] auto slice(usize from, usize to) const -> WideString;
 
     [[nodiscard]] auto clamp_index(usize i) const -> usize;
 
     [[nodiscard]] auto get_char(usize position) const -> widechar;
 
     [[nodiscard]] auto length() const -> usize;
+
+    auto get_line(usize line_number) const -> Range<>;
   };
 } // goos

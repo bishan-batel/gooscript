@@ -43,7 +43,7 @@ namespace goos::parser {
   };
 
   class TokenStream {
-    lexer::TokenList list;
+    lexer::TokenList list{};
     usize position{0};
     token::EndOfFile eof;
 

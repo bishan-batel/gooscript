@@ -44,6 +44,8 @@ namespace goos::parser::err {
     explicit Error(Box<ErrorBase> error)
       : error{std::move(error)} {}
 
+    [[nodiscard]] auto get() const -> const ErrorBase& { return error; };
+
     [[nodiscard]] auto what() const -> String override { return error->what(); }
   };
 

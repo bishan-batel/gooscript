@@ -30,12 +30,12 @@ namespace goos {
 
   auto SourceFile::get_contents() const -> const WideString& { return contents; }
 
-  auto SourceFile::slice(const Range<> range) const -> WideStringView {
+  auto SourceFile::slice(const Range<> range) const -> WideString {
     return slice(range.lower_bound(), range.upper_bound());
   }
 
-  auto SourceFile::slice(const usize from, const usize to) const -> WideStringView {
-    return WideStringView{*contents}.substr(clamp_index(from), clamp_index(to - from));
+  auto SourceFile::slice(const usize from, const usize to) const -> WideString {
+    return contents->substr(clamp_index(from), clamp_index(to - from));
   }
 
   auto SourceFile::clamp_index(const usize i) const -> usize {
@@ -48,6 +48,22 @@ namespace goos {
 
   auto SourceFile::length() const -> usize {
     return contents->size();
+  }
+
+  auto SourceFile::get_line(const usize line_number) const -> Range<> {
+    usize index{0}, line{1};
+    for (const widechar c: *contents) {
+      if (line == line_number) break;
+
+      if (c == '\n') {
+        line++;
+      }
+      index++;
+    }
+
+    usize end;
+    for (end = index; get_char(end) != '\n'; end++) {}
+    return crab::range(index, end);
   }
 
   SourceFile::SourceFile(String name, WideString contents)
