@@ -4,7 +4,9 @@
 
 #pragma once
 #include "ast/expression/IdentifierBinding.hpp"
+#include "ast/expression/literal/Array.hpp"
 #include "ast/expression/literal/Decimal.hpp"
+#include "ast/expression/literal/Dictionary.hpp"
 #include "ast/expression/literal/Integer.hpp"
 #include "ast/expression/literal/Nil.hpp"
 #include "ast/expression/literal/StringLiteral.hpp"
@@ -23,4 +25,8 @@ namespace goos::parser::pass::expr {
   auto null(TokenStream &stream) -> OptionalResult<ast::expression::Nil>;
 
   auto identifier_binding(TokenStream &stream) -> OptionalResult<ast::expression::IdentifierBinding>;
+
+  auto array(TokenStream &stream) -> OptionalResult<ast::expression::Array>;
+
+  auto dictionary(TokenStream &stream) -> OptionalResult<ast::expression::Dictionary>;
 }

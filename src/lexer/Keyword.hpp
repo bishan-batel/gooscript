@@ -24,7 +24,9 @@ namespace goos::lexer {
     FN,
     RETURN,
     EVAL,
-    AS
+    AS,
+    CONST,
+    IS
   };
 
   inline static const Dictionary<WideStringView, Keyword> STR_TO_KEYWORD_TABLE{
@@ -58,6 +60,8 @@ namespace goos::lexer {
     {L"return", Keyword::RETURN},
     {L"eval", Keyword::EVAL},
     {L"as", Keyword::AS},
+    {L"const", Keyword::CONST},
+    {L"is", Keyword::CONST},
   };
 
   static const auto KEYWORD_TO_STR_MAP{

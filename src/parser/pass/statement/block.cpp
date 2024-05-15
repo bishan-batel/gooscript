@@ -10,8 +10,6 @@
 #include "ast/expression/literal/Unit.hpp"
 #include "parser/pass/statement/statement.hpp"
 
-// TODO final block evaluation:
-
 namespace goos::parser::pass {
   auto block(TokenStream &stream) -> OptionalResult<ast::expression::ScopeBlock> {
     if (not stream.try_consume(lexer::Keyword::DO)) {
@@ -49,6 +47,7 @@ namespace goos::parser::pass {
     return crab::ok(list.take_unchecked());
   }
 
+  // TODO fix missing error when there is no ending delimeter
   auto statements_list(
     TokenStream &stream,
     const std::function<bool(TokenStream &)> &try_consume_end

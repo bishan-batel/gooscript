@@ -58,6 +58,8 @@ namespace goos::ast::expression {
     for (const auto &v: values) {
       arr->push(v->json());
     }
+
+    obj->put(L"elements", std::move(arr));
     return obj;
   }
 }

@@ -8,9 +8,20 @@
 
 #include "ast/expression/Binary.hpp"
 #include "ast/expression/FunctionCall.hpp"
+#include "ast/expression/Unary.hpp"
 
 namespace goos::parser::pass::expr {
   auto factor(TokenStream &stream) -> MustEvalResult<ast::Expression> {
+    if (auto op = crab::ref::cast<token::Operator>(stream.curr()); op and is_unary(op.get_unchecked()->get_op())) {
+      stream.next();
+      auto operand{factor(stream)};
+
+      if (operand.is_err()) return crab::err(operand.take_err_unchecked());
+
+      auto unary{crab::make_box<ast::expression::Unary>(op.get_unchecked()->get_op(), operand.take_unchecked())};
+      return crab::ok<Box<ast::Expression>>(std::move(unary));
+    }
+
     for (const auto &pass: FACTOR_PASSES) {
       OptionalResult<ast::Expression> result{pass(stream)};
 

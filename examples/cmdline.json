@@ -9,9 +9,85 @@
     {
       "mutability": "let",
       "initial": {
+        "values": [
+          {
+            "value": "value",
+            "key": {
+              "ident": "some_key",
+              "type": "identifier"
+            }
+          }
+        ],
+        "type": "dictioanry"
+      },
+      "name": "dictionary",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let",
+      "initial": {
+        "expr": {
+          "expr": {
+            "expr": {
+              "expr": {
+                "expr": {
+                  "expr": {
+                    "expr": {
+                      "expr": {
+                        "expr": {
+                          "expr": {
+                            "expr": {
+                              "expr": {
+                                "expr": 2,
+                                "op": "-"
+                              },
+                              "op": "-"
+                            },
+                            "op": "-"
+                          },
+                          "op": "-"
+                        },
+                        "op": "-"
+                      },
+                      "op": "-"
+                    },
+                    "op": "-"
+                  },
+                  "op": "-"
+                },
+                "op": "-"
+              },
+              "op": "-"
+            },
+            "op": "-"
+          },
+          "op": "-"
+        },
+        "op": "-"
+      },
+      "name": "unary_moment",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let",
+      "initial": {
         "type": "nil"
       },
       "name": "b",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let",
+      "initial": {
+        "elements": [
+          10,
+          42,
+          5,
+          3
+        ],
+        "type": "array"
+      },
+      "name": "values",
       "type": "declvar"
     },
     {
@@ -45,6 +121,33 @@
         "type": "eval"
       },
       "statements": [
+        {
+          "else": {
+            "args": [
+              "huh"
+            ],
+            "function": {
+              "ident": "log",
+              "type": "identifier"
+            },
+            "type": "funcall"
+          },
+          "then": {
+            "args": [
+              "Huh"
+            ],
+            "function": {
+              "ident": "log",
+              "type": "identifier"
+            },
+            "type": "funcall"
+          },
+          "condition": {
+            "ident": "true",
+            "type": "identifier"
+          },
+          "type": "if"
+        },
         {
           "mutability": "let",
           "initial": 0,
@@ -89,6 +192,18 @@
         }
       ],
       "type": "scope"
+    },
+    {
+      "mutability": "let",
+      "initial": 0,
+      "name": "bruh",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let",
+      "initial": 0,
+      "name": "huh",
+      "type": "declvar"
     }
   ],
   "type": "scope"

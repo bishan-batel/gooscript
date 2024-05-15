@@ -1,85 +1,85 @@
 #!/bin/goo
 
-let math = use("math");
+let math = use("math")
 
 # math.goo 
 
 # i borrowed 
-let a = math.times_two(2);
+let a = math.times_two(2)
 
-log("Hello {huh} {huh+1} World");
+log("Hello {huh} {huh+1} World")
+
 
 if true {
-  log("Condition is true");
+  log("Condition is true")
 } else if true {
-  log("huh");
+  log("huh")
 } else {
-  log("bruh");
+  log("bruh")
 }
 
 
-var mutable_variable = 0;
-mutable_variable += 1;
+var mutable_variable = 0
+mutable_variable += 1
 
-if true then log("");
+if true then log("")
 
 unless false {
-  log("bruh");
+  log("bruh")
 }
 
 unless false {
-  log("bruh");
+  log("bruh")
 }
 
 while true {
-  log("huh");
+  log("huh")
 }
 
 
-while true do log("huh");
+while true do log("huh")
 
-# let a = 5 if true else 0;
+# let a = 5 if true else 0
 
-let condition = 0 + 1;
+let condition = 0 + 1
 
 # variable that 1 if the condition is true, 5 if not 
-var a = 0;
+var a = 0
 
-let a = null;
+let a = null
 
 if condition {
-  a = 1;
+  a = 1
 } else {
-  a = 5;
+  a = 5
 }
 
-if condition { a = 1; }
-else a = 5;
+if condition { a = 1 }
+else a = 5
 
 # a = condition ? 1 : 5 
-let a = if condition then 1 else 5;
+let a = if condition then 1 else 5
 
 if a and b or c {
   log("condition")
 }
 
 fn hello_world {
-  log("Hello World");
+  log("Hello World")
 }
 
-
 let hello_world = fn {
-  log("Hello World");
-};
+  log("Hello World")
+}
 
 
 fn times_two(x) { 
-  return x * 2;
+  return x * 2
 }
 
-fn times_two(x) = x * 2;
+fn times_two(x) = x * 2
 
-# array = [10, 20, 420, 5];
+# array = [10, 20, 420, 5]
 
 
 # if you type any variation of "cock", it says "haha very funny" and logs your IP to git 
@@ -91,7 +91,7 @@ fn times_two(x) = x * 2;
 dictionary = {
   count = 2,
   name  = "wha",
-};
+}
 
 
 # charizard.bruh
@@ -106,7 +106,7 @@ dictionary = {
 # }
 
 #
-return pokemon;
+return pokemon
 
 let iterator = fn(lower_bound, upper_bound) {
   return {
@@ -114,26 +114,26 @@ let iterator = fn(lower_bound, upper_bound) {
     upper = upper_bound,
 
     next = fn(self) {
-      num += 1;
-      return if num < upper_bound then num else 0;
+      num += 1
+      return if num < upper_bound then num else 0
     },
-  };
-};
+  }
+}
 
-echo "";
+echo ""
 
 class Iterator {
-};
+}
 
 
-let i;
+let i
 
 while (i = iterator.next()) {
-  log("{i}");
+  log("{i}")
 }
 
 for i in iterator {
-  log("{i}");
+  log("{i}")
 }
 
 
@@ -142,18 +142,18 @@ for i in iterator {
 
 # (int, int)
 
-let a = (5, 3);
+let a = (5, 3)
 
 let dictionary = {
   "bruh" = 0,
   "huh" = 420
-};
-
-for [key, value] in dictionary {
-  log("{key}");
 }
 
-for i in range(10) do log("hi");
+for [key, value] in dictionary {
+  log("{key}")
+}
+
+for i in range(10) do log("hi")
 
 while true {
   log("bruh")
@@ -166,40 +166,40 @@ until false {
 let a = match huh {
   0 => log("0"),
   default => log("huh")
-};
-
-let a = Vec2:new();
-
-if true then log();
-
-if true then {
-};
-
-if true {
-  let a = if true then 10 else 0;
 }
 
-let a = 0;
+let a = Vec2:new()
+
+if true then log()
+
+if true then {
+}
+
+if true {
+  let a = if true then 10 else 0
+}
+
+let a = 0
 
 fn bruh {
-  let a = b.clone();
+  let a = b.clone()
 }
 
 let a = bruh fn {
-};
+}
 
 add_animation {
   setup = fn {}
-};
+}
 
 add_animation("Huh") fn {
-};
+}
 
 
 let arg = 
   upper = 10,
   lower = 100
-};
+}
 
 
 #

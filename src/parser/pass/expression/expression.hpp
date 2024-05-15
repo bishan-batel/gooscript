@@ -84,6 +84,8 @@ namespace goos::parser::pass::expr {
     meta::transmute(if_condition),
     meta::transmute(while_loop),
     meta::transmute(for_loop),
+    meta::transmute(array),
+    meta::transmute(dictionary),
     meta::transmute(decimal),
     meta::transmute(integer),
     meta::transmute(string),

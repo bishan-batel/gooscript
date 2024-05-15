@@ -1,5 +1,7 @@
 #include "Operator.hpp"
 
+#include <stdexcept>
+
 namespace goos::lexer {
   [[maybe_unused]]
   auto is_assign(Operator op) -> bool {
@@ -9,6 +11,10 @@ namespace goos::lexer {
   [[maybe_unused]]
   auto is_binary(Operator op) -> bool {
     return static_cast<u32>(op) & BINARY_FLAG;
+  }
+
+  auto is_unary(Operator op) -> bool {
+    return static_cast<u32>(op) & UNARY_FLAG;
   }
 
   [[maybe_unused]]

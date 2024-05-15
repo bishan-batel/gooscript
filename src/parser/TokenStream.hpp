@@ -125,6 +125,10 @@ namespace goos::parser {
     [[nodiscard]]
     auto consume_operator(lexer::Operator allowed) -> Result<lexer::Operator>;
 
+    template<typename... Operators> requires (std::is_same_v<Operators, lexer::Operator> && ...)
+    [[nodiscard]]
+    auto consume_operator(Operators... operators) -> Result<lexer::Operator>;
+
     [[nodiscard]]
     auto consume_identifier() -> Result<WideString>;
 
@@ -160,6 +164,12 @@ namespace goos::parser {
     }
 
     return crab::none;
+  }
+
+  template<typename... Operators> requires (std::is_same_v<Operators, lexer::Operator> && ...)
+  auto TokenStream::consume_operator(Operators... operators) -> Result<lexer::Operator> {
+    std::array arr{operators...};
+    return consume_operator(std::span{arr});
   }
 
   template<typename T, typename... Args> requires std::is_base_of_v<err::ErrorBase, T>

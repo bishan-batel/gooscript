@@ -48,12 +48,13 @@ namespace goos::lexer {
     SHIFT_LEFT        = binary,
     SHIFT_RIGHT       = binary,
     ADD               = binary,
-    SUB               = binary,
+    SUB               = binary | unary,
     MUL               = binary,
     DIV               = binary,
     MOD               = binary,
     ARROW             = delimiter,
     THIN_ARROW        = delimiter,
+    COLON             = delimiter,
     SEMICOLON         = delimiter,
     COMMA             = delimiter,
     PAREN_OPEN        = paren(OPEN),
@@ -93,7 +94,8 @@ namespace goos::lexer {
     {L"/", Operator::DIV},
     {L"%", Operator::MOD},
     {L";", Operator::SEMICOLON},
-    {L":", Operator::COMMA},
+    {L":", Operator::COLON},
+    {L",", Operator::COMMA},
     {L"(", Operator::PAREN_OPEN},
     {L")", Operator::PAREN_CLOSE},
     {L"[", Operator::BRACKET_OPEN},
@@ -116,6 +118,9 @@ namespace goos::lexer {
 
   [[maybe_unused]]
   auto is_binary(Operator op) -> bool;
+
+  [[maybe_unused]]
+  auto is_unary(Operator op) -> bool;
 
   [[maybe_unused]]
   auto is_assign(Operator op) -> bool;

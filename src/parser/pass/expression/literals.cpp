@@ -3,6 +3,7 @@
 //
 #include "literals.hpp"
 
+#include "expression.hpp"
 #include "token/Decimal.hpp"
 #include "token/Identifier.hpp"
 #include "token/Integer.hpp"
@@ -62,5 +63,92 @@ namespace goos::parser::pass::expr {
       return crab::ok(crab::some(std::move(binding)));
     }
     return crab::ok<Option<Box<ast::expression::IdentifierBinding>>>(crab::none);
+  }
+
+  auto array(TokenStream &stream) -> OptionalResult<ast::expression::Array> {
+    if (not stream.try_consume(lexer::Operator::BRACKET_OPEN)) {
+      return OptionalResult<ast::expression::Array>{crab::none};
+    }
+
+    Vec<Box<ast::Expression>> elements;
+
+    while (not stream.is_curr(lexer::Operator::BRACKET_CLOSE) and not stream.is_eof()) {
+      auto expr = expression(stream);
+      if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+
+      elements.push_back(expr.take_unchecked());
+
+      if (stream.try_consume(lexer::Operator::COMMA)) {
+        continue;
+      }
+
+      break;
+    }
+
+    // expect a '[' at end of the array
+    if (auto err = stream.consume_operator(lexer::Operator::BRACKET_CLOSE); err.is_err()) {
+      return crab::err(err.take_err_unchecked());
+    }
+
+    return crab::ok(crab::some(crab::make_box<ast::expression::Array>(std::move(elements))));
+  }
+
+  auto dictionary([[maybe_unused]] TokenStream &stream) -> OptionalResult<ast::expression::Dictionary> {
+    if (not stream.try_consume(lexer::Operator::CURLY_OPEN)) {
+      return OptionalResult<ast::expression::Dictionary>{crab::none};
+    }
+
+    Vec<ast::expression::Dictionary::Pair> pairs;
+
+    while (not stream.is_curr(lexer::Operator::CURLY_CLOSE) and not stream.is_eof()) {
+      // Key Value
+      Option<Box<ast::Expression>> key{crab::none}; {
+        auto identifier{identifier_binding(stream)};
+        if (identifier.is_err()) return crab::err(identifier.take_err_unchecked());
+
+        if (auto value = identifier.take_unchecked()) {
+          key = Box<ast::Expression>{value.take_unchecked()};
+        }
+      }
+
+      // if not an identifier, it must be a string
+      if (key.is_none()) {
+        auto str{string(stream)};
+        if (str.is_err()) return crab::err(str.take_err_unchecked());
+
+        if (auto value = str.take_unchecked()) {
+          key = value.take_unchecked();
+        }
+      }
+      // check for err
+
+      // if key is not an identifier, it must be a string
+      if (key.is_none()) {
+        return crab::err(stream.unexpected("An Identifier or a String"));
+      }
+
+      // Key-Value seperator is a ':' or '='
+      if (auto err = stream.consume_operator(lexer::Operator::COLON, lexer::Operator::EQUALS); err.is_err()) {
+        return crab::err(err.take_err_unchecked());
+      }
+
+      auto value = expression(stream);
+      if (value.is_err()) return crab::err(value.take_err_unchecked());
+
+      pairs.push_back({key.take_unchecked(), value.take_unchecked()});
+
+      if (stream.try_consume(lexer::Operator::COMMA)) {
+        continue;
+      }
+
+      break;
+    }
+
+    // expect a '[' at end of the array
+    if (auto err = stream.consume_operator(lexer::Operator::BRACKET_CLOSE); err.is_err()) {
+      return crab::err(err.take_err_unchecked());
+    }
+
+    return crab::ok(crab::some(crab::make_box<ast::expression::Dictionary>(std::move(pairs))));
   }
 }

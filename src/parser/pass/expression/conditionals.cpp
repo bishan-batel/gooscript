@@ -3,10 +3,13 @@
 //
 #include "conditionals.hpp"
 #include "expression.hpp"
+#include "ast/expression/Unary.hpp"
 
 namespace goos::parser::pass::expr {
   auto if_condition(TokenStream &stream) -> OptionalResult<ast::expression::If> {
-    if (not stream.try_consume(lexer::Keyword::IF)) {
+    const bool invert = stream.is_curr(lexer::Keyword::UNLESS);
+
+    if (not(stream.try_consume(lexer::Keyword::IF) or stream.try_consume(lexer::Keyword::UNLESS))) {
       return OptionalResult<ast::expression::If>{crab::none};
     }
 
@@ -16,10 +19,12 @@ namespace goos::parser::pass::expr {
 
     auto condition = result_cond.take_unchecked();
 
+    if (invert) condition = crab::make_box<ast::expression::Unary>(lexer::Operator::NOT, std::move(condition));
+
     Box<ast::Expression> then{crab::make_box<ast::expression::Unit>()};
 
     if (stream.try_consume(lexer::Operator::CURLY_OPEN)) {
-      auto result{statements_list(stream, [](auto &s) { return s.try_consume(lexer::Operator::CURLY_CLOSE); })};
+      auto result{statements_list(stream, [](TokenStream &s) { return s.try_consume(lexer::Operator::CURLY_CLOSE); })};
       if (result.is_err()) return crab::err(result.take_err_unchecked());
       then = result.take_unchecked();
     } else if (stream.try_consume(lexer::Keyword::THEN)) {
@@ -28,12 +33,13 @@ namespace goos::parser::pass::expr {
       if (result.is_err()) return crab::err(result.take_err_unchecked());
 
       then = result.take_unchecked();
+    } else {
+      return crab::err(stream.unexpected("'then' or '{' "));
     }
 
     Box<ast::Expression> else_then{crab::make_box<ast::expression::Unit>()};
 
     if (stream.try_consume(lexer::Keyword::ELSE)) {
-      // else {...}
       if (stream.try_consume(lexer::Operator::CURLY_OPEN)) {
         auto result{statements_list(stream, [](auto &s) { return s.try_consume(lexer::Operator::CURLY_CLOSE); })};
         if (result.is_err()) return crab::err(result.take_err_unchecked());
@@ -56,10 +62,12 @@ namespace goos::parser::pass::expr {
   }
 
   auto while_loop([[maybe_unused]] TokenStream &stream) -> OptionalResult<ast::expression::If> {
+    if (not stream.try_consume(lexer::Keyword::WHILE)) return OptionalResult<ast::expression::If>{crab::none};
     return OptionalResult<ast::expression::If>{crab::none};
   }
 
   auto for_loop([[maybe_unused]] TokenStream &stream) -> OptionalResult<ast::expression::If> {
+    // TODO
     return OptionalResult<ast::expression::If>{crab::none};
   }
 }

@@ -1,8 +1,20 @@
+
+let dictionary = {
+  some_key = "value"
+}
+
+let unary_moment = -------------2
+
+
 let b = nil
 
-let a = do { x * x }
+let values = [10, 42, 5, 3]
 
+
+let a = do { x * x }
 do {
+
+  if true then log("Huh") else log("huh");
 
 
   let number = 0
@@ -10,6 +22,10 @@ do {
   print(if number == 1 { "true" } else { "false" })
 
   return a
-};
+}
 
 
+let bruh = 0;
+
+
+let huh = 0;
