@@ -81,6 +81,7 @@ namespace goos::parser::pass::expr {
 
   inline static const std::vector FACTOR_PASSES{
     meta::transmute(block),
+    meta::transmute(grouping),
     meta::transmute(if_condition),
     meta::transmute(while_loop),
     meta::transmute(for_loop),
