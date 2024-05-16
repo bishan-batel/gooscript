@@ -1,5 +1,5 @@
 //
-// Created by bishan_ on 5/15/24.
+// Created bany bish_ on 5/15/24.
 //
 
 #pragma once
@@ -7,7 +7,7 @@
 #include "ast/Statement.hpp"
 
 namespace goos::runtime {
-  class Intepreter final : ast::Statement::IVisitor, ast::Expression::IVisitor {
+  class Intepreter final : ast::Statement::IVisitor {
   public:
     auto execute(const ast::Statement &statement) -> void;
 

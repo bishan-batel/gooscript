@@ -9,13 +9,19 @@
 #include <memory>
 #include <memory>
 #include <memory>
+#include <memory>
 
 #include "ast/expression/Binary.hpp"
+#include "ast/expression/FunctionCall.hpp"
 #include "ast/expression/compound/ScopeBlock.hpp"
+#include "ast/expression/literal/Boolean.hpp"
 #include "ast/expression/literal/Integer.hpp"
+#include "data/Boolean.hpp"
 #include "data/Integer.hpp"
 #include "data/Nil.hpp"
+#include "data/Unit.hpp"
 #include "data/Value.hpp"
+#include "utils/str.hpp"
 
 namespace goos::runtime {
   auto Intepreter::execute(const ast::Statement &statement) -> void {
@@ -27,35 +33,35 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_eval([[maybe_unused]] const ast::Eval &eval) -> void {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: eval");
   }
 
   auto Intepreter::visit_return([[maybe_unused]] const ast::Return &ret) -> void {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: return");
   }
 
   auto Intepreter::visit_variable_declaration(
     [[maybe_unused]] const ast::VariableDeclaration &variable_declaration
   ) -> void {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: variable_declaration");
   }
 
   auto Intepreter::visit_array([[maybe_unused]] const ast::expression::Array &array) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: array");
   }
 
   auto Intepreter::visit_boolean([[maybe_unused]] const ast::expression::Boolean &boolean) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    return std::make_shared<Boolean>(boolean.get_state());
   }
 
   auto Intepreter::visit_decimal([[maybe_unused]] const ast::expression::Decimal &decimal) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: decimal");
   }
 
   auto Intepreter::visit_dictionary(
     [[maybe_unused]] const ast::expression::Dictionary &dictionary
   ) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: dictionary");
   }
 
   auto Intepreter::visit_integer([[maybe_unused]] const ast::expression::Integer &integer) -> std::shared_ptr<Value> {
@@ -63,22 +69,21 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_lambda([[maybe_unused]] const ast::expression::Lambda &lambda) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: lambda");
   }
 
   auto Intepreter::visit_nil([[maybe_unused]] const ast::expression::Nil &nil) -> std::shared_ptr<Value> {
-    std::shared_ptr<Value> v = std::make_shared<Nil>();
-    return v;
+    return std::make_shared<Nil>();
   }
 
   auto Intepreter::visit_string_literal(
     [[maybe_unused]] const ast::expression::StringLiteral &str
   ) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: string_literal");
   }
 
   auto Intepreter::visit_unit([[maybe_unused]] const ast::expression::Unit &unit) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    return std::make_shared<Unit>();
   }
 
   auto Intepreter::visit_binary([[maybe_unused]] const ast::expression::Binary &binary) -> std::shared_ptr<Value> {
@@ -138,21 +143,32 @@ namespace goos::runtime {
   auto Intepreter::visit_function_call(
     [[maybe_unused]] const ast::expression::FunctionCall &function_call
   ) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    std::wcout << "funcall";
+    // std::wcout << execute(function_call.get_function())->to_string();
+    std::wcout << '(';
+    std::wcout << str::join(
+      function_call.get_arguments(),
+      [this](auto &arg) {
+        return execute(arg)->to_string();
+      }
+    );
+    std::wcout << ')' << std::endl;
+
+    return std::make_shared<Unit>();
   }
 
   auto Intepreter::visit_identifier_binding(
     [[maybe_unused]] const ast::expression::IdentifierBinding &identifier
   ) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: identifier_binding");
   }
 
   auto Intepreter::visit_unary([[maybe_unused]] const ast::expression::Unary &unary) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: unary");
   }
 
   auto Intepreter::visit_if([[maybe_unused]] const ast::expression::If &if_expr) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: if");
   }
 
   auto Intepreter::visit_scope([[maybe_unused]] const ast::expression::ScopeBlock &scope) -> std::shared_ptr<Value> {
@@ -163,6 +179,6 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_while([[maybe_unused]] const ast::expression::While &while_expr) -> std::shared_ptr<Value> {
-    throw std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented: while");
   }
 }

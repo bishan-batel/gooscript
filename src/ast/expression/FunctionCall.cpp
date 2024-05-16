@@ -71,4 +71,8 @@ namespace goos::ast::expression {
   auto FunctionCall::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
     return visitor.visit_function_call(*this);
   }
+
+  auto FunctionCall::get_function() const -> const Expression& { return function; }
+
+  auto FunctionCall::get_arguments() const -> const Vec<Box<Expression>>& { return arguments; }
 }

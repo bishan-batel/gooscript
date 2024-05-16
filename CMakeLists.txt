@@ -114,6 +114,14 @@ set(SOURCE_FILES
         src/runtime/data/Nil.hpp
         src/runtime/data/Integer.cpp
         src/runtime/data/Integer.hpp
+        src/runtime/Enviornment.cpp
+        src/runtime/Enviornment.hpp
+        src/runtime/Error.cpp
+        src/runtime/Error.hpp
+        src/runtime/data/Boolean.cpp
+        src/runtime/data/Boolean.hpp
+        src/runtime/data/Unit.cpp
+        src/runtime/data/Unit.hpp
 )
 
 
