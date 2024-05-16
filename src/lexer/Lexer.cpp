@@ -226,7 +226,7 @@ namespace goos::lexer {
 
       next(string.length());
 
-      emplace<token::Operator>(file, crab::range_inclusive(begin, position), op);
+      emplace<token::Operator>(file, crab::range(begin, position), op);
 
       return crab::ok(true);
     }
