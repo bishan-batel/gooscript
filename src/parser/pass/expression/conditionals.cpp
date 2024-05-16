@@ -61,9 +61,45 @@ namespace goos::parser::pass::expr {
     );
   }
 
-  auto while_loop([[maybe_unused]] TokenStream &stream) -> OptionalResult<ast::expression::If> {
-    if (not stream.try_consume(lexer::Keyword::WHILE)) return OptionalResult<ast::expression::If>{crab::none};
-    return OptionalResult<ast::expression::If>{crab::none};
+  auto while_loop([[maybe_unused]] TokenStream &stream) -> OptionalResult<ast::expression::While> {
+    const bool invert = stream.is_curr(lexer::Keyword::UNTIL);
+
+    if (not(stream.try_consume(lexer::Keyword::WHILE) or stream.try_consume(lexer::Keyword::UNTIL))) {
+      return OptionalResult<ast::expression::While>{crab::none};
+    }
+
+    auto result_cond{expression(stream)};
+    if (result_cond.is_err())
+      return crab::err(result_cond.take_err_unchecked());
+
+    auto condition = result_cond.take_unchecked();
+
+    if (invert) condition = crab::make_box<ast::expression::Unary>(lexer::Operator::NOT, std::move(condition));
+
+    Box<ast::Expression> then_do{crab::make_box<ast::expression::Unit>()};
+
+    if (stream.try_consume(lexer::Operator::CURLY_OPEN)) {
+      auto result{statements_list(stream, [](TokenStream &s) { return s.try_consume(lexer::Operator::CURLY_CLOSE); })};
+      if (result.is_err()) return crab::err(result.take_err_unchecked());
+      then_do = result.take_unchecked();
+    } else if (stream.try_consume(lexer::Keyword::DO)) {
+      auto result{expression(stream)};
+
+      if (result.is_err()) return crab::err(result.take_err_unchecked());
+
+      then_do = result.take_unchecked();
+    } else {
+      return crab::err(stream.unexpected("'do' or '{' "));
+    }
+
+    return crab::ok(
+      crab::some(
+        crab::make_box<ast::expression::While>(
+          std::move(condition),
+          std::move(then_do)
+        )
+      )
+    );
   }
 
   auto for_loop([[maybe_unused]] TokenStream &stream) -> OptionalResult<ast::expression::If> {
