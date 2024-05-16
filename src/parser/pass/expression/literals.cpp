@@ -10,6 +10,19 @@
 #include "token/StringLiteral.hpp"
 
 namespace goos::parser::pass::expr {
+  auto grouping(TokenStream &stream) -> OptionalResult<ast::Expression> {
+    if (not stream.try_consume(lexer::Operator::PAREN_OPEN)) return OptionalResult<ast::Expression>{crab::none};
+
+    auto expr = expression(stream);
+    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+
+    if (auto err = stream.consume_operator(lexer::Operator::PAREN_CLOSE); err.is_err()) {
+      return crab::err(err.take_err_unchecked());
+    }
+
+    return crab::ok(crab::some(expr.take_unchecked()));
+  }
+
   auto decimal(TokenStream &stream) -> OptionalResult<ast::expression::Decimal> {
     if (auto decimal = stream.try_consume<token::Decimal>()) {
       const f64 number{decimal.take_unchecked()->get_number()};

@@ -14,6 +14,8 @@
 #include "parser/TokenStream.hpp"
 
 namespace goos::parser::pass::expr {
+  auto grouping(TokenStream &stream) -> OptionalResult<ast::Expression>;
+
   auto decimal(TokenStream &stream) -> OptionalResult<ast::expression::Decimal>;
 
   auto integer(TokenStream &stream) -> OptionalResult<ast::expression::Integer>;
