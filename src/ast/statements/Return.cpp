@@ -34,7 +34,7 @@ namespace goos::ast {
     return obj;
   }
 
-  auto Return::accept(IVisitor &visitor) const -> void {
+  auto Return::accept(IVisitor &visitor) const -> runtime::VoidResult {
     return visitor.visit_return(*this);
   }
 } // namespace goos::ast

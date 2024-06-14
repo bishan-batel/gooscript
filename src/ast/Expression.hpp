@@ -45,8 +45,8 @@ namespace goos::ast {
     [[nodiscard]] auto clone() const -> Box<Statement> final;
 
     // ReSharper disable once CppFinalNonOverridingVirtualFunction
-    auto accept(IVisitor &visitor) const -> void final;
+    auto accept(IVisitor &visitor) const -> runtime::VoidResult final;
 
-    [[nodiscard]] virtual auto accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> = 0;
+    [[nodiscard]] virtual auto accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> = 0;
   };
 }

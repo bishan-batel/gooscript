@@ -33,7 +33,7 @@ namespace goos::ast {
     return obj;
   }
 
-  auto Eval::accept(IVisitor &visitor) const -> void {
+  auto Eval::accept(IVisitor &visitor) const -> runtime::VoidResult {
     return visitor.visit_eval(*this);
   }
 }

@@ -22,7 +22,7 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
-    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> override;
+    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> override;
 
     [[nodiscard]] auto get_function() const -> const Expression&;
 

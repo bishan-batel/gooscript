@@ -12,9 +12,9 @@ namespace goos::runtime {
   public:
     explicit Integer(i64 value);
 
-    auto to_string() const -> WideString override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    auto get_type() const -> meta::VariantType override;
+    [[nodiscard]] auto get_type() const -> meta::VariantType override;
 
     auto set(i64 v) -> void;
 

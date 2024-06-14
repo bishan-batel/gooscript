@@ -116,8 +116,6 @@ set(SOURCE_FILES
         src/runtime/data/Integer.hpp
         src/runtime/Environment.cpp
         src/runtime/Environment.hpp
-        src/runtime/Error.cpp
-        src/runtime/Error.hpp
         src/runtime/data/Boolean.cpp
         src/runtime/data/Boolean.hpp
         src/runtime/data/Unit.cpp
@@ -126,6 +124,13 @@ set(SOURCE_FILES
         src/runtime/data/Decimal.hpp
         src/meta/Identifier.cpp
         src/meta/Identifier.hpp
+        src/runtime/data/StringLiteral.cpp
+        src/runtime/data/StringLiteral.hpp
+        src/ast/expression/ICallable.hpp
+        src/runtime/err/RuntimeError.cpp
+        src/runtime/err/RuntimeError.hpp
+        src/runtime/err/VariableNotFound.cpp
+        src/runtime/err/VariableNotFound.hpp
 )
 
 

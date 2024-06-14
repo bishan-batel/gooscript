@@ -34,7 +34,7 @@ namespace goos::ast::expression {
     return crab::make_box<json::Text>(state ? L"true" : L"false");
   }
 
-  auto Boolean::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
+  auto Boolean::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
     return visitor.visit_boolean(*this);
   }
 }

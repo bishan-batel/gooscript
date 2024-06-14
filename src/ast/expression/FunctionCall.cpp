@@ -68,7 +68,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto FunctionCall::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
+  auto FunctionCall::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
     return visitor.visit_function_call(*this);
   }
 

@@ -52,7 +52,7 @@ namespace goos::parser::pass {
       return crab::err(name_result.take_err_unchecked());
     }
 
-    WideString name{name_result.take_unchecked()};
+    goos::meta::Identifier name{name_result.take_unchecked()};
 
     Box<ast::Expression> initializer{crab::make_box<ast::expression::Unit>()};
 

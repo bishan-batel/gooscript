@@ -8,11 +8,10 @@
 
 #include "preamble.hpp"
 #include "meta/VariantType.hpp"
+#include "runtime/Environment.hpp"
 
 namespace goos::runtime {
   class Value;
-
-  using Any = Rc<Value>;
 
   class Value {
   public:

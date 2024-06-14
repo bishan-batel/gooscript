@@ -32,7 +32,7 @@ namespace goos::ast::expression {
     return crab::make_box<json::Number>(static_cast<f32>(number));
   }
 
-  auto Integer::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
+  auto Integer::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
     return visitor.visit_integer(*this);
   }
 }

@@ -6,4 +6,3 @@
 
 #include <stdexcept>
 
-namespace goos::runtime {}

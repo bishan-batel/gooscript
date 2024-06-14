@@ -52,7 +52,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto If::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
+  auto If::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
     return visitor.visit_if(*this);
   }
 } // namespace goos::ast::expression

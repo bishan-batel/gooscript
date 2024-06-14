@@ -5,20 +5,23 @@
 #pragma once
 #include "ast/Expression.hpp"
 #include "ast/Statement.hpp"
+#include "meta/Identifier.hpp"
 #include "meta/Mutability.hpp"
 
 namespace goos::ast {
   class VariableDeclaration final : public Statement {
-    WideString name;
+    meta::Identifier name;
     meta::Mutability mutability;
     Box<Expression> initializer;
 
   public:
-    explicit VariableDeclaration(WideString name, meta::Mutability mutability, Box<Expression> initializer);
+    explicit VariableDeclaration(meta::Identifier name, meta::Mutability mutability, Box<Expression> initializer);
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto clone() const -> Box<Statement> override;
+
+    [[nodiscard]] auto get_name() const -> meta::Identifier;
 
     [[nodiscard]] auto get_mutability() const -> meta::Mutability;
 
@@ -28,6 +31,6 @@ namespace goos::ast {
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
-    auto accept(IVisitor &visitor) const -> void override;
+    auto accept(IVisitor &visitor) const -> runtime::VoidResult override;
   };
 }

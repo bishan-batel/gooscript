@@ -32,7 +32,7 @@ namespace goos::ast::expression {
     return crab::make_box<json::Text>(literal);
   }
 
-  auto StringLiteral::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
+  auto StringLiteral::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
     return visitor.visit_string_literal(*this);
   }
 }

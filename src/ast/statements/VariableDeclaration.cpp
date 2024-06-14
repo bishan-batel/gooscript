@@ -11,7 +11,7 @@
 
 namespace goos::ast {
   VariableDeclaration::VariableDeclaration(
-    WideString name,
+    meta::Identifier name,
     const meta::Mutability mutability,
     Box<Expression> initializer
   )
@@ -30,11 +30,15 @@ namespace goos::ast {
         ty = L"let mut";
         break;
     };
-    return fmt::format(L"{} {}", ty, name);
+    return fmt::format(L"{} {}", ty, name.get_string());
   }
 
   auto VariableDeclaration::clone() const -> Box<Statement> {
     return crab::make_box<VariableDeclaration>(name, mutability, initializer->clone_expr());
+  }
+
+  auto VariableDeclaration::get_name() const -> meta::Identifier {
+    return name;
   }
 
   auto VariableDeclaration::get_mutability() const -> meta::Mutability {
@@ -74,7 +78,7 @@ namespace goos::ast {
     return obj;
   }
 
-  auto VariableDeclaration::accept(IVisitor &visitor) const -> void {
+  auto VariableDeclaration::accept(IVisitor &visitor) const -> runtime::VoidResult {
     return visitor.visit_variable_declaration(*this);
   }
 }

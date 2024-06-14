@@ -76,7 +76,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto ScopeBlock::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
+  auto ScopeBlock::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
     return visitor.visit_scope(*this);
   }
 

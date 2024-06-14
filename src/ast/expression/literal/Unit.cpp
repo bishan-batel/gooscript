@@ -26,7 +26,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto Unit::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
+  auto Unit::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
     return visitor.visit_unit(*this);
   }
 }

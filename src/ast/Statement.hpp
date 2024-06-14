@@ -7,16 +7,25 @@
 #include <option.hpp>
 #include <preamble.hpp>
 #include <box.hpp>
-#include <memory>
 #include <rc.hpp>
 
 #include <ref.hpp>
 
 #include "json/Value.hpp"
+#include <result.hpp>
+
+#include "runtime/err/RuntimeError.hpp"
 
 namespace goos {
   namespace runtime {
     class Value;
+
+    template<typename T>
+    using Result = Result<T, Box<err::Error>>;
+
+    using VoidResult = Option<Box<err::Error>>;
+
+    using Any = RcMut<Value>;
   }
 
   namespace ast {
@@ -49,48 +58,50 @@ namespace goos {
         virtual ~IVisitor() = default;
 
         // Statements
-        virtual auto visit_eval(const Eval &eval) -> void = 0;
+        virtual auto visit_eval(const Eval &eval) -> runtime::VoidResult = 0;
 
-        virtual auto visit_return(const Return &ret) -> void = 0;
+        virtual auto visit_return(const Return &ret) -> runtime::VoidResult = 0;
 
-        virtual auto visit_variable_declaration(const VariableDeclaration &variable_declaration) -> void = 0;
+        virtual auto visit_variable_declaration(
+          const VariableDeclaration &variable_declaration
+        ) -> runtime::VoidResult = 0;
 
         // Expressions
-        virtual auto visit_array(const expression::Array &array) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_array(const expression::Array &array) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_boolean(const expression::Boolean &boolean) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_boolean(const expression::Boolean &boolean) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_decimal(const expression::Decimal &decimal) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_decimal(const expression::Decimal &decimal) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_dictionary(const expression::Dictionary &dictionary) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_dictionary(const expression::Dictionary &dictionary) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_integer(const expression::Integer &integer) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_integer(const expression::Integer &integer) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_lambda(const expression::Lambda &lambda) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_lambda(const expression::Lambda &lambda) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_nil(const expression::Nil &nil) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_nil(const expression::Nil &nil) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_string_literal(const expression::StringLiteral &str) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_string_literal(const expression::StringLiteral &str) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_unit(const expression::Unit &unit) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_unit(const expression::Unit &unit) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_binary(const expression::Binary &binary) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_binary(const expression::Binary &binary) -> runtime::Result<runtime::Any> = 0;
 
         virtual auto visit_function_call(
           const expression::FunctionCall &function_call
-        ) -> RcMut<runtime::Value> = 0;
+        ) -> runtime::Result<runtime::Any> = 0;
 
         virtual auto visit_identifier_binding(
           const expression::IdentifierBinding &identifier
-        ) -> RcMut<runtime::Value> = 0;
+        ) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_unary(const expression::Unary &unary) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_unary(const expression::Unary &unary) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_if(const expression::If &if_expr) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_if(const expression::If &if_expr) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_scope(const expression::ScopeBlock &scope) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_scope(const expression::ScopeBlock &scope) -> runtime::Result<runtime::Any> = 0;
 
-        virtual auto visit_while(const expression::While &while_expr) -> RcMut<runtime::Value> = 0;
+        virtual auto visit_while(const expression::While &while_expr) -> runtime::Result<runtime::Any> = 0;
       };
 
       Statement() = default;
@@ -120,7 +131,7 @@ namespace goos {
 
       [[nodiscard]] virtual auto clone() const -> Box<Statement> = 0;
 
-      virtual auto accept(IVisitor &visitor) const -> void = 0;
+      virtual auto accept(IVisitor &visitor) const -> runtime::VoidResult = 0;
     };
 
     template<typename T> requires std::is_base_of_v<Statement, T>

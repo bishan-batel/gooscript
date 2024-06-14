@@ -7,6 +7,7 @@
 
 namespace goos::ast::expression {
   class StringLiteral final : public Expression {
+    // TODO convert to Rc<WideString> to prevent copying from Lexer -> Parser -> Runtime
     WideString literal;
 
   public:
@@ -22,6 +23,6 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
-    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> override;
+    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> override;
   };
 }

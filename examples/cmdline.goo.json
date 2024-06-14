@@ -1,109 +1,29 @@
 {
   "eval": {
-    "rhs": {
-      "rhs": 3,
-      "lhs": 2,
-      "op": "*"
-    },
-    "lhs": 5,
-    "op": "+"
+    "ident": "a",
+    "type": "identifier"
   },
   "statements": [
     {
-      "args": [
-        5
-      ],
-      "function": {
-        "ident": "print",
-        "type": "identifier"
-      },
-      "type": "funcall"
+      "mutability": "let",
+      "initial": 69,
+      "name": "a",
+      "type": "declvar"
     },
     {
-      "args": [
-        {
-          "rhs": 2,
-          "lhs": 5,
-          "op": "+"
-        }
-      ],
-      "function": {
-        "ident": "print",
+      "rhs": {
+        "rhs": 420,
+        "lhs": {
+          "ident": "a",
+          "type": "identifier"
+        },
+        "op": "+"
+      },
+      "lhs": {
+        "ident": "a",
         "type": "identifier"
       },
-      "type": "funcall"
-    },
-    {
-      "args": [
-        {
-          "rhs": 2,
-          "lhs": 5,
-          "op": "+"
-        }
-      ],
-      "function": {
-        "ident": "print",
-        "type": "identifier"
-      },
-      "type": "funcall"
-    },
-    {
-      "args": [
-        {
-          "rhs": 2,
-          "lhs": 5,
-          "op": "+"
-        }
-      ],
-      "function": {
-        "ident": "print",
-        "type": "identifier"
-      },
-      "type": "funcall"
-    },
-    {
-      "args": [
-        {
-          "rhs": 2,
-          "lhs": 5,
-          "op": "+"
-        }
-      ],
-      "function": {
-        "ident": "print",
-        "type": "identifier"
-      },
-      "type": "funcall"
-    },
-    {
-      "args": [
-        {
-          "rhs": 2,
-          "lhs": 5,
-          "op": "+"
-        }
-      ],
-      "function": {
-        "ident": "print",
-        "type": "identifier"
-      },
-      "type": "funcall"
-    },
-    {
-      "args": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
-      "function": {
-        "ident": "print",
-        "type": "identifier"
-      },
-      "type": "funcall"
+      "op": "="
     }
   ],
   "type": "scope"

@@ -148,7 +148,7 @@ auto main(i32 argc, const char *argv[]) -> i32 {
 
   print(fg(fmt::color::light_green), "Running Program: \n");
   runtime::Intepreter intepreter{};
-  RcMut<runtime::Value> val = intepreter.execute(result.take_unchecked());
+  Rc<runtime::Value> val = intepreter.evaluate(result.take_unchecked()).take_unchecked();
 
   std::wcout << "Program exited with value: " << val->to_string() << std::endl;
   return 0;

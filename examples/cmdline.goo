@@ -1,17 +1,16 @@
 
 
-print(5.)
+# print(5.)
+# print(5 + 2)
+# print(5 + 2)
+# print(5 + 2)
+# print(5 + 2)
+# print(5 + 2)
+# print(1, 2, 3, 4, 5, 6, 7)
 
-print(5 + 2)
-print(5 + 2)
-print(5 + 2)
-print(5 + 2)
-print(5 + 2)
-
-
-print(1, 2, 3, 4, 5, 6, 7)
-
-5 + 2 * 3
+let a = 69;
+a = a + 420;
+a
 
 #let dictionary = {
 #  some_key = "value"
