@@ -46,7 +46,7 @@ namespace goos::parser::pass {
       mutability = goos::meta::Mutability::CONSTANT;
     } else return OptionalResult<ast::VariableDeclaration>{crab::none};
 
-    Result<WideString> name_result{stream.consume_identifier()};
+    Result<goos::meta::Identifier> name_result{stream.consume_identifier()};
 
     if (name_result.is_err()) {
       return crab::err(name_result.take_err_unchecked());

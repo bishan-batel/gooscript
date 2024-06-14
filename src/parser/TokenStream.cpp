@@ -106,7 +106,7 @@ namespace goos::parser {
     );
   }
 
-  auto TokenStream::consume_identifier() -> Result<WideString> {
+  auto TokenStream::consume_identifier() -> Result<meta::Identifier> {
     if (auto identifier = try_consume<token::Identifier>()) {
       return crab::ok(identifier.get_unchecked()->get_identifier());
     }

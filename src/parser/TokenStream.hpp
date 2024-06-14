@@ -11,6 +11,7 @@
 #include "Error.hpp"
 #include "ast/Statement.hpp"
 #include "lexer/Lexer.hpp"
+#include "meta/Identifier.hpp"
 #include "token/EndOfFile.hpp"
 
 namespace goos::parser {
@@ -130,7 +131,7 @@ namespace goos::parser {
     auto consume_operator(Operators... operators) -> Result<lexer::Operator>;
 
     [[nodiscard]]
-    auto consume_identifier() -> Result<WideString>;
+    auto consume_identifier() -> Result<meta::Identifier>;
 
     [[nodiscard]] auto is_eof() const -> bool;
 

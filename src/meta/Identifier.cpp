@@ -4,10 +4,8 @@
 
 #include "Identifier.hpp"
 
-#include <stdexcept>
-
 goos::meta::Identifier::Identifier(WideString name)
-  : name{std::move(name)} {
+  : name{crab::make_rc<WideString>(std::move(name))} {
   compute_hash();
 }
 

@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include "preamble.hpp"
+#include "ast/expression/literal/Array.hpp"
 
 namespace goos::meta {
   class Identifier {
@@ -13,7 +14,7 @@ namespace goos::meta {
     using Hash = usize;
 
   private:
-    WideString name;
+    Rc<WideString> name;
     Hash hash = 0;
 
   public:

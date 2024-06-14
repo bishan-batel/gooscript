@@ -6,6 +6,7 @@
 #include <preamble.hpp>
 
 #include "Token.hpp"
+#include "meta/Identifier.hpp"
 
 namespace goos::token {
   inline static const Set<widechar> INVALID_IDENTIFIER_CHARS{
@@ -47,12 +48,12 @@ namespace goos::token {
   };
 
   class Identifier final : public Token {
-    WideString identifier;
+    meta::Identifier identifier;
 
   public:
     Identifier(SourceFile file, Range<> range, WideString identifier);
 
-    [[nodiscard]] auto get_identifier() const -> const WideString&;
+    [[nodiscard]] auto get_identifier() const -> const meta::Identifier&;
 
     [[nodiscard]] auto clone() const -> Box<Token> override;
 

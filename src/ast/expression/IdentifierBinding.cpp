@@ -8,11 +8,16 @@
 #include "json/Object.hpp"
 
 namespace goos::ast::expression {
-  IdentifierBinding::IdentifierBinding(meta::Identifier identifier) : identifier{std::move(identifier)} {}
+  IdentifierBinding::IdentifierBinding(meta::Identifier identifier)
+    : identifier{
+      crab::make_rc<meta::Identifier>(std::move(identifier))
+    } {}
 
   auto IdentifierBinding::get_identifier() const -> const meta::Identifier& { return identifier; }
 
-  auto IdentifierBinding::to_string() const -> WideString { return identifier; }
+  auto IdentifierBinding::to_string() const -> WideString {
+    return identifier;
+  }
 
   auto IdentifierBinding::clone_expr() const -> Box<Expression> {
     return crab::make_box<IdentifierBinding>(identifier);
