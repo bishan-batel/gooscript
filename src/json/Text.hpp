@@ -14,10 +14,10 @@ namespace goos::json {
 
     auto set_text(WideString value) -> void;
 
-    auto get_text() const -> const WideString&;
-
     auto write(std::wostream &os) const -> void override;
 
-    auto clone() const -> Box<Value> override;
+    [[nodiscard]] auto get_text() const -> const WideString&;
+
+    [[nodiscard]] auto clone() const -> Box<Value> override;
   };
 }
