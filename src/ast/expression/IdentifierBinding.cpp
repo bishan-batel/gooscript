@@ -8,9 +8,9 @@
 #include "json/Object.hpp"
 
 namespace goos::ast::expression {
-  IdentifierBinding::IdentifierBinding(WideString identifier) : identifier{std::move(identifier)} {}
+  IdentifierBinding::IdentifierBinding(meta::Identifier identifier) : identifier{std::move(identifier)} {}
 
-  auto IdentifierBinding::get_identifier() const -> const WideString& { return identifier; }
+  auto IdentifierBinding::get_identifier() const -> const meta::Identifier& { return identifier; }
 
   auto IdentifierBinding::to_string() const -> WideString { return identifier; }
 

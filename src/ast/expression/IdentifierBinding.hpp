@@ -6,15 +6,16 @@
 #include <preamble.hpp>
 
 #include "ast/Expression.hpp"
+#include "meta/Identifier.hpp"
 
 namespace goos::ast::expression {
   class IdentifierBinding final : public Expression {
-    WideString identifier;
+    meta::Identifier identifier;
 
   public:
-    explicit IdentifierBinding(WideString identifier);
+    explicit IdentifierBinding(meta::Identifier identifier);
 
-    [[nodiscard]] auto get_identifier() const -> const WideString&;
+    [[nodiscard]] auto get_identifier() const -> const meta::Identifier&;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
