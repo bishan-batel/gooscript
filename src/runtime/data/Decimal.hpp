@@ -6,15 +6,11 @@
 #include "Value.hpp"
 
 namespace goos::runtime {
-  class Boolean final : public Value {
-    bool state;
+  class Decimal final : public Value {
+    f64 value;
 
   public:
-    explicit Boolean(bool state);
-
-    auto set(bool v) -> void;
-
-    [[nodiscard]] auto get() const -> bool;
+    explicit Decimal(f64 value);
 
     [[nodiscard]] auto to_string() const -> WideString override;
 

@@ -76,7 +76,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto Dictionary::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+  auto Dictionary::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
     return visitor.visit_dictionary(*this);
   }
 }

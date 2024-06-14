@@ -32,7 +32,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto IdentifierBinding::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+  auto IdentifierBinding::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
     return visitor.visit_identifier_binding(*this);
   }
 }

@@ -11,9 +11,6 @@
 
 namespace goos::runtime {
   class Value;
-  // TODO when crab supports mutable Rc, switch to that over std::shared_ptr.
-  template<typename T>
-  using Rc = std::shared_ptr<T>;
 
   using Any = Rc<Value>;
 
@@ -37,9 +34,9 @@ namespace goos::runtime {
     template<typename T>
     auto coerce_unchecked() -> T&;
 
-    virtual auto to_string() const -> WideString = 0;
+    [[nodiscard]] virtual auto to_string() const -> WideString = 0;
 
-    virtual auto get_type() const -> meta::VariantType = 0;
+    [[nodiscard]] virtual auto get_type() const -> meta::VariantType = 0;
   };
 
   template<typename T>

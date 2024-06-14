@@ -42,7 +42,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto While::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+  auto While::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
     return visitor.visit_while(*this);
   }
 } // namespace goos::ast::expression

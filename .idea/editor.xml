@@ -3,7 +3,6 @@
   <component name="BackendCodeEditorSettings">
     <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_BINARY_EXPRESSIONS_CHAIN/@EntryValue" value="true" type="bool" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_CALLS_CHAIN/@EntryValue" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_EXPRESSION/@EntryValue" value="false" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_FOR_STMT/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTIPLE_DECLARATION/@EntryValue" value="false" type="bool" />
@@ -14,7 +13,6 @@
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/KEEP_USER_LINEBREAKS/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_CASE_FROM_SWITCH/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_COMMENT/@EntryValue" value="true" type="bool" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INT_ALIGN_EQ/@EntryValue" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/SIMPLE_BLOCK_STYLE/@EntryValue" value="DO_NOT_CHANGE" type="string" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/SPACE_AFTER_FOR_SEMICOLON/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/SPACE_BEFORE_FOR_SEMICOLON/@EntryValue" value="false" type="bool" />
@@ -37,7 +35,6 @@
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/PLACE_ELSE_ON_NEW_LINE/@EntryValue" value="false" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/PLACE_CATCH_ON_NEW_LINE/@EntryValue" value="false" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/NAMESPACE_INDENTATION/@EntryValue" value="All" type="string" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_ARGUMENT/@EntryValue" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_EXTENDS_LIST/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_PARAMETER/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_TYPE_ARGUMENT/@EntryValue" value="false" type="bool" />
@@ -105,8 +102,6 @@
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/LINKAGE_SPECIFICATION_INDENTATION/@EntryValue" value="All" type="string" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_PREPROCESSOR_DIRECTIVES/@EntryValue" value="Normal" type="string" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_MULTILINE_EXPRESSION_BRACES/@EntryValue" value="true" type="bool" />
-    <option name="/Default/CodeStyle/CppIncludeDirective/UseRelativePaths/@EntryValue" value="WhenRelativePathIsShorter" type="string" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppCodeStyle/FunctionDeclarationStyle/@EntryValue" value="TrailingReturnType" type="string" />
     <option name="/Default/CodeEditing/CppCodeGeneration/FunctionImplementationKind/@EntryValue" value="ThrowNotImplemented" type="string" />
     <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003Apreamble_002Ehpp_002Fl_003Asrc_003Fpreamble_002Ehpp/@EntryIndexedValue" value="ForceIncluded" type="string" />
     <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003Ashader_002Ecpp_002Fl_003Asrc_003Fshader_003Fshader_002Ecpp/@EntryIndexedValue" value="ForceIncluded" type="string" />
@@ -116,17 +111,8 @@
     <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003Amain_002Eixx_002Fl_003Asrc_003Fmain_002Eixx/@EntryIndexedValue" value="ForceIncluded" type="string" />
     <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=8BC9CEB8_002D8B4A_002D11D0_002D8D11_002D00A0C91BC942_002Fd_003Ainclude_002Ff_003Aresult_002Ehpp/@EntryIndexedValue" value="ForceIncluded" type="string" />
     <option name="/Default/CodeStyle/EditorConfig/EnableClangFormatSupport/@EntryValue" value="false" type="bool" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/USE_CONTINUOUS_LINE_INDENT_IN_METHOD_PARS/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/USE_CONTINUOUS_LINE_INDENT_IN_EXPRESSION_BRACES/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_EXPORT_DECLARATION_MEMBERS/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_ACCESS_SPECIFIERS_FROM_CLASS/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_MEMBER_INITIALIZER_LIST/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_WRAPPED_FUNCTION_NAMES/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_GOTO_LABELS/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/ALIGN_FIRST_ARG_BY_PAREN/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/OUTDENT_COMMAS/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/OUTDENT_DOTS/@EntryValue" />
-    <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INT_ALIGN_DECLARATION_NAMES/@EntryValue" />
+    <option name="/Default/CodeStyle/CppIncludeDirective/UseRelativePaths/@EntryValue" value="WhenRelativePathIsShorter" type="string" />
+    <option name="/Default/CodeStyle/CodeFormatting/CppCodeStyle/FunctionDeclarationStyle/@EntryValue" value="TrailingReturnType" type="string" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INT_ALIGN_ENUM_INITIALIZERS/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INT_ALIGN_BITFIELD_SIZES/@EntryValue" value="true" type="bool" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INT_ALIGN_COMMENTS/@EntryValue" value="true" type="bool" />

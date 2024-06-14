@@ -24,7 +24,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto Nil::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+  auto Nil::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
     return visitor.visit_nil(*this);
   }
 } // goos

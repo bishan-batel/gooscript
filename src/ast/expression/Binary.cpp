@@ -54,7 +54,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto Binary::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+  auto Binary::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
     return visitor.visit_binary(*this);
   }
 }

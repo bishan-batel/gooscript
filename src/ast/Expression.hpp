@@ -26,7 +26,6 @@ namespace goos::ast::expression {
 }
 
 namespace goos::ast {
-
   class Expression : public Statement {
   public:
     Expression() = default;
@@ -48,6 +47,6 @@ namespace goos::ast {
     // ReSharper disable once CppFinalNonOverridingVirtualFunction
     auto accept(IVisitor &visitor) const -> void final;
 
-    [[nodiscard]] virtual auto accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> = 0;
+    [[nodiscard]] virtual auto accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> = 0;
   };
 }

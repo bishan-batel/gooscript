@@ -26,7 +26,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto Unit::accept_expr(IVisitor &visitor) const -> std::shared_ptr<runtime::Value> {
+  auto Unit::accept_expr(IVisitor &visitor) const -> RcMut<runtime::Value> {
     return visitor.visit_unit(*this);
   }
 }

@@ -8,6 +8,103 @@
     "lhs": 5,
     "op": "+"
   },
-  "statements": [],
+  "statements": [
+    {
+      "args": [
+        5
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
+    },
+    {
+      "args": [
+        {
+          "rhs": 2,
+          "lhs": 5,
+          "op": "+"
+        }
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
+    },
+    {
+      "args": [
+        {
+          "rhs": 2,
+          "lhs": 5,
+          "op": "+"
+        }
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
+    },
+    {
+      "args": [
+        {
+          "rhs": 2,
+          "lhs": 5,
+          "op": "+"
+        }
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
+    },
+    {
+      "args": [
+        {
+          "rhs": 2,
+          "lhs": 5,
+          "op": "+"
+        }
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
+    },
+    {
+      "args": [
+        {
+          "rhs": 2,
+          "lhs": 5,
+          "op": "+"
+        }
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
+    },
+    {
+      "args": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
+    }
+  ],
   "type": "scope"
 }

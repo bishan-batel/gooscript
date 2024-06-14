@@ -122,6 +122,8 @@ set(SOURCE_FILES
         src/runtime/data/Boolean.hpp
         src/runtime/data/Unit.cpp
         src/runtime/data/Unit.hpp
+        src/runtime/data/Decimal.cpp
+        src/runtime/data/Decimal.hpp
 )
 
 

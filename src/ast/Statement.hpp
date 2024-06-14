@@ -8,6 +8,7 @@
 #include <preamble.hpp>
 #include <box.hpp>
 #include <memory>
+#include <rc.hpp>
 
 #include <ref.hpp>
 
@@ -55,41 +56,41 @@ namespace goos {
         virtual auto visit_variable_declaration(const VariableDeclaration &variable_declaration) -> void = 0;
 
         // Expressions
-        virtual auto visit_array(const expression::Array &array) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_array(const expression::Array &array) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_boolean(const expression::Boolean &boolean) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_boolean(const expression::Boolean &boolean) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_decimal(const expression::Decimal &decimal) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_decimal(const expression::Decimal &decimal) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_dictionary(const expression::Dictionary &dictionary) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_dictionary(const expression::Dictionary &dictionary) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_integer(const expression::Integer &integer) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_integer(const expression::Integer &integer) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_lambda(const expression::Lambda &lambda) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_lambda(const expression::Lambda &lambda) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_nil(const expression::Nil &nil) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_nil(const expression::Nil &nil) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_string_literal(const expression::StringLiteral &str) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_string_literal(const expression::StringLiteral &str) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_unit(const expression::Unit &unit) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_unit(const expression::Unit &unit) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_binary(const expression::Binary &binary) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_binary(const expression::Binary &binary) -> RcMut<runtime::Value> = 0;
 
         virtual auto visit_function_call(
           const expression::FunctionCall &function_call
-        ) -> std::shared_ptr<runtime::Value> = 0;
+        ) -> RcMut<runtime::Value> = 0;
 
         virtual auto visit_identifier_binding(
           const expression::IdentifierBinding &identifier
-        ) -> std::shared_ptr<runtime::Value> = 0;
+        ) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_unary(const expression::Unary &unary) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_unary(const expression::Unary &unary) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_if(const expression::If &if_expr) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_if(const expression::If &if_expr) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_scope(const expression::ScopeBlock &scope) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_scope(const expression::ScopeBlock &scope) -> RcMut<runtime::Value> = 0;
 
-        virtual auto visit_while(const expression::While &while_expr) -> std::shared_ptr<runtime::Value> = 0;
+        virtual auto visit_while(const expression::While &while_expr) -> RcMut<runtime::Value> = 0;
       };
 
       Statement() = default;

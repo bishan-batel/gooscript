@@ -67,10 +67,12 @@ namespace goos {
   }
 
   SourceFile::SourceFile(String name, WideString contents)
-    : name{crab::some(std::move(name))}, contents{std::move(contents)} {}
+    : name{crab::make_rc<Option<String>>(crab::some(std::move(name)))},
+      contents{crab::make_rc<WideString>(std::move(contents))} {}
 
   SourceFile::SourceFile(WideString contents)
-    : name{crab::none}, contents{std::move(contents)} {}
+    : name{crab::make_rc<Option<String>>(crab::none)},
+      contents{crab::make_rc<WideString>(std::move(contents))} {}
 
   auto SourceFile::create(String name, WideString contents) -> SourceFile {
     return SourceFile{std::move(name), std::move(contents)};
