@@ -7,10 +7,11 @@
 
 #include "preamble.hpp"
 #include "data/Value.hpp"
+#include "meta/Identifier.hpp"
 
 namespace goos::runtime {
   class Environment final {
-    Dictionary<WideString, std::shared_ptr<Value>> values{};
+    Dictionary<meta::Identifier, std::shared_ptr<Value>> values{};
     Option<Ref<Environment>> parent;
     usize depth{0};
 

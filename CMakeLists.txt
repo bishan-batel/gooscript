@@ -124,6 +124,8 @@ set(SOURCE_FILES
         src/runtime/data/Unit.hpp
         src/runtime/data/Decimal.cpp
         src/runtime/data/Decimal.hpp
+        src/meta/Identifier.cpp
+        src/meta/Identifier.hpp
 )
 
 
