@@ -9,13 +9,13 @@
 #include "data/Value.hpp"
 
 namespace goos::runtime {
-  class Enviornment final {
+  class Environment final {
     Dictionary<WideString, std::shared_ptr<Value>> values{};
-    Option<Ref<Enviornment>> parent;
+    Option<Ref<Environment>> parent;
     usize depth{0};
 
   public:
-    explicit Enviornment(Option<Ref<Enviornment>> parent = crab::none);
+    explicit Environment(Option<Ref<Environment>> parent = crab::none);
 
     [[nodiscard]] auto get_depth() const -> usize;
   };

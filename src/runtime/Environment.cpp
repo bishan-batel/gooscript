@@ -2,17 +2,17 @@
 // Created by bishan_ on 5/15/24.
 //
 
-#include "Enviornment.hpp"
+#include "Environment.hpp"
 
 namespace goos::runtime {
-  Enviornment::Enviornment(const Option<Ref<Enviornment>> parent)
+  Environment::Environment(const Option<Ref<Environment>> parent)
     : parent{parent} {
     if (auto p = parent) {
       depth = p.get_unchecked()->depth + 1;
     }
   }
 
-  auto Enviornment::get_depth() const -> usize {
+  auto Environment::get_depth() const -> usize {
     return depth;
   }
 }
