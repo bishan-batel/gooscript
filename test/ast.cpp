@@ -50,7 +50,7 @@ TEST_CASE("AST Into String", "[ast_string]") {
   SECTION("Binary") { TEST_CLONE(L"(unit) and (unit)", Binary, expr, goos::lexer::Operator::AND, expr); }
   SECTION("Unary") { TEST_CLONE(L"not (unit)", Unary, goos::lexer::Operator::NOT, expr); }
   SECTION("FunctionCall") { TEST_CLONE(L"funcall(unit)()", FunctionCall, expr, {}); }
-  SECTION("IdentifierBinding") { TEST_CLONE(L"wha", IdentifierBinding, L"wha"); }
+  SECTION("IdentifierBinding") { TEST_CLONE(L"wha", IdentifierBinding, meta::Identifier{L"wha"}); }
   SECTION("Eval") { TEST_CLONE(L"eval (unit)", Eval, expr) }
   SECTION("Return") { TEST_CLONE(L"return unit", Return, expr) }
   SECTION("Nil") { TEST_CLONE(L"nil", Nil) }
@@ -88,7 +88,7 @@ auto scope(std::array<Box<Statement>, N> statements) {
 }
 
 #define UNIT crab::make_box<expression::Unit>()
-#define DECL_VARIABLE(name, mut, expr) Box<Statement>::wrap_unchecked(new VariableDeclaration {name, meta::Mutability:: mut, expr})
+#define DECL_VARIABLE(name, mut, expr) Box<Statement>::wrap_unchecked(new VariableDeclaration {goos::meta::Identifier{name}, meta::Mutability:: mut, expr})
 
 #define SCOPE(...) scope(std::array{__VA_ARGS__})
 
