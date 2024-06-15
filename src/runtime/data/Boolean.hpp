@@ -21,5 +21,7 @@ namespace goos::runtime {
     [[nodiscard]] auto get_type() const -> meta::VariantType override;
 
     auto is_truthy() const -> bool override;
+
+    [[nodiscard]] auto hash() const -> usize override;
   };
 }

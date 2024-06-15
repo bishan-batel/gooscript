@@ -34,4 +34,8 @@ namespace goos::runtime {
   auto Integer::is_integral() const -> bool {
     return true;
   }
+
+  auto Integer::hash() const -> usize {
+    return std::hash<i64>{}(value);
+  }
 }

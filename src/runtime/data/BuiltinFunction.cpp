@@ -34,4 +34,9 @@ namespace goos::runtime {
   auto BuiltinFunction::get_arity() const -> usize {
     return arity;
   }
+
+  auto BuiltinFunction::hash() const -> usize {
+    // All builtin functions are unique.
+    return reinterpret_cast<usize>(this);
+  }
 }

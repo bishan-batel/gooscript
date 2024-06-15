@@ -13,5 +13,7 @@ namespace goos::runtime {
     auto to_string() const -> WideString override;
 
     auto get_type() const -> meta::VariantType override;
+
+    auto hash() const -> usize override;
   };
 }

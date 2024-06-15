@@ -36,6 +36,8 @@ namespace goos::runtime {
     [[nodiscard]] virtual auto get_type() const -> meta::VariantType = 0;
 
     [[nodiscard]] virtual auto is_truthy() const -> bool { return false; }
+
+    [[nodiscard]] virtual auto hash() const -> usize = 0;
   };
 
   template<typename T>
@@ -48,3 +50,10 @@ namespace goos::runtime {
     return coerce<T>().take_unchecked();
   }
 }
+
+template<>
+struct std::hash<goos::runtime::IValue> {
+  auto operator()(const goos::runtime::IValue &value) const noexcept -> usize {
+    return value.hash();
+  }
+};

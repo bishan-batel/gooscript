@@ -36,4 +36,8 @@ namespace goos::runtime {
   auto Decimal::is_integral() const -> bool {
     return false;
   }
+
+  auto Decimal::hash() const -> usize {
+    return std::hash<f64>{}(value);
+  }
 }

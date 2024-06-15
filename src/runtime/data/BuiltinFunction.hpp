@@ -39,5 +39,7 @@ namespace goos::runtime {
     [[nodiscard]] auto get_arity_type() const -> ArityType override;
 
     [[nodiscard]] auto get_arity() const -> usize override;
+
+    [[nodiscard]] auto hash() const -> usize override;
   };
 }

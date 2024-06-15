@@ -23,7 +23,11 @@ namespace goos::runtime {
     return meta::VariantType::BOOLEAN;
   }
 
-  bool Boolean::is_truthy() const {
+  auto Boolean::is_truthy() const -> bool {
     return state;
+  }
+
+  auto Boolean::hash() const -> usize {
+    return std::hash<bool>()(state);
   }
 }

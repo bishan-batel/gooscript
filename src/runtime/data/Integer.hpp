@@ -28,5 +28,7 @@ namespace goos::runtime {
     [[nodiscard]] auto get_number() const -> f64 override;
 
     [[nodiscard]] auto is_integral() const -> bool override;
+
+    [[nodiscard]] auto hash() const -> usize override;
   };
 }

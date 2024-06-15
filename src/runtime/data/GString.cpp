@@ -24,4 +24,8 @@ namespace goos::runtime {
   auto GString::get_type() const -> meta::VariantType {
     return meta::VariantType::STRING;
   }
+
+  auto GString::hash() const -> usize {
+    return std::hash<WideString>{}(text);
+  }
 }

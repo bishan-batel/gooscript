@@ -14,4 +14,8 @@ namespace goos::runtime {
   auto Unit::get_type() const -> meta::VariantType {
     return meta::VariantType::UNIT;
   }
+
+  auto Unit::hash() const -> usize {
+    return 4206942_u64;
+  }
 }

@@ -2,6 +2,7 @@
 // Created by bishan_ on 5/15/24.
 //
 
+#include <preamble.hpp>
 #include "Nil.hpp"
 
 namespace goos::runtime {
@@ -11,5 +12,9 @@ namespace goos::runtime {
 
   auto Nil::get_type() const -> meta::VariantType {
     return meta::VariantType::NIL;
+  }
+
+  auto Nil::hash() const -> usize {
+    return 42069_u64;
   }
 }
