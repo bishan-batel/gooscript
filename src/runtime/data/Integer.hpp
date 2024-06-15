@@ -3,10 +3,11 @@
 //
 
 #pragma once
-#include "Value.hpp"
+#include "INumeric.hpp"
+#include "IValue.hpp"
 
 namespace goos::runtime {
-  class Integer final : public Value {
+  class Integer final : public INumeric {
     i64 value;
 
   public:
@@ -21,5 +22,11 @@ namespace goos::runtime {
     auto set(i64 v) -> void;
 
     [[nodiscard]] auto get() const -> i64;
+
+    auto set_number(f64 v) -> void override;
+
+    [[nodiscard]] auto get_number() const -> f64 override;
+
+    [[nodiscard]] auto is_integral() const -> bool override;
   };
 }

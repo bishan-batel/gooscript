@@ -4,7 +4,7 @@
 
 #include "NotCallable.hpp"
 
-#include "runtime/data/Value.hpp"
+#include "runtime/data/IValue.hpp"
 #include "utils/str.hpp"
 
 namespace goos {

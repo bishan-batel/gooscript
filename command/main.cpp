@@ -5,7 +5,8 @@
 #include "parser/TokenStream.hpp"
 #include "parser/pass/statement/block.hpp"
 #include "runtime/Intepreter.hpp"
-#include "runtime/data/Value.hpp"
+#include "runtime/data/IValue.hpp"
+#include "runtime/data/TypeConversion.hpp"
 #include "source/SourceFile.hpp"
 #include <fmt/format.h>
 #include <fmt/color.h>
@@ -146,10 +147,13 @@ auto main(i32 argc, const char *argv[]) -> i32 {
     result.get_unchecked()->json()->write(output);
   }
 
-  print(fg(fmt::color::light_green), "Running Program: \n");
-  runtime::Intepreter intepreter{};
-  Rc<runtime::Value> val = intepreter.evaluate(result.take_unchecked()).take_unchecked();
+  using namespace runtime;
 
-  std::wcout << "Program exited with value: " << val->to_string() << std::endl;
+  print(fg(fmt::color::light_green), "Running Program: \n");
+  Intepreter intepreter{};
+
+  Any exit_result = intepreter.evaluate(result.take_unchecked()).take_unchecked();
+
+  std::wcout << "Program exited with value: " << exit_result->to_string() << std::endl;
   return 0;
 }

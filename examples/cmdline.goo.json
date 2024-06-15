@@ -7,48 +7,244 @@
       "mutability": "let",
       "initial": {
         "body": {
-          "args": [
-            "Hello World"
-          ],
-          "function": {
-            "ident": "print",
-            "type": "identifier"
+          "eval": {
+            "do": {
+              "eval": {
+                "type": "unit"
+              },
+              "statements": [
+                {
+                  "mutability": "let",
+                  "initial": {
+                    "rhs": 3,
+                    "lhs": {
+                      "ident": "n",
+                      "type": "identifier"
+                    },
+                    "op": "mod"
+                  },
+                  "name": "fizz",
+                  "type": "declvar"
+                },
+                {
+                  "mutability": "let",
+                  "initial": {
+                    "rhs": 5,
+                    "lhs": {
+                      "ident": "n",
+                      "type": "identifier"
+                    },
+                    "op": "mod"
+                  },
+                  "name": "buzz",
+                  "type": "declvar"
+                },
+                {
+                  "else": {
+                    "else": {
+                      "else": {
+                        "eval": {
+                          "type": "unit"
+                        },
+                        "statements": [
+                          {
+                            "args": [
+                              {
+                                "ident": "n",
+                                "type": "identifier"
+                              }
+                            ],
+                            "function": {
+                              "ident": "print",
+                              "type": "identifier"
+                            },
+                            "type": "funcall"
+                          }
+                        ],
+                        "type": "scope"
+                      },
+                      "then": {
+                        "eval": {
+                          "type": "unit"
+                        },
+                        "statements": [
+                          {
+                            "args": [
+                              "Buzz"
+                            ],
+                            "function": {
+                              "ident": "print",
+                              "type": "identifier"
+                            },
+                            "type": "funcall"
+                          }
+                        ],
+                        "type": "scope"
+                      },
+                      "condition": {
+                        "rhs": 0,
+                        "lhs": {
+                          "ident": "buzz",
+                          "type": "identifier"
+                        },
+                        "op": "=="
+                      },
+                      "type": "if"
+                    },
+                    "then": {
+                      "eval": {
+                        "type": "unit"
+                      },
+                      "statements": [
+                        {
+                          "args": [
+                            "Fizz"
+                          ],
+                          "function": {
+                            "ident": "print",
+                            "type": "identifier"
+                          },
+                          "type": "funcall"
+                        }
+                      ],
+                      "type": "scope"
+                    },
+                    "condition": {
+                      "rhs": 0,
+                      "lhs": {
+                        "ident": "fizz",
+                        "type": "identifier"
+                      },
+                      "op": "=="
+                    },
+                    "type": "if"
+                  },
+                  "then": {
+                    "eval": {
+                      "type": "unit"
+                    },
+                    "statements": [
+                      {
+                        "args": [
+                          "FizzBuzz"
+                        ],
+                        "function": {
+                          "ident": "print",
+                          "type": "identifier"
+                        },
+                        "type": "funcall"
+                      }
+                    ],
+                    "type": "scope"
+                  },
+                  "condition": {
+                    "rhs": 0,
+                    "lhs": {
+                      "rhs": {
+                        "ident": "buzz",
+                        "type": "identifier"
+                      },
+                      "lhs": {
+                        "ident": "fizz",
+                        "type": "identifier"
+                      },
+                      "op": "+"
+                    },
+                    "op": "=="
+                  },
+                  "type": "if"
+                },
+                {
+                  "rhs": {
+                    "rhs": 1,
+                    "lhs": {
+                      "ident": "n",
+                      "type": "identifier"
+                    },
+                    "op": "+"
+                  },
+                  "lhs": {
+                    "ident": "n",
+                    "type": "identifier"
+                  },
+                  "op": "="
+                }
+              ],
+              "type": "scope"
+            },
+            "condition": {
+              "rhs": {
+                "ident": "N",
+                "type": "identifier"
+              },
+              "lhs": {
+                "ident": "n",
+                "type": "identifier"
+              },
+              "op": "<"
+            },
+            "type": "while"
           },
-          "type": "funcall"
+          "statements": [
+            {
+              "mutability": "let",
+              "initial": 100,
+              "name": "N",
+              "type": "declvar"
+            },
+            {
+              "mutability": "let mut",
+              "initial": 0,
+              "name": "n",
+              "type": "declvar"
+            }
+          ],
+          "type": "scope"
         },
         "params": [],
         "type": "declfun"
       },
-      "name": "fun1",
+      "name": "fizzbuzz",
       "type": "declvar"
     },
     {
       "mutability": "let",
       "initial": {
         "body": {
-          "rhs": {
-            "ident": "b",
-            "type": "identifier"
+          "else": 20,
+          "then": 10,
+          "condition": {
+            "rhs": {
+              "ident": "num2",
+              "type": "identifier"
+            },
+            "lhs": {
+              "ident": "num1",
+              "type": "identifier"
+            },
+            "op": ">"
           },
-          "lhs": {
-            "ident": "a",
-            "type": "identifier"
-          },
-          "op": "+"
+          "type": "if"
         },
         "params": [
-          "a",
-          "b"
+          "num1",
+          "num2"
         ],
         "type": "declfun"
       },
-      "name": "sum",
+      "name": "min",
       "type": "declvar"
     },
     {
-      "args": [],
+      "args": [
+        {
+          "eval": 420,
+          "statements": [],
+          "type": "scope"
+        }
+      ],
       "function": {
-        "ident": "fun1",
+        "ident": "print",
         "type": "identifier"
       },
       "type": "funcall"
@@ -57,11 +253,29 @@
       "args": [
         {
           "args": [
-            9,
-            10
+            10,
+            42
           ],
           "function": {
-            "ident": "sum",
+            "ident": "min",
+            "type": "identifier"
+          },
+          "type": "funcall"
+        }
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
+    },
+    {
+      "args": [
+        "Funny Number: ",
+        {
+          "args": [],
+          "function": {
+            "ident": "funny_number",
             "type": "identifier"
           },
           "type": "funcall"

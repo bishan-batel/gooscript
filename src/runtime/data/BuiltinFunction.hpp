@@ -4,32 +4,33 @@
 
 #pragma once
 #include <functional>
+#include <utility>
 
-#include "Callable.hpp"
-#include "Value.hpp"
+#include "ICallable.hpp"
+#include "IValue.hpp"
 
 namespace goos::runtime {
-  class BuiltinFunction final : public Callable {
-    std::function<Result<Any>(Vec<Any>)> function;
+  class BuiltinFunction final : public ICallable {
+    std::function<Result<Any>(Environment &env, const Vec<Any> &args)> function;
     usize arity{};
     ArityType arity_type;
 
-    explicit BuiltinFunction(std::function<Result<Any>(Vec<Any>)> function, usize arity, ArityType arity_type);
+    explicit BuiltinFunction(decltype(function) function, usize arity, ArityType arity_type);
 
   public:
-    static auto from(usize arity, decltype(function) function) -> RcMut<BuiltinFunction> {
+    static auto from(const usize arity, decltype(function) function) -> RcMut<BuiltinFunction> {
       return RcMut<BuiltinFunction>::from_owned_unchecked(
         new BuiltinFunction{std::move(function), arity, ArityType::Finite}
       );
     }
 
-    static auto varargs(decltype(function) function) -> RcMut<BuiltinFunction> {
+    static auto varargs(const decltype(function) &function) -> RcMut<BuiltinFunction> {
       return RcMut<BuiltinFunction>::from_owned_unchecked(
-        new BuiltinFunction{std::move(function), 0, ArityType::Varargs}
+        new BuiltinFunction{function, 0, ArityType::Varargs}
       );
     }
 
-    [[nodiscard]] auto call(const Vec<Any> &values) const -> Result<Any> override;
+    [[nodiscard]] auto call(Environment &env, const Vec<Any> &values) const -> Result<Any> override;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 

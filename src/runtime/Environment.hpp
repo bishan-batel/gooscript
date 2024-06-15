@@ -4,21 +4,25 @@
 
 #pragma once
 
+#include <bitset>
+
 #include "preamble.hpp"
+#include "data/TypeConversion.hpp"
 #include "meta/Identifier.hpp"
 #include "meta/Mutability.hpp"
 #include "meta/VariantType.hpp"
 
 namespace goos::runtime {
+  class Intepreter;
   class BuiltinFunction;
 
   class Variable final {
     meta::Mutability mutability;
-    RcMut<Value> value;
+    RcMut<IValue> value;
     meta::VariantType type;
 
   public:
-    Variable(meta::Mutability mutability, RcMut<Value> value);
+    Variable(meta::Mutability mutability, RcMut<IValue> value);
 
     Variable(const Variable &) = delete;
 
@@ -28,37 +32,65 @@ namespace goos::runtime {
 
     [[nodiscard]] auto get_mutability() const -> meta::Mutability;
 
-    [[nodiscard]] auto get_value() const -> RcMut<Value>;
+    [[nodiscard]] auto get_value() const -> RcMut<IValue>;
 
     [[nodiscard]] auto get_type() const -> meta::VariantType;
 
-    auto set_value(RcMut<Value> value) -> void;
+    auto set_value(RcMut<IValue> value) -> void;
   };
 
   class Environment final {
     Dictionary<meta::Identifier, RcMut<Variable>> bindings{};
     Option<RcMut<Environment>> parent;
     usize depth{0};
+    RefMut<Intepreter> intepreter;
 
   public:
     auto define_builtin(WideString name, const RcMut<BuiltinFunction> &function) -> void;
 
-    static RcMut<Environment> get_standard_environment();
+    static auto get_standard_environment(Intepreter &intepreter) -> RcMut<Environment>;
 
-    explicit Environment(RcMut<Environment> parent);
+    explicit Environment(Intepreter &intepreter, RcMut<Environment> parent);
 
-    explicit Environment(Option<RcMut<Environment>> parent = crab::none);
+    explicit Environment(Intepreter &intepreter, Option<RcMut<Environment>> parent = crab::none);
 
-    auto push_variable(meta::Identifier identifier, meta::Mutability mutability, RcMut<Value> value) -> void;
+    static auto enclose(RcMut<Environment> enclosing) -> RcMut<Environment>;
 
-    auto set_value(const meta::Identifier &identifier, RcMut<Value> value) -> void;
+    template<typename IntoIdentifier, typename ValueTy> requires
+      std::is_constructible_v<meta::Identifier, IntoIdentifier> and
+      type::is_value<ValueTy>
+    auto define_constant(IntoIdentifier identifier, RcMut<ValueTy> value) -> Result<RcMut<Variable>>;
 
-    [[nodiscard]] auto get_variable(const meta::Identifier &identifier) const -> RcMut<Variable>;
+    auto push_variable(
+      meta::Identifier identifier,
+      meta::Mutability mutability,
+      RcMut<IValue> value
+    ) -> Result<RcMut<Variable>>;
 
-    [[nodiscard]] auto try_get_variable(const meta::Identifier &identifier) const -> Option<RcMut<Variable>>;
+    auto set_value(const meta::Identifier &identifier, RcMut<IValue> value) const -> Result<RcMut<Variable>>;
+
+    [[nodiscard]] auto get_variable(const meta::Identifier &identifier) const -> Result<RcMut<Variable>>;
 
     [[nodiscard]] auto get_depth() const -> usize;
 
     auto get_previous() const -> Option<RcMut<Environment>>;
+
+    auto runtime() const -> Intepreter&;
   };
+
+  template<typename IntoIdentifier, typename ValueTy> requires
+    std::is_constructible_v<meta::Identifier, IntoIdentifier> and
+    type::is_value<ValueTy>
+  auto Environment::define_constant(IntoIdentifier identifier, RcMut<ValueTy> value) -> Result<RcMut<Variable>> {
+    return push_variable(meta::Identifier{identifier}, meta::Mutability::IMMUTABLE, Any{value});
+  }
+
+  // template<typename T, typename V> requires std::is_constructible_v<meta::Identifier, T>
+  // auto Environment::define_constant(T identifier, V value) -> Result<RcMut<Variable>> {
+  //   return push_variable(
+  //     meta::Identifier{identifier},
+  //     meta::Mutability::IMMUTABLE,
+  //     type::to_goos_any(std::move(value))
+  //   );
+  // }
 }

@@ -22,4 +22,16 @@ namespace goos::runtime {
   auto Integer::get() const -> i64 {
     return value;
   }
+
+  auto Integer::set_number(const f64 v) -> void {
+    value = static_cast<i64>(v);
+  }
+
+  auto Integer::get_number() const -> f64 {
+    return value;
+  }
+
+  auto Integer::is_integral() const -> bool {
+    return true;
+  }
 }

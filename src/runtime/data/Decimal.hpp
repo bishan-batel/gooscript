@@ -3,10 +3,11 @@
 //
 
 #pragma once
-#include "Value.hpp"
+#include "INumeric.hpp"
+#include "IValue.hpp"
 
 namespace goos::runtime {
-  class Decimal final : public Value {
+  class Decimal final : public INumeric {
     f64 value;
 
   public:
@@ -21,5 +22,11 @@ namespace goos::runtime {
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto get_type() const -> meta::VariantType override;
+
+    auto set_number(f64 v) -> void override;
+
+    [[nodiscard]] auto get_number() const -> f64 override;
+
+    [[nodiscard]] auto is_integral() const -> bool override;
   };
 }

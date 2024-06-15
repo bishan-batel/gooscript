@@ -3,14 +3,14 @@
 //
 
 #pragma once
-#include "Value.hpp"
+#include "IValue.hpp"
 
 namespace goos::runtime {
-  class Boolean final : public Value {
+  class Boolean final : public IValue {
     bool state;
 
   public:
-    explicit Boolean(bool state);
+    explicit Boolean(bool state = false);
 
     auto set(bool v) -> void;
 

@@ -3,10 +3,10 @@
 //
 
 #pragma once
-#include "Value.hpp"
+#include "IValue.hpp"
 
 namespace goos::runtime {
-  class Nil final : public Value {
+  class Nil final : public IValue {
   public:
     Nil() = default;
 

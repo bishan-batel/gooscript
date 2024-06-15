@@ -8,11 +8,15 @@
 
 #include "data/Boolean.hpp"
 #include "data/BuiltinFunction.hpp"
+#include "data/GString.hpp"
+#include "data/TypeConversion.hpp"
 #include "data/Unit.hpp"
-#include "data/Value.hpp"
+#include "data/IValue.hpp"
+#include "err/DuplicateName.hpp"
+#include "err/VariableNotFound.hpp"
 
 namespace goos::runtime {
-  Variable::Variable(const meta::Mutability mutability, RcMut<Value> value)
+  Variable::Variable(const meta::Mutability mutability, RcMut<IValue> value)
     : mutability{mutability},
       value{std::move(value)},
       type{this->value->get_type()} {}
@@ -21,7 +25,7 @@ namespace goos::runtime {
     return mutability;
   }
 
-  auto Variable::get_value() const -> RcMut<Value> {
+  auto Variable::get_value() const -> RcMut<IValue> {
     return value;
   }
 
@@ -29,7 +33,7 @@ namespace goos::runtime {
     return type;
   }
 
-  auto Variable::set_value(RcMut<Value> value) -> void {
+  auto Variable::set_value(RcMut<IValue> value) -> void {
     this->value = std::move(value);
   }
 
@@ -41,16 +45,40 @@ namespace goos::runtime {
     );
   }
 
-  RcMut<Environment> Environment::get_standard_environment() {
-    auto env = crab::make_rc_mut<Environment>();
+  auto Environment::get_standard_environment(Intepreter &intepreter) -> RcMut<Environment> {
+    auto env = crab::make_rc_mut<Environment>(RefMut{intepreter});
 
-    // env->push_variable(meta::Identifier{L"true"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(true));
+    env->define_constant("PI", type::to_goos(std::numbers::pi));
+
+    env->push_variable(meta::Identifier{L"true"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(true));
     // env->push_variable(meta::Identifier{L"false"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(false));
+
+    env->define_builtin(
+      L"funny_number",
+      BuiltinFunction::from(
+        0,
+        [](Environment &, const Vec<Any> &) -> Result<Any> {
+          return crab::ok(type::to_goos_any(42069LL));
+        }
+      )
+    );
+
+    env->define_builtin(
+      L"readline",
+      BuiltinFunction::from(
+        0,
+        [](Environment &, const Vec<Any> &) -> Result<Any> {
+          WideString str;
+          std::getline(std::wcin, str);
+          return crab::ok(type::to_goos_any(std::move(str)));
+        }
+      )
+    );
 
     env->define_builtin(
       L"print",
       BuiltinFunction::varargs(
-        [](const Vec<Any> &args) -> Result<Any> {
+        [](Environment &, const Vec<Any> &args) -> Result<Any> {
           for (const auto &arg: args) {
             std::wcout << arg->to_string();
           }
@@ -63,45 +91,56 @@ namespace goos::runtime {
     return env;
   }
 
-  Environment::Environment(RcMut<Environment> parent) : Environment{crab::some(std::move(parent))} {}
+  Environment::Environment(Intepreter &intepreter, RcMut<Environment> parent)
+    : Environment{intepreter, crab::some(std::move(parent))} {}
 
-  Environment::Environment(Option<RcMut<Environment>> parent)
-    : parent{std::move(parent)} {
+  Environment::Environment(Intepreter &intepreter, Option<RcMut<Environment>> parent)
+    : parent{std::move(parent)}, intepreter{intepreter} {
     if (auto p = this->parent) {
       depth = p.get_unchecked()->depth + 1;
     }
   }
 
+  auto Environment::enclose(RcMut<Environment> enclosing) -> RcMut<Environment> {
+    return crab::make_rc_mut<Environment>(enclosing->intepreter, std::move(enclosing));
+  }
+
   auto Environment::push_variable(
     meta::Identifier identifier,
     const meta::Mutability mutability,
-    RcMut<Value> value
-  ) -> void {
-    // TODO error handling for scope
+    RcMut<IValue> value
+  ) -> Result<RcMut<Variable>> {
+    if (get_variable(identifier).is_ok()) {
+      return err::make<err::DuplicateName>(identifier);
+    }
+
     bindings.emplace(std::move(identifier), crab::make_rc_mut<Variable>(mutability, std::move(value)));
+
+    return get_variable(identifier);
   }
 
-  // ReSharper disable once CppMemberFunctionMayBeConst
-  auto Environment::set_value // NOLINT(*-make-member-function-const)
-  (const meta::Identifier &identifier, RcMut<Value> value) -> void {
-    get_variable(identifier)->set_value(std::move(value));
+  auto Environment::set_value(const meta::Identifier &identifier, RcMut<IValue> value) const -> Result<RcMut<Variable>> {
+    Result<RcMut<Variable>> var = get_variable(identifier);
+
+    if (var.is_ok()) {
+      var.get_unchecked()->set_value(std::move(value));
+    }
+
+    return var;
   }
 
-  auto Environment::get_variable(const meta::Identifier &identifier) const -> RcMut<Variable> {
+  auto Environment::get_variable(const meta::Identifier &identifier) const -> Result<RcMut<Variable>> {
     // TODO error handling
-    return try_get_variable(identifier).take_unchecked();
-  }
-
-  auto Environment::try_get_variable(const meta::Identifier &identifier) const -> Option<RcMut<Variable>> {
+    // return try_get_variable(identifier).take_unchecked();
     if (bindings.contains(identifier)) {
-      return bindings.at(identifier);
+      return crab::ok(bindings.at(identifier));
     }
 
     if (parent.is_some()) {
-      return parent.get_unchecked()->try_get_variable(identifier);
+      return parent.get_unchecked()->get_variable(identifier);
     }
 
-    return crab::none;
+    return err::make<err::VariableNotFound>(identifier);
   }
 
   auto Environment::get_depth() const -> usize {
@@ -110,5 +149,9 @@ namespace goos::runtime {
 
   auto Environment::get_previous() const -> Option<RcMut<Environment>> {
     return parent;
+  }
+
+  auto Environment::runtime() const -> Intepreter& {
+    return intepreter;
   }
 }

@@ -1,53 +1,30 @@
+let fizzbuzz = fn {
+  let N = 100;
+  var n = 0;
+
+  while n < N {
+    let fizz = n mod 3;
+    let buzz = n mod 5;
+
+    if fizz + buzz == 0 {
+      print("FizzBuzz");
+    } else if (fizz == 0) {
+      print("Fizz");
+    } else if (buzz == 0) {
+      print("Buzz");
+    } else {
+      print(n);
+    }
+    n = n + 1;
+  }
+};
 
 
-# print(5.)
-# print(5 + 2)
-# print(5 + 2)
-# print(5 + 2)
-# print(5 + 2)
-# print(5 + 2)
-# print(1, 2, 3, 4, 5, 6, 7)
+let min = fn (num1, num2) => if num1 > num2 then 10 else 20;
 
-let fun1 = fn => print("Hello World");
+print(do { 420 });
 
-let sum = fn(a, b) => a + b;
+print(min(10, 42))
 
 
-fun1();
-
-print(sum(9, 10));
-
-# print();
-
-#print("Funny number: ", a);
-
-#let dictionary = {
-#  some_key = "value"
-#}
-#
-#let unary_moment = -------------2
-#
-#
-#let b = nil
-#
-#let values = [10, 42, 5, 3]
-#
-#
-#let a = do { x * x }
-#do {
-#
-#  if true then log("Huh") else log("huh");
-#
-#
-#  let number = 0
-#
-#  print(if number == 1 { "true" } else { "false" })
-#
-#  return a
-#}
-#
-#
-#let bruh = 0;
-#
-#
-#let huh = 0;
+print("Funny Number: ", funny_number());

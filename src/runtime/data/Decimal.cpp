@@ -24,4 +24,16 @@ namespace goos::runtime {
   auto Decimal::get_type() const -> meta::VariantType {
     return meta::VariantType::DECIMAL;
   }
+
+  auto Decimal::set_number(const f64 v) -> void {
+    value = v;
+  }
+
+  auto Decimal::get_number() const -> f64 {
+    return value;
+  }
+
+  auto Decimal::is_integral() const -> bool {
+    return false;
+  }
 }

@@ -7,6 +7,7 @@
 
 #include "preamble.hpp"
 #include "ast/expression/literal/Array.hpp"
+#include "utils/str.hpp"
 
 namespace goos::meta {
   class Identifier {
@@ -19,6 +20,12 @@ namespace goos::meta {
 
   public:
     explicit Identifier(WideString name);
+
+    template<typename T> requires std::is_convertible_v<T, WideString>
+    explicit Identifier(T name);
+
+    template<typename T> requires std::is_convertible_v<T, StringView>
+    explicit Identifier(T name);
 
     // ReSharper disable once CppNonExplicitConversionOperator
     operator // NOLINT(*-explicit-constructor)
@@ -33,6 +40,12 @@ namespace goos::meta {
   private:
     auto compute_hash() -> void;
   };
+
+  template<typename T> requires std::is_convertible_v<T, WideString>
+  Identifier::Identifier(T name) : Identifier{static_cast<WideString>(std::move(name))} {}
+
+  template<typename T> requires std::is_convertible_v<T, StringView>
+  Identifier::Identifier(T name) : Identifier{str::convert(static_cast<StringView>(name))} {}
 }
 
 template<>

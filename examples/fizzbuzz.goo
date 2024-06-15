@@ -7,11 +7,20 @@ while N < 10 {
   let fizz = n mod 3;
   let buzz = n mod 5;
 
-  if not (fizz or buzz) {
-    log("{N}");
+
+  if fizz + buzz == 0 {
+    print(n);
+  } 
+  else if fizz + buzz == fizz {
+    print("Fizz");
+  }
+  else if fizz + buzz == buzz {
+    print("Buzz");
+  } else {
+    print("FizzBuzz");
   }
 
-  n += 1;
+  n = n + 1;
 }
 
 

@@ -6,7 +6,7 @@
 
 namespace goos::runtime {
   BuiltinFunction::BuiltinFunction(
-    std::function<Result<Any>(Vec<Any>)> function,
+    decltype(function) function,
     const usize arity,
     const ArityType arity_type
   )
@@ -14,9 +14,9 @@ namespace goos::runtime {
       arity{arity},
       arity_type{arity_type} {}
 
-  auto BuiltinFunction::call(const Vec<Any> &values) const -> Result<Any> {
+  auto BuiltinFunction::call(Environment &env, const Vec<Any> &values) const -> Result<Any> {
     // TODO error checking
-    return function(values);
+    return function(env, values);
   }
 
   auto BuiltinFunction::to_string() const -> WideString {

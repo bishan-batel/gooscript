@@ -5,7 +5,8 @@
 #pragma once
 #include <option.hpp>
 
-#include "Value.hpp"
+#include "IValue.hpp"
+#include "runtime/Environment.hpp"
 
 namespace goos::runtime {
   enum class ArityType {
@@ -13,9 +14,9 @@ namespace goos::runtime {
     Finite
   };
 
-  class Callable : public Value {
+  class ICallable : public IValue {
   public:
-    [[nodiscard]] virtual auto call(const Vec<Any> &values) const -> Result<Any> = 0;
+    [[nodiscard]] virtual auto call(Environment &env, const Vec<Any> &values) const -> Result<Any> = 0;
 
     [[nodiscard]] virtual auto get_arity_type() const -> ArityType = 0;
 

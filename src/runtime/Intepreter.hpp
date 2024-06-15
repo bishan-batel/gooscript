@@ -5,14 +5,11 @@
 #pragma once
 #include <bitset>
 
-#include "Environment.hpp"
 #include "ast/Expression.hpp"
 #include "ast/Statement.hpp"
 #include <result.hpp>
-#include <stack>
 
 #include "data/Unit.hpp"
-#include "err/RuntimeError.hpp"
 
 namespace goos::runtime {
   enum class ControlFlowFlag : u32 {
@@ -21,8 +18,10 @@ namespace goos::runtime {
     RETURN     = 2,
   };
 
+  class Environment;
+
   class Intepreter final : ast::Statement::IVisitor {
-    RcMut<Environment> env{Environment::get_standard_environment()};
+    RcMut<Environment> current_environment;
     std::bitset<sizeof(ControlFlowFlag) * 8> halt_flags;
     Option<Any> halt_evaluation;
 
@@ -37,6 +36,10 @@ namespace goos::runtime {
     auto consume_halt_flag(ControlFlowFlag flag) -> Option<Any>;
 
   public:
+    [[nodiscard]] auto env() const -> Environment&;
+
+    Intepreter();
+
     auto execute(const ast::Statement &statement) -> VoidResult;
 
     auto evaluate(const ast::Expression &expr) -> Result<Any>;
@@ -83,11 +86,11 @@ namespace goos::runtime {
 
     auto visit_while(const ast::expression::While &while_expr) -> Result<Any> override;
 
-    template<typename T> requires std::is_base_of_v<Value, T>
+    template<typename T> requires std::is_base_of_v<IValue, T>
     static auto ok(RcMut<T> any) -> Result<Any>;
   };
 
-  template<typename T> requires std::is_base_of_v<Value, T>
+  template<typename T> requires std::is_base_of_v<IValue, T>
   auto Intepreter::ok(RcMut<T> any) -> Result<Any> {
     return Result<Any>{any};
   }

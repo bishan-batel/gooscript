@@ -23,26 +23,31 @@
 #include "data/Boolean.hpp"
 #include "data/BuiltinFunction.hpp"
 #include "data/Decimal.hpp"
-#include "data/Callable.hpp"
+#include "data/ICallable.hpp"
 #include "data/Integer.hpp"
 #include "data/Nil.hpp"
 #include "data/GString.hpp"
 #include "data/Unit.hpp"
-#include "data/Value.hpp"
+#include "data/IValue.hpp"
 #include "err/NotCallable.hpp"
+#include "Environment.hpp"
 #include "utils/str.hpp"
 
 namespace goos::runtime {
   auto Intepreter::push_env() -> Environment& {
-    env = crab::make_rc_mut<Environment>(env);
-    return env;
+    current_environment = Environment::enclose(current_environment);
+    return current_environment;
   }
 
   auto Intepreter::pop_env() -> Environment& {
-    auto prev = env->get_previous();
+    auto prev = current_environment->get_previous();
     debug_assert(prev.is_some(), "Incorrect pairing of 'pop' vs 'push'");
-    env = prev.take_unchecked();
-    return env;
+    current_environment = prev.take_unchecked();
+    return current_environment;
+  }
+
+  auto Intepreter::env() const -> Environment& {
+    return current_environment;
   }
 
   auto Intepreter::halt(const ControlFlowFlag flag, Any value) -> void {
@@ -63,6 +68,8 @@ namespace goos::runtime {
     }
     return crab::none;
   }
+
+  Intepreter::Intepreter() : current_environment{Environment::get_standard_environment(*this)} {}
 
   auto Intepreter::execute(const ast::Statement &statement) -> VoidResult {
     return statement.accept(*this);
@@ -97,7 +104,7 @@ namespace goos::runtime {
 
     if (initial.is_err()) return some(initial.take_err_unchecked());
 
-    env->push_variable(
+    current_environment->push_variable(
       variable_declaration.get_name(),
       variable_declaration.get_mutability(),
       initial.take_unchecked()
@@ -122,28 +129,25 @@ namespace goos::runtime {
 
     return ok(
       BuiltinFunction::varargs(
-        [this, closure, &lambda](const Vec<Any> &args) -> Result<Any> {
-          push_env();
-
+        [closure, &lambda](Environment &env, const Vec<Any> &args) -> Result<Any> {
           const auto &params = lambda.get_params();
           const usize count = std::min(args.size(), params.size());
 
           for (usize i = 0; i < count; i++) {
-            env->push_variable(
+            env.push_variable(
               meta::Identifier{params[i]},
               meta::Mutability::IMMUTABLE,
               args[i]
             );
           }
 
-          auto value = evaluate(closure);
-          pop_env();
+          auto value = env.runtime().evaluate(closure);
 
           if (value.is_err()) {
             return crab::err(value.take_err_unchecked());
           }
 
-          if (auto ret = consume_halt_flag(ControlFlowFlag::RETURN)) {
+          if (auto ret = env.runtime().consume_halt_flag(ControlFlowFlag::RETURN)) {
             return crab::ok(ret.take_unchecked());
           }
 
@@ -191,11 +195,13 @@ namespace goos::runtime {
       }
       const Any value = value_result.take_unchecked();
 
-      if (should_halt_control_flow()) {
+      if (env().runtime().should_halt_control_flow()) {
         return ok(value);
       }
 
-      env->set_value(lhs_val->get_identifier(), value);
+      if (auto err = current_environment->set_value(lhs_val->get_identifier(), value); err.is_err())
+        return crab::err(err.take_err_unchecked());
+
       return ok(value);
     }
 
@@ -237,7 +243,7 @@ namespace goos::runtime {
 
     auto callable_any = function_result.take_unchecked();
 
-    auto callable_option = callable_any.downcast<Callable>();
+    auto callable_option = callable_any.downcast<ICallable>();
 
     if (callable_option.is_none()) {
       return crab::err<Box<err::Error>>(
@@ -245,7 +251,7 @@ namespace goos::runtime {
       );
     }
 
-    const RcMut<Callable> callable = callable_option.take_unchecked();
+    const RcMut<ICallable> callable = callable_option.take_unchecked();
 
     Vec<Any> arguments;
     arguments.reserve(function_call.get_arguments().size());
@@ -266,13 +272,21 @@ namespace goos::runtime {
       arguments.push_back(std::move(value));
     }
 
-    return callable->call(arguments);
+    push_env();
+    auto result = callable->call(current_environment, arguments);
+    pop_env();
+    return result;
   }
 
   auto Intepreter::visit_identifier_binding(
     [[maybe_unused]] const ast::expression::IdentifierBinding &identifier
   ) -> Result<Any> {
-    return ok(env->get_variable(identifier.get_identifier())->get_value());
+    Result<RcMut<Variable>> var = current_environment->get_variable(identifier.get_identifier());
+    if (var.is_err()) {
+      return crab::err(var.take_err_unchecked());
+    }
+
+    return crab::ok(var.take_unchecked()->get_value());
   }
 
   auto Intepreter::visit_unary([[maybe_unused]] const ast::expression::Unary &unary) -> Result<Any> {
@@ -304,15 +318,13 @@ namespace goos::runtime {
         if (auto evaluation = consume_halt_flag(ControlFlowFlag::EVAL)) {
           return ok(evaluation.take_unchecked());
         }
-
+        pop_env();
         return ok(crab::make_rc_mut<Unit>());
       }
     }
 
     Result<Any> value = evaluate(scope.get_eval());
-
     pop_env();
-
     return value;
   }
 

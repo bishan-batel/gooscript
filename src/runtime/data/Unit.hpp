@@ -3,10 +3,10 @@
 //
 
 #pragma once
-#include "Value.hpp"
+#include "IValue.hpp"
 
 namespace goos::runtime {
-  class Unit final : public Value {
+  class Unit final : public IValue {
   public:
     Unit();
 

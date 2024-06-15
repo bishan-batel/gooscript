@@ -18,14 +18,14 @@
 
 namespace goos {
   namespace runtime {
-    class Value;
+    class IValue;
 
     template<typename T>
     using Result = Result<T, Box<err::Error>>;
 
     using VoidResult = Option<Box<err::Error>>;
 
-    using Any = RcMut<Value>;
+    using Any = RcMut<IValue>;
   }
 
   namespace ast {

@@ -3,10 +3,10 @@
 //
 
 #pragma once
-#include "Value.hpp"
+#include "IValue.hpp"
 
 namespace goos::runtime {
-  class GString final : public Value {
+  class GString final : public IValue {
     WideString text;
 
   public:

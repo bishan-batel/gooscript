@@ -8,24 +8,23 @@
 
 #include "preamble.hpp"
 #include "meta/VariantType.hpp"
-#include "runtime/Environment.hpp"
 
 namespace goos::runtime {
-  class Value;
+  class IValue;
 
-  class Value {
+  class IValue {
   public:
-    Value() = default;
+    IValue() = default;
 
-    Value(Value &) = delete;
+    IValue(IValue &) = delete;
 
-    virtual ~Value() = default;
+    virtual ~IValue() = default;
 
-    auto operator=(Value &) -> Value& = delete;
+    auto operator=(IValue &) -> IValue& = delete;
 
-    Value(Value &&) = default;
+    IValue(IValue &&) = default;
 
-    auto operator=(Value &&) -> Value& = default;
+    auto operator=(IValue &&) -> IValue& = default;
 
     template<typename T>
     auto coerce() -> Option<RefMut<T>>;
@@ -41,12 +40,12 @@ namespace goos::runtime {
   };
 
   template<typename T>
-  auto Value::coerce() -> Option<RefMut<T>> {
+  auto IValue::coerce() -> Option<RefMut<T>> {
     return crab::ref::cast<T>(*this);
   }
 
   template<typename T>
-  auto Value::coerce_unchecked() -> T& {
+  auto IValue::coerce_unchecked() -> T& {
     return coerce<T>().take_unchecked();
   }
 }

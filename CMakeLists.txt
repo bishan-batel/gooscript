@@ -108,7 +108,7 @@ set(SOURCE_FILES
         src/parser/pass/expression/conditionals.cpp
         src/runtime/Intepreter.cpp
         src/runtime/Intepreter.hpp
-        src/runtime/data/Value.hpp
+        src/runtime/data/IValue.hpp
         src/runtime/data/Nil.cpp
         src/runtime/data/Nil.hpp
         src/runtime/data/Integer.cpp
@@ -125,7 +125,7 @@ set(SOURCE_FILES
         src/meta/Identifier.hpp
         src/runtime/data/GString.cpp
         src/runtime/data/GString.hpp
-        src/runtime/data/Callable.hpp
+        src/runtime/data/ICallable.hpp
         src/runtime/err/RuntimeError.cpp
         src/runtime/err/RuntimeError.hpp
         src/runtime/err/VariableNotFound.cpp
@@ -138,6 +138,10 @@ set(SOURCE_FILES
         src/parser/pass/expression/functions.cpp
         src/runtime/PrimitiveOperations.cpp
         src/runtime/PrimitiveOperations.hpp
+        src/runtime/err/DuplicateName.hpp
+        src/runtime/err/DuplicateName.cpp
+        src/runtime/data/TypeConversion.hpp
+        src/runtime/data/INumeric.hpp
 )
 
 
