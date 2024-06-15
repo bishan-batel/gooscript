@@ -10,6 +10,8 @@
 #include "meta/VariantType.hpp"
 
 namespace goos::runtime {
+  class BuiltinFunction;
+
   class Variable final {
     meta::Mutability mutability;
     RcMut<Value> value;
@@ -39,6 +41,10 @@ namespace goos::runtime {
     usize depth{0};
 
   public:
+    auto define_builtin(WideString name, const RcMut<BuiltinFunction> &function) -> void;
+
+    static RcMut<Environment> get_standard_environment();
+
     explicit Environment(RcMut<Environment> parent);
 
     explicit Environment(Option<RcMut<Environment>> parent = crab::none);

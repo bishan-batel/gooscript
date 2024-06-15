@@ -1,29 +1,77 @@
 {
   "eval": {
-    "ident": "a",
-    "type": "identifier"
+    "type": "unit"
   },
   "statements": [
     {
       "mutability": "let",
-      "initial": 69,
-      "name": "a",
+      "initial": {
+        "body": {
+          "args": [
+            "Hello World"
+          ],
+          "function": {
+            "ident": "print",
+            "type": "identifier"
+          },
+          "type": "funcall"
+        },
+        "params": [],
+        "type": "declfun"
+      },
+      "name": "fun1",
       "type": "declvar"
     },
     {
-      "rhs": {
-        "rhs": 420,
-        "lhs": {
-          "ident": "a",
-          "type": "identifier"
+      "mutability": "let",
+      "initial": {
+        "body": {
+          "rhs": {
+            "ident": "b",
+            "type": "identifier"
+          },
+          "lhs": {
+            "ident": "a",
+            "type": "identifier"
+          },
+          "op": "+"
         },
-        "op": "+"
+        "params": [
+          "a",
+          "b"
+        ],
+        "type": "declfun"
       },
-      "lhs": {
-        "ident": "a",
+      "name": "sum",
+      "type": "declvar"
+    },
+    {
+      "args": [],
+      "function": {
+        "ident": "fun1",
         "type": "identifier"
       },
-      "op": "="
+      "type": "funcall"
+    },
+    {
+      "args": [
+        {
+          "args": [
+            9,
+            10
+          ],
+          "function": {
+            "ident": "sum",
+            "type": "identifier"
+          },
+          "type": "funcall"
+        }
+      ],
+      "function": {
+        "ident": "print",
+        "type": "identifier"
+      },
+      "type": "funcall"
     }
   ],
   "type": "scope"

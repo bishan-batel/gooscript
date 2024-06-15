@@ -13,15 +13,19 @@
 #include "ast/expression/literal/Boolean.hpp"
 #include "ast/expression/literal/Decimal.hpp"
 #include "ast/expression/literal/Integer.hpp"
+#include "ast/expression/literal/Lambda.hpp"
 #include "ast/expression/literal/StringLiteral.hpp"
 #include "ast/statements/VariableDeclaration.hpp"
 #include "data/Boolean.hpp"
+#include "data/BuiltinFunction.hpp"
 #include "data/Decimal.hpp"
+#include "data/Callable.hpp"
 #include "data/Integer.hpp"
 #include "data/Nil.hpp"
 #include "data/StringLiteral.hpp"
 #include "data/Unit.hpp"
 #include "data/Value.hpp"
+#include "err/NotCallable.hpp"
 #include "utils/str.hpp"
 
 namespace goos::runtime {
@@ -35,6 +39,25 @@ namespace goos::runtime {
     debug_assert(prev.is_some(), "Incorrect pairing of 'pop' vs 'push'");
     env = prev.take_unchecked();
     return env;
+  }
+
+  auto Intepreter::halt(const ControlFlowFlag flag, Any value) -> void {
+    halt_flags.set(flag);
+    debug_assert(halt_evaluation.is_none(), "Invaliod Halting");
+    halt_evaluation = crab::some(std::move(value));
+  }
+
+  auto Intepreter::should_halt_control_flow() const -> bool {
+    return halt_flags.any();
+  }
+
+  auto Intepreter::consume_halt_flag(const ControlFlowFlag flag) -> Option<Any> {
+    if (halt_flags[flag]) {
+      halt_flags.reset(flag);
+      debug_assert(halt_evaluation.is_some(), "Invalid Halting");
+      return std::exchange(halt_evaluation, crab::none);
+    }
+    return crab::none;
   }
 
   auto Intepreter::execute(const ast::Statement &statement) -> VoidResult {
@@ -79,7 +102,41 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_lambda([[maybe_unused]] const ast::expression::Lambda &lambda) -> Result<Any> {
-    throw std::logic_error("Not implemented");
+    // TODO
+
+    const auto closure = Rc<ast::Expression>::from_owned_unchecked(
+      Box<ast::Expression>::unwrap(lambda.get_body().clone_expr())
+    );
+
+    return ok(
+      BuiltinFunction::varargs(
+        [this, closure, &lambda](const Vec<Any> &args) {
+          push_env();
+
+          const auto &params = lambda.get_params();
+          const usize count = std::min(args.size(), params.size());
+
+          for (usize i = 0; i < count; i++) {
+            env->push_variable(
+              meta::Identifier{params[i]},
+              meta::Mutability::IMMUTABLE,
+              args[i]
+            );
+          }
+
+          // for (const auto &[param, arg]:
+          //      std::views::zip(lambda.get_params(), args)) {
+          // }
+
+          auto value = evaluate(closure);
+
+          pop_env();
+
+          return value;
+        }
+      )
+    );
+    // throw std::logic_error("Not implemented");
   }
 
   auto Intepreter::visit_string_literal([[maybe_unused]] const ast::expression::StringLiteral &str) -> Result<Any> {
@@ -118,8 +175,11 @@ namespace goos::runtime {
       if (value_result.is_err()) {
         return crab::err(value_result.take_err_unchecked());
       }
-
       const Any value = value_result.take_unchecked();
+
+      if (should_halt_control_flow()) {
+        return ok(value);
+      }
 
       env->set_value(lhs_val->get_identifier(), value);
       return ok(value);
@@ -188,18 +248,48 @@ namespace goos::runtime {
   auto Intepreter::visit_function_call(
     [[maybe_unused]] const ast::expression::FunctionCall &function_call
   ) -> Result<Any> {
-    std::wcout << "funcall";
-    // std::wcout << execute(function_call.get_function())->to_string();
-    // std::wcout << '(';
-    // std::wcout << str::join(
-    //   function_call.get_arguments(),
-    //   [this](auto &arg) {
-    //     return evaluate(arg).get_unchecked()->to_string();
-    //   }
-    // );
-    std::wcout << ')' << std::endl;
+    auto function_result = evaluate(function_call.get_function());
 
-    return ok(crab::make_rc_mut<Unit>());
+    if (function_result.is_err()) {
+      return crab::err(function_result.take_err_unchecked());
+    }
+
+    if (should_halt_control_flow()) {
+      return function_result;
+    }
+
+    auto callable_any = function_result.take_unchecked();
+
+    auto callable_option = callable_any.downcast<Callable>();
+
+    if (callable_option.is_none()) {
+      return crab::err<Box<err::Error>>(
+        crab::make_box<err::NotCallable>(std::move(callable_any))
+      );
+    }
+
+    const RcMut<Callable> callable = callable_option.take_unchecked();
+
+    Vec<Any> arguments;
+    arguments.reserve(function_call.get_arguments().size());
+
+    for (auto &arg: function_call.get_arguments()) {
+      auto value_result = evaluate(arg);
+
+      if (value_result.is_err()) {
+        return crab::err(value_result.take_err_unchecked());
+      }
+
+      auto value = value_result.take_unchecked();
+
+      if (should_halt_control_flow()) {
+        return ok(value);
+      }
+
+      arguments.push_back(std::move(value));
+    }
+
+    return callable->call(arguments);
   }
 
   auto Intepreter::visit_identifier_binding(
@@ -217,10 +307,24 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_scope([[maybe_unused]] const ast::expression::ScopeBlock &scope) -> Result<Any> {
+    push_env();
     for (const auto &statement: scope.get_statements()) {
       execute(statement);
+
+      if (should_halt_control_flow()) {
+        if (auto evaluation = consume_halt_flag(BREAK_LOOP)) {
+          return ok(evaluation.take_unchecked());
+        }
+
+        return ok(crab::make_rc_mut<Unit>());
+      }
     }
-    return evaluate(scope.get_eval());
+
+    Result<Any> value = evaluate(scope.get_eval());
+
+    pop_env();
+
+    return value;
   }
 
   auto Intepreter::visit_while([[maybe_unused]] const ast::expression::While &while_expr) -> Result<Any> {

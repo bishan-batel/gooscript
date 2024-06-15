@@ -38,7 +38,7 @@ namespace goos::ast::expression {
   auto ScopeBlock::clone_expr() const -> Box<Expression> {
     Vec<Box<Statement>> statements{};
 
-    for (const auto &statement: statements) {
+    for (const auto &statement: this->statements) {
       statements.push_back(statement->clone());
     }
 

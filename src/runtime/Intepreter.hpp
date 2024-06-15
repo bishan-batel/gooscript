@@ -3,19 +3,38 @@
 //
 
 #pragma once
+#include <bitset>
+
 #include "Environment.hpp"
 #include "ast/Expression.hpp"
 #include "ast/Statement.hpp"
 #include <result.hpp>
+#include <stack>
+
+#include "data/Unit.hpp"
 #include "err/RuntimeError.hpp"
 
 namespace goos::runtime {
+  enum ControlFlowFlag : u32 {
+    BREAK_LOOP = 0,
+    EVAL       = 1,
+    RETURN     = 2,
+  };
+
   class Intepreter final : ast::Statement::IVisitor {
-    RcMut<Environment> env{crab::make_rc_mut<Environment>()};
+    RcMut<Environment> env{Environment::get_standard_environment()};
+    std::bitset<sizeof(ControlFlowFlag) * 8> halt_flags;
+    Option<Any> halt_evaluation;
 
     auto push_env() -> Environment&;
 
     auto pop_env() -> Environment&;
+
+    [[nodiscard]] auto should_halt_control_flow() const -> bool;
+
+    auto halt(ControlFlowFlag flag, Any value = crab::make_rc_mut<Unit>()) -> void;
+
+    auto consume_halt_flag(ControlFlowFlag flag) -> Option<Any>;
 
   public:
     auto execute(const ast::Statement &statement) -> VoidResult;

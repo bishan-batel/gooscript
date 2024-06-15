@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "data/BuiltinFunction.hpp"
+#include "data/Unit.hpp"
 #include "data/Value.hpp"
 
 namespace goos::runtime {
@@ -28,6 +30,33 @@ namespace goos::runtime {
 
   auto Variable::set_value(RcMut<Value> value) -> void {
     this->value = std::move(value);
+  }
+
+  auto Environment::define_builtin(WideString name, const RcMut<BuiltinFunction> &function) -> void {
+    push_variable(
+      meta::Identifier{std::move(name)},
+      meta::Mutability::IMMUTABLE,
+      function
+    );
+  }
+
+  RcMut<Environment> Environment::get_standard_environment() {
+    auto env = crab::make_rc_mut<Environment>();
+
+    env->define_builtin(
+      L"print",
+      BuiltinFunction::varargs(
+        [](const Vec<Any> &args) -> Result<Any> {
+          for (const auto &arg: args) {
+            std::wcout << arg->to_string();
+          }
+          std::wcout << std::endl;
+          return crab::ok<Any>(crab::make_rc_mut<Unit>());
+        }
+      )
+    );
+
+    return env;
   }
 
   Environment::Environment(RcMut<Environment> parent) : Environment{crab::some(std::move(parent))} {}

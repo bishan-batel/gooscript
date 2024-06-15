@@ -4,6 +4,7 @@
 
 #pragma once
 #include "conditionals.hpp"
+#include "functions.hpp"
 #include "literals.hpp"
 #include "../statement/block.hpp"
 #include "ast/Expression.hpp"
@@ -80,7 +81,7 @@ namespace goos::parser::pass::expr {
   // Optional Factor Passes
 
   inline static const std::vector FACTOR_PASSES{
-    meta::transmute(block),
+    meta::transmute([](auto& s) { return block(s); }),
     meta::transmute(grouping),
     meta::transmute(if_condition),
     meta::transmute(while_loop),
@@ -93,5 +94,6 @@ namespace goos::parser::pass::expr {
     meta::transmute(unit),
     meta::transmute(null),
     meta::transmute(identifier_binding),
+    meta::transmute(lambda),
   };
 }

@@ -126,11 +126,17 @@ set(SOURCE_FILES
         src/meta/Identifier.hpp
         src/runtime/data/StringLiteral.cpp
         src/runtime/data/StringLiteral.hpp
-        src/ast/expression/ICallable.hpp
+        src/runtime/data/Callable.hpp
         src/runtime/err/RuntimeError.cpp
         src/runtime/err/RuntimeError.hpp
         src/runtime/err/VariableNotFound.cpp
         src/runtime/err/VariableNotFound.hpp
+        src/runtime/data/BuiltinFunction.cpp
+        src/runtime/data/BuiltinFunction.hpp
+        src/runtime/err/NotCallable.cpp
+        src/runtime/err/NotCallable.hpp
+        src/parser/pass/expression/functions.hpp
+        src/parser/pass/expression/functions.cpp
 )
 
 
