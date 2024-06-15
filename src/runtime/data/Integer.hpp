@@ -10,7 +10,9 @@ namespace goos::runtime {
     i64 value;
 
   public:
-    explicit Integer(i64 value);
+    using Contained = i64;
+
+    explicit Integer(i64 value = 0);
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
