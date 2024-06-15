@@ -13,6 +13,12 @@ namespace goos::ast::expression {
   If::If(Box<Expression> condition, Box<Expression> then, Box<Expression> else_then)
     : condition{std::move(condition)}, then{std::move(then)}, else_then{std::move(else_then)} {}
 
+  auto If::get_condition() const -> const Expression & { return condition; }
+
+  auto If::get_then() const -> const Expression & { return then; }
+
+  auto If::get_else_then() const -> const Expression & { return else_then; }
+
   auto If::to_string() const -> WideString {
     return fmt::format(
       L"if {} then {{ {} }} else {{ {} }}",

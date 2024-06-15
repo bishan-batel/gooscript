@@ -12,6 +12,12 @@ namespace goos::ast::expression {
   public:
     If(Box<Expression> condition, Box<Expression> then, Box<Expression> else_then);
 
+    [[nodiscard]] auto get_condition() const -> const Expression&;
+
+    [[nodiscard]] auto get_then() const -> const Expression&;
+
+    [[nodiscard]] auto get_else_then() const -> const Expression&;
+
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
