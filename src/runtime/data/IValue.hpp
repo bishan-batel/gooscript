@@ -10,10 +10,9 @@
 #include "meta/VariantType.hpp"
 
 namespace goos::runtime {
-  class IValue;
+  struct IValue;
 
-  class IValue {
-  public:
+  struct IValue {
     IValue() = default;
 
     IValue(IValue &) = delete;

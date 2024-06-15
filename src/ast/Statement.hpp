@@ -18,7 +18,7 @@
 
 namespace goos {
   namespace runtime {
-    class IValue;
+    struct IValue;
 
     template<typename T>
     using Result = Result<T, Box<err::Error>>;
