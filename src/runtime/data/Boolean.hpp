@@ -19,5 +19,7 @@ namespace goos::runtime {
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto get_type() const -> meta::VariantType override;
+
+    auto is_truthy() const -> bool override;
   };
 }

@@ -22,4 +22,8 @@ namespace goos::runtime {
   auto Boolean::get_type() const -> meta::VariantType {
     return meta::VariantType::BOOLEAN;
   }
+
+  bool Boolean::is_truthy() const {
+    return state;
+  }
 }

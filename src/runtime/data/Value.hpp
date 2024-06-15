@@ -36,6 +36,8 @@ namespace goos::runtime {
     [[nodiscard]] virtual auto to_string() const -> WideString = 0;
 
     [[nodiscard]] virtual auto get_type() const -> meta::VariantType = 0;
+
+    [[nodiscard]] virtual auto is_truthy() const -> bool { return false; }
   };
 
   template<typename T>
