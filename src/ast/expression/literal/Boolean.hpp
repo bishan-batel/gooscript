@@ -10,8 +10,7 @@ namespace goos::ast::expression {
     bool state;
 
   public:
-    explicit Boolean(const bool state)
-      : state{state} {}
+    explicit Boolean(bool state);
 
     [[nodiscard]] auto get_state() const -> bool;
 

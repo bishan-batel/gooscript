@@ -44,8 +44,8 @@ namespace goos::runtime {
   RcMut<Environment> Environment::get_standard_environment() {
     auto env = crab::make_rc_mut<Environment>();
 
-    env->push_variable(meta::Identifier{L"true"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(true));
-    env->push_variable(meta::Identifier{L"false"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(false));
+    // env->push_variable(meta::Identifier{L"true"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(true));
+    // env->push_variable(meta::Identifier{L"false"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(false));
 
     env->define_builtin(
       L"print",

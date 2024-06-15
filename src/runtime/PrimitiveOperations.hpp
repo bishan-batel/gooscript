@@ -58,6 +58,18 @@ namespace goos::runtime::primitive_operators {
     using lexer::Operator;
 
     Dictionary<Operands, BinaryFunction> map{
+      binary<Operator::AND, Boolean>(
+        [](const auto &lhs, const auto &rhs) { return lhs and rhs; }
+      ),
+
+      binary<Operator::NOT_EQUALS, Boolean>(
+        [](const auto &lhs, const auto &rhs) { return lhs != rhs; }
+      ),
+
+      binary<Operator::OR, Boolean>(
+        [](const auto &lhs, const auto &rhs) { return lhs or rhs; }
+      ),
+
       binary<Operator::ADD, GString>(
         [](const auto &lhs, const auto &rhs) { return lhs + rhs; }
       ),

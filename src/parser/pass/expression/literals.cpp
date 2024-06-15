@@ -69,6 +69,18 @@ namespace goos::parser::pass::expr {
     return crab::ok<Option<Box<ast::expression::Nil>>>(crab::none);
   }
 
+  auto boolean(TokenStream &stream) -> OptionalResult<ast::expression::Boolean> {
+    if (stream.try_consume(lexer::Keyword::TRUE)) {
+      return crab::ok(crab::some(crab::make_box<ast::expression::Boolean>(true)));
+    }
+
+    if (stream.try_consume(lexer::Keyword::FALSE)) {
+      return crab::ok(crab::some(crab::make_box<ast::expression::Boolean>(false)));
+    }
+
+    return crab::ok<Option<Box<ast::expression::Boolean>>>(crab::none);
+  }
+
   auto identifier_binding(TokenStream &stream) -> OptionalResult<ast::expression::IdentifierBinding> {
     if (auto identifier = stream.try_consume<token::Identifier>()) {
       auto binding =

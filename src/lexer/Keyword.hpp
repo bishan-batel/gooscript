@@ -26,7 +26,9 @@ namespace goos::lexer {
     EVAL,
     AS,
     CONST,
-    IS
+    IS,
+    TRUE,
+    FALSE
   };
 
   inline static const Dictionary<WideStringView, Keyword> STR_TO_KEYWORD_TABLE{
@@ -62,6 +64,9 @@ namespace goos::lexer {
     {L"as", Keyword::AS},
     {L"const", Keyword::CONST},
     {L"is", Keyword::CONST},
+
+    {L"true", Keyword::TRUE},
+    {L"false", Keyword::FALSE},
   };
 
   static const auto KEYWORD_TO_STR_MAP{

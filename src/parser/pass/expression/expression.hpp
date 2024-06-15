@@ -91,6 +91,7 @@ namespace goos::parser::pass::expr {
     meta::transmute(decimal),
     meta::transmute(integer),
     meta::transmute(string),
+    meta::transmute(boolean),
     meta::transmute(unit),
     meta::transmute(null),
     meta::transmute(identifier_binding),

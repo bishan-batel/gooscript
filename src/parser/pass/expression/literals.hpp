@@ -12,6 +12,7 @@
 #include "ast/expression/literal/StringLiteral.hpp"
 #include "ast/expression/literal/Unit.hpp"
 #include "parser/TokenStream.hpp"
+#include "ast/expression/literal/Boolean.hpp"
 
 namespace goos::parser::pass::expr {
   auto grouping(TokenStream &stream) -> OptionalResult<ast::Expression>;
@@ -25,6 +26,8 @@ namespace goos::parser::pass::expr {
   auto unit(TokenStream &stream) -> OptionalResult<ast::expression::Unit>;
 
   auto null(TokenStream &stream) -> OptionalResult<ast::expression::Nil>;
+
+  auto boolean(TokenStream &stream) -> OptionalResult<ast::expression::Boolean>;
 
   auto identifier_binding(TokenStream &stream) -> OptionalResult<ast::expression::IdentifierBinding>;
 

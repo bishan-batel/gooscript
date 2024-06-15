@@ -10,6 +10,8 @@
 #include "json/Text.hpp"
 
 namespace goos::ast::expression {
+  Boolean::Boolean(const bool state): state{state} {}
+
   auto Boolean::get_state() const -> bool {
     return state;
   }
