@@ -18,7 +18,7 @@ namespace goos::runtime {
   }
 
   auto StringLiteral::to_string() const -> WideString {
-    return fmt::format(L"\"{}\"", text);
+    return text;
   }
 
   auto StringLiteral::get_type() const -> meta::VariantType {
