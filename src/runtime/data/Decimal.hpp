@@ -10,7 +10,13 @@ namespace goos::runtime {
     f64 value;
 
   public:
-    explicit Decimal(f64 value);
+    using Contained = f64;
+
+    explicit Decimal(f64 value = 0.f);
+
+    [[nodiscard]] auto get() const -> f64;
+
+    auto set(f64 v) -> void;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 

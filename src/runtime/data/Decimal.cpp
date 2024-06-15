@@ -9,6 +9,14 @@
 namespace goos::runtime {
   Decimal::Decimal(const f64 value): value{value} {}
 
+  auto Decimal::get() const -> f64 {
+    return value;
+  }
+
+  auto Decimal::set(const f64 v) -> void {
+    value = v;
+  }
+
   auto Decimal::to_string() const -> WideString {
     return fmt::format(L"{}", value);
   }
