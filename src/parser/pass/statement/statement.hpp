@@ -26,7 +26,7 @@ namespace goos::parser::pass {
 
   namespace meta {
     template<typename F>
-      requires std::is_invocable_v<F, TokenStream &>
+      requires std::is_invocable_v<F, TokenStream&>
     auto transmute(F f) -> OptionalPass<ast::Statement> {
       return [f](TokenStream &stream) -> OptionalResult<ast::Statement> {
         auto result{f(stream)};
@@ -44,9 +44,9 @@ namespace goos::parser::pass {
   } // namespace meta
 
   inline static const std::vector STATEMENT_PASSES{
-      meta::transmute(block),
-      meta::transmute(variable_declare),
-      meta::transmute(return_statement),
-      meta::transmute(eval),
+    meta::transmute([](auto &s) { return block(s); }),
+    meta::transmute(variable_declare),
+    meta::transmute(return_statement),
+    meta::transmute(eval),
   };
 } // namespace goos::parser::pass

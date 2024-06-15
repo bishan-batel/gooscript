@@ -10,7 +10,7 @@ namespace goos::parser::pass {
   /**
    * @brief Attempts to parse a block statement from a stream, if applicable
    */
-  [[nodiscard]] auto block(TokenStream &stream) -> OptionalResult<ast::expression::ScopeBlock>;
+  [[nodiscard]] auto block(TokenStream &stream, bool require_do=true) -> OptionalResult<ast::expression::ScopeBlock>;
 
   /**
    * @brief Parses a block statement from the stream, assuming top level.
