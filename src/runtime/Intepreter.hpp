@@ -15,7 +15,7 @@
 #include "err/RuntimeError.hpp"
 
 namespace goos::runtime {
-  enum ControlFlowFlag : u32 {
+  enum class ControlFlowFlag : u32 {
     BREAK_LOOP = 0,
     EVAL       = 1,
     RETURN     = 2,

@@ -108,7 +108,6 @@ set(SOURCE_FILES
         src/parser/pass/expression/conditionals.cpp
         src/runtime/Intepreter.cpp
         src/runtime/Intepreter.hpp
-        src/runtime/data/Value.cpp
         src/runtime/data/Value.hpp
         src/runtime/data/Nil.cpp
         src/runtime/data/Nil.hpp
@@ -124,8 +123,8 @@ set(SOURCE_FILES
         src/runtime/data/Decimal.hpp
         src/meta/Identifier.cpp
         src/meta/Identifier.hpp
-        src/runtime/data/StringLiteral.cpp
-        src/runtime/data/StringLiteral.hpp
+        src/runtime/data/GString.cpp
+        src/runtime/data/GString.hpp
         src/runtime/data/Callable.hpp
         src/runtime/err/RuntimeError.cpp
         src/runtime/err/RuntimeError.hpp
@@ -137,6 +136,8 @@ set(SOURCE_FILES
         src/runtime/err/NotCallable.hpp
         src/parser/pass/expression/functions.hpp
         src/parser/pass/expression/functions.cpp
+        src/runtime/PrimitiveOperations.cpp
+        src/runtime/PrimitiveOperations.hpp
 )
 
 

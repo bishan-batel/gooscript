@@ -70,6 +70,7 @@ namespace goos::lexer {
     {L"and", Operator::AND},
     {L"or", Operator::OR},
     {L"not", Operator::NOT},
+    {L"mod", Operator::MOD},
     {L"-=", Operator::SUB_ASSIGN},
     {L"%=", Operator::MOD_ASSIGN},
     {L"*=", Operator::MUL_ASSIGN},
