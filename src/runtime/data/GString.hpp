@@ -6,11 +6,13 @@
 #include "Value.hpp"
 
 namespace goos::runtime {
-  class StringLiteral final : public Value {
+  class GString final : public Value {
     WideString text;
 
   public:
-    explicit StringLiteral(WideString string);
+    using Contained = WideString;
+
+    explicit GString(WideString string = L"");
 
     auto set(WideString v) -> void;
 
