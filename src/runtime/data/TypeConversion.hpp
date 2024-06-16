@@ -13,6 +13,10 @@
 #include "ast/Statement.hpp"
 
 namespace goos::runtime::type {
+  struct no_matching_primitive {};
+
+  struct no_matching_wrapper {};
+
   template<typename T>
   concept is_value = std::derived_from<T, IValue> ;
 
@@ -21,15 +25,11 @@ namespace goos::runtime::type {
 
   template<typename T> requires std::derived_from<T, IValue>
   struct goos_to_primitive {
-    struct no_matching_primitive {};
-
     using type = no_matching_primitive;
   };
 
   template<typename>
   struct primitive_to_goos {
-    struct no_matching_wrapper {};
-
     using type = no_matching_wrapper;
   };
 
@@ -38,6 +38,13 @@ namespace goos::runtime::type {
 
   template<typename T>
   using primitive_to_goose_t = typename primitive_to_goos<T>::type;
+
+  /**
+   * @brief Is 'Primitive' a type that can be converted from C++ -> Goos
+   */
+  template<typename Primitive>
+  concept is_convertible_primitive = not std::is_same_v<typename primitive_to_goose_t<Primitive>::type,
+    no_matching_primitive>;
 
   // Specific Template Instantiations
 
@@ -105,9 +112,9 @@ namespace goos::runtime::type {
   #undef goos_define_from_cpp
 
   // Conversions
-  template<typename Wrapper> requires std::derived_from<Wrapper, IValue>
+  template<typename Wrapper> requires is_concrete_value<Wrapper>
   auto from_goos(RcMut<Wrapper> wrapper) -> goos_to_primitive_t<Wrapper> {
-    return wrapper.get();
+    return wrapper->get();
   }
 
   template<typename T>
@@ -115,6 +122,24 @@ namespace goos::runtime::type {
     return crab::make_rc_mut<primitive_to_goose_t<T>>(
       static_cast<goos_to_primitive_t<primitive_to_goose_t<T>>>(std::move(primitive))
     );
+  }
+
+  template<typename Primitive>
+  auto try_from_goose(Any wrapper) -> Option<Primitive> {
+    if (auto specialized = wrapper.downcast<primitive_to_goose_t<Primitive>>()) {
+      return crab::some(static_cast<Primitive>(specialized.take_unchecked()->get()));
+    }
+
+    // Identity case.
+    if constexpr (is_concrete_value<Primitive>) {
+      return wrapper.downcast<Primitive>();
+    }
+    return crab::none;
+  }
+
+  template<>
+  inline auto try_from_goose<Any>(Any wrapper) -> Option<Any> {
+    return crab::some(std::move(wrapper));
   }
 
   template<typename T>
