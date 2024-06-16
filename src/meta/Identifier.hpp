@@ -33,6 +33,8 @@ namespace goos::meta {
 
     [[nodiscard]] auto get_string() const -> const WideString&;
 
+    [[nodiscard]] auto get_string_ref_counted() const -> Rc<WideString>;
+
     [[nodiscard]] auto get_hash() const -> Hash;
 
     auto operator==(const Identifier &identifier) const -> bool;

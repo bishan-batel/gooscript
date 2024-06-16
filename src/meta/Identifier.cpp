@@ -15,6 +15,10 @@ auto goos::meta::Identifier::get_string() const -> const WideString& {
   return name;
 }
 
+auto goos::meta::Identifier::get_string_ref_counted() const -> Rc<WideString> {
+  return name;
+}
+
 goos::meta::Identifier::operator const std::wstring&() const {
   return get_string();
 }
