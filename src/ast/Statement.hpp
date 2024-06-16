@@ -14,18 +14,12 @@
 #include "json/Value.hpp"
 #include <result.hpp>
 
+#include "runtime/data/IValue.hpp"
 #include "runtime/err/RuntimeError.hpp"
 
 namespace goos {
   namespace runtime {
     struct IValue;
-
-    template<typename T>
-    using Result = Result<T, Box<err::Error>>;
-
-    using VoidResult = Option<Box<err::Error>>;
-
-    using Any = RcMut<IValue>;
   }
 
   namespace ast {
