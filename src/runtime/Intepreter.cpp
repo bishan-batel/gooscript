@@ -21,7 +21,7 @@
 #include "ast/statements/Return.hpp"
 #include "ast/statements/VariableDeclaration.hpp"
 #include "data/Boolean.hpp"
-#include "data/BuiltinFunction.hpp"
+#include "data/ExternFunction.hpp"
 #include "data/Decimal.hpp"
 #include "data/ICallable.hpp"
 #include "data/Integer.hpp"
@@ -31,6 +31,8 @@
 #include "data/IValue.hpp"
 #include "err/NotCallable.hpp"
 #include "Environment.hpp"
+#include "ast/expression/literal/Dictionary.hpp"
+#include "data/Dictionary.hpp"
 #include "utils/str.hpp"
 
 namespace goos::runtime {
@@ -117,7 +119,37 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_dictionary([[maybe_unused]] const ast::expression::Dictionary &dictionary) -> Result<Any> {
-    throw std::logic_error("Not implemented");
+    const auto dict = crab::make_rc_mut<Dictionary>();
+    // throw std::logic_error("Not implemented");
+
+    for (const auto &[key , value]: dictionary.get_pairs()) {
+      Any key_expr = Unit::value();
+
+      if (auto ident = key->try_as<ast::expression::IdentifierBinding>()) {
+        key_expr = crab::make_rc_mut<GString>(ident.get_unchecked()->get_identifier());
+      } else {
+        auto key_result = evaluate(key);
+        if (key_result.is_err()) return crab::err(key_result.take_err_unchecked());
+
+        if (should_halt_control_flow()) {
+          // return unit
+          return ok(Unit::value());
+        }
+
+        key_expr = key_result.take_unchecked();
+      }
+
+      auto value_result = evaluate(value);
+      if (value_result.is_err()) return crab::err(value_result.take_err_unchecked());
+
+      if (should_halt_control_flow()) {
+        // return unit
+        return ok(Unit::value());
+      }
+      dict->set(std::move(key_expr), value_result.take_unchecked());
+    }
+
+    return ok(dict);
   }
 
   auto Intepreter::visit_lambda([[maybe_unused]] const ast::expression::Lambda &lambda) -> Result<Any> {
@@ -128,7 +160,7 @@ namespace goos::runtime {
     );
 
     return ok(
-      BuiltinFunction::varargs(
+      ExternFunction::varargs(
         [closure, &lambda](Environment &env, const Vec<Any> &args) -> Result<Any> {
           const auto &params = lambda.get_params();
           const usize count = std::min(args.size(), params.size());
@@ -174,11 +206,11 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_nil([[maybe_unused]] const ast::expression::Nil &nil) -> Result<Any> {
-    return ok(crab::make_rc_mut<Nil>());
+    return ok(Nil::value());
   }
 
   auto Intepreter::visit_unit([[maybe_unused]] const ast::expression::Unit &unit) -> Result<Any> {
-    return ok(crab::make_rc_mut<Unit>());
+    return ok(Unit::value());
   }
 
   auto Intepreter::visit_binary([[maybe_unused]] const ast::expression::Binary &binary) -> Result<Any> {
@@ -193,9 +225,10 @@ namespace goos::runtime {
       if (value_result.is_err()) {
         return crab::err(value_result.take_err_unchecked());
       }
+
       const Any value = value_result.take_unchecked();
 
-      if (env().runtime().should_halt_control_flow()) {
+      if (should_halt_control_flow()) {
         return ok(value);
       }
 
@@ -203,6 +236,35 @@ namespace goos::runtime {
         return crab::err(err.take_err_unchecked());
 
       return ok(value);
+    }
+
+    if (binary.get_op() == lexer::Operator::DOT) {
+      const meta::Identifier rhs_identifier =
+          binary
+          .get_rhs()
+          .try_as<ast::expression::IdentifierBinding>()
+          .take_unchecked()
+          ->get_identifier();
+
+      Result<Any> dictionary_value = evaluate(binary.get_lhs());
+
+      if (dictionary_value.is_err()) {
+        return crab::err(dictionary_value.take_err_unchecked());
+      }
+
+      // TODO: error handling
+
+      if (should_halt_control_flow()) {
+        return ok(Unit::value());
+      }
+
+      const RcMut<Dictionary> dict = dictionary_value.take_unchecked().downcast<Dictionary>().take_unchecked();
+
+      if (auto value = dict->get(rhs_identifier)) {
+        return ok(value.take_unchecked());
+      }
+
+      return ok(Nil::value());
     }
 
     auto lhs_result{evaluate(binary.get_lhs())};
@@ -225,7 +287,14 @@ namespace goos::runtime {
       return ok(func(lhs_val, rhs_val));
     }
 
-    return ok(crab::make_rc_mut<Nil>());
+    const auto lhs_hash = lhs_val->hash();
+    const auto rhs_hash = lhs_val->hash();
+
+    switch (binary.get_op()) {
+      case lexer::Operator::EQUALS: { return ok(crab::make_rc_mut<Boolean>(lhs_hash == rhs_hash)); }
+      case lexer::Operator::NOT_EQUALS: { return ok(crab::make_rc_mut<Boolean>(lhs_hash != rhs_hash)); }
+      default: { return ok(Nil::value()); }
+    }
   }
 
   auto Intepreter::visit_function_call(
@@ -298,38 +367,62 @@ namespace goos::runtime {
 
     if (condition.is_err()) return crab::err(condition.take_err_unchecked());
 
+    if (should_halt_control_flow()) {
+      return ok(Unit::value());
+    }
+
     if (condition.take_unchecked()->is_truthy()) {
       Result<Any> then = evaluate(if_expr.get_then());
       if (then.is_err()) return crab::err(then.take_err_unchecked());
+
+      if (should_halt_control_flow()) {
+        return ok(Unit::value());
+      }
+
       return ok(then.take_unchecked());
     }
 
     Result<Any> else_then = evaluate(if_expr.get_else_then());
     if (else_then.is_err()) return crab::err(else_then.take_err_unchecked());
+
+    if (should_halt_control_flow()) {
+      return ok(Unit::value());
+    }
+
     return ok(else_then.take_unchecked());
   }
 
   auto Intepreter::visit_scope([[maybe_unused]] const ast::expression::ScopeBlock &scope) -> Result<Any> {
     push_env();
     for (const auto &statement: scope.get_statements()) {
-      execute(statement);
+      if (auto err = execute(statement)) {
+        return crab::err(err.take_unchecked());
+      }
 
       if (should_halt_control_flow()) {
         if (auto evaluation = consume_halt_flag(ControlFlowFlag::EVAL)) {
           return ok(evaluation.take_unchecked());
         }
         pop_env();
-        return ok(crab::make_rc_mut<Unit>());
+        return ok(Unit::value());
       }
     }
 
     Result<Any> value = evaluate(scope.get_eval());
+
+    if (value.is_err()) return crab::err(value.take_err_unchecked());
+
     pop_env();
+
+    if (should_halt_control_flow()) {
+      return ok(Unit::value());
+    }
+
     return value;
   }
 
   auto Intepreter::visit_while([[maybe_unused]] const ast::expression::While &while_expr) -> Result<Any> {
-    Any eval = crab::make_rc_mut<Unit>();
+    Any eval = Unit::value();
 
     while (true) {
       Result<Any> condition = evaluate(while_expr.get_condition());
@@ -341,9 +434,17 @@ namespace goos::runtime {
 
       Result<Any> body = evaluate(while_expr.get_body());
       if (body.is_err()) return crab::err(body.take_err_unchecked());
+
+      if (auto value = consume_halt_flag(ControlFlowFlag::BREAK_LOOP)) {
+        return ok(value.take_unchecked());
+      }
+
+      if (should_halt_control_flow()) {
+        return ok(Unit::value());
+      }
       eval = body.take_unchecked();
     }
 
-    return crab::ok(eval);
+    return ok(eval);
   }
 }

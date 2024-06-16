@@ -85,13 +85,5 @@ namespace goos::runtime {
     auto visit_scope(const ast::expression::ScopeBlock &scope) -> Result<Any> override;
 
     auto visit_while(const ast::expression::While &while_expr) -> Result<Any> override;
-
-    template<typename T> requires std::is_base_of_v<IValue, T>
-    static auto ok(RcMut<T> any) -> Result<Any>;
   };
-
-  template<typename T> requires std::is_base_of_v<IValue, T>
-  auto Intepreter::ok(RcMut<T> any) -> Result<Any> {
-    return Result<Any>{any};
-  }
 }
