@@ -20,7 +20,7 @@ namespace goos::parser::pass::expr {
 
       return decltype(ORDER_OF_OPERATIONS){
         {},
-        {Operator::COLON, Operator::DOT},
+        {},
         {Operator::MUL, Operator::DIV, Operator::MOD},
         {Operator::ADD, Operator::SUB},
         // Vec{Operator::BitShiftLeft, Operator::BitShiftRight},
