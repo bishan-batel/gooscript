@@ -5,9 +5,9 @@
 #include "Boolean.hpp"
 
 namespace goos::runtime {
-  auto Boolean::set(const bool v) -> void {
-    state = v;
-  }
+  // auto Boolean::set(const bool v) -> void {
+  //   state = v;
+  // }
 
   Boolean::Boolean(const bool state) : state{state} {}
 
@@ -27,7 +27,11 @@ namespace goos::runtime {
     return state;
   }
 
-  auto Boolean::hash() const -> usize {
+  auto Boolean::base_hash() const -> usize {
     return std::hash<bool>()(state);
+  }
+
+  auto Boolean::clone() const -> Any {
+    return crab::make_rc_mut<Boolean>(state);
   }
 }

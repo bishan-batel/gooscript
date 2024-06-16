@@ -12,7 +12,7 @@ namespace goos::runtime {
   public:
     explicit Boolean(bool state = false);
 
-    auto set(bool v) -> void;
+    // auto set(bool v) -> void;
 
     [[nodiscard]] auto get() const -> bool;
 
@@ -22,6 +22,8 @@ namespace goos::runtime {
 
     auto is_truthy() const -> bool override;
 
-    [[nodiscard]] auto hash() const -> usize override;
+    [[nodiscard]] auto base_hash() const -> usize override;
+
+    [[nodiscard]] auto clone() const -> Any override;
   };
 }
