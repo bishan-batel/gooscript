@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 namespace goos::utils {
-  auto combine_hash(const usize seed, const usize next) -> usize {
+  auto hash_code_mix(const usize seed, const usize next) -> usize {
     return next + 0x9e3779b9 + (seed << 6) + (seed >> 2) ^ seed;
   }
 }
