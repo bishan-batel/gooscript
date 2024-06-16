@@ -5,6 +5,11 @@
 #include "Unit.hpp"
 
 namespace goos::runtime {
+  auto Unit::value() -> RcMut<Unit> {
+    static const RcMut<Unit> VALUE = crab::make_rc_mut<Unit>();
+    return VALUE;
+  }
+
   Unit::Unit() = default;
 
   auto Unit::to_string() const -> WideString {
@@ -15,7 +20,11 @@ namespace goos::runtime {
     return meta::VariantType::UNIT;
   }
 
-  auto Unit::hash() const -> usize {
+  auto Unit::base_hash() const -> usize {
     return 4206942_u64;
+  }
+
+  auto Unit::clone() const -> Any {
+    return value();
   }
 }

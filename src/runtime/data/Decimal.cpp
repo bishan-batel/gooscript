@@ -13,9 +13,9 @@ namespace goos::runtime {
     return value;
   }
 
-  auto Decimal::set(const f64 v) -> void {
-    value = v;
-  }
+  // auto Decimal::set(const f64 v) -> void {
+  //   value = v;
+  // }
 
   auto Decimal::to_string() const -> WideString {
     return fmt::format(L"{}", value);
@@ -23,10 +23,6 @@ namespace goos::runtime {
 
   auto Decimal::get_type() const -> meta::VariantType {
     return meta::VariantType::DECIMAL;
-  }
-
-  auto Decimal::set_number(const f64 v) -> void {
-    value = v;
   }
 
   auto Decimal::get_number() const -> f64 {
@@ -37,7 +33,11 @@ namespace goos::runtime {
     return false;
   }
 
-  auto Decimal::hash() const -> usize {
+  auto Decimal::base_hash() const -> usize {
     return std::hash<f64>{}(value);
+  }
+
+  auto Decimal::clone() const -> Any {
+    return crab::make_rc_mut<Decimal>(value);
   }
 }

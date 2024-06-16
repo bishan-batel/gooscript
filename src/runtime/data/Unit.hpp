@@ -8,12 +8,16 @@
 namespace goos::runtime {
   class Unit final : public IValue {
   public:
+    static auto value() -> RcMut<Unit>;
+
     Unit();
 
     auto to_string() const -> WideString override;
 
     auto get_type() const -> meta::VariantType override;
 
-    auto hash() const -> usize override;
+    auto base_hash() const -> usize override;
+
+    [[nodiscard]] auto clone() const -> Any override;
   };
 }

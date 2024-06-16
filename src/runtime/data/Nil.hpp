@@ -8,12 +8,18 @@
 namespace goos::runtime {
   class Nil final : public IValue {
   public:
+    static auto value() -> RcMut<Nil>;
+
     Nil() = default;
+
+    explicit Nil(std::nullptr_t);
 
     auto to_string() const -> WideString override;
 
     auto get_type() const -> meta::VariantType override;
 
-    auto hash() const -> usize override;
+    auto base_hash() const -> usize override;
+
+    [[nodiscard]] auto clone() const -> Any override;
   };
 }

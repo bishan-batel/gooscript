@@ -23,10 +23,6 @@ namespace goos::runtime {
     return value;
   }
 
-  auto Integer::set_number(const f64 v) -> void {
-    value = static_cast<i64>(v);
-  }
-
   auto Integer::get_number() const -> f64 {
     return value;
   }
@@ -35,7 +31,11 @@ namespace goos::runtime {
     return true;
   }
 
-  auto Integer::hash() const -> usize {
+  auto Integer::base_hash() const -> usize {
     return std::hash<i64>{}(value);
+  }
+
+  auto Integer::clone() const -> Any {
+    return crab::make_rc_mut<Integer>(value);
   }
 }

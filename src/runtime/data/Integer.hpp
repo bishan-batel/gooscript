@@ -23,12 +23,12 @@ namespace goos::runtime {
 
     [[nodiscard]] auto get() const -> i64;
 
-    auto set_number(f64 v) -> void override;
-
     [[nodiscard]] auto get_number() const -> f64 override;
 
     [[nodiscard]] auto is_integral() const -> bool override;
 
-    [[nodiscard]] auto hash() const -> usize override;
+    [[nodiscard]] auto base_hash() const -> usize override;
+
+    [[nodiscard]] auto clone() const -> Any override;
   };
 }

@@ -8,9 +8,13 @@
 
 #include "preamble.hpp"
 #include "meta/VariantType.hpp"
+#include "utils/hash.hpp"
 
 namespace goos::runtime {
-  struct IValue;
+  #if __JETBRAINS_IDE__
+  [[jetbrains::pass_by_value]]
+  #endif
+  using Any = RcMut<struct IValue>;
 
   struct IValue {
     IValue() = default;
@@ -31,13 +35,19 @@ namespace goos::runtime {
     template<typename T>
     auto coerce_unchecked() -> T&;
 
+    [[nodiscard]] virtual auto clone() const -> Any = 0;
+
     [[nodiscard]] virtual auto to_string() const -> WideString = 0;
 
     [[nodiscard]] virtual auto get_type() const -> meta::VariantType = 0;
 
     [[nodiscard]] virtual auto is_truthy() const -> bool { return false; }
 
-    [[nodiscard]] virtual auto hash() const -> usize = 0;
+    [[nodiscard]] virtual auto base_hash() const -> usize = 0;
+
+    [[nodiscard]] auto hash() const -> usize {
+      return utils::combine_hash(base_hash(), static_cast<usize>(get_type()));
+    }
   };
 
   template<typename T>
@@ -54,6 +64,6 @@ namespace goos::runtime {
 template<>
 struct std::hash<goos::runtime::IValue> {
   auto operator()(const goos::runtime::IValue &value) const noexcept -> usize {
-    return value.hash();
+    return value.base_hash();
   }
 };
