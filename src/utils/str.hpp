@@ -49,23 +49,21 @@ namespace goos::str {
 namespace goos::str {
   template<std::ranges::input_range Range, typename F>
   auto join(Range &&range, F to_string, const WideStringView seperator) -> WideString {
-    {
-      WideStringStream stream{};
+    WideStringStream stream{};
 
-      usize n = 0;
-      for (const auto &element: range) {
-        stream << to_string(element);
+    usize n = 0;
+    for (const auto &element: range) {
+      stream << to_string(element);
 
-        stream << seperator;
-        n++;
-      }
-
-      if (n > 0) {
-        const WideString string{stream.str()};
-        return string.substr(0, string.size() - seperator.length());
-      }
-
-      return stream.str();
+      stream << seperator;
+      n++;
     }
+
+    if (n > 0) {
+      const WideString string{stream.str()};
+      return string.substr(0, string.size() - seperator.length());
+    }
+
+    return stream.str();
   }
 }
