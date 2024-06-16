@@ -130,8 +130,8 @@ set(SOURCE_FILES
         src/runtime/err/RuntimeError.hpp
         src/runtime/err/VariableNotFound.cpp
         src/runtime/err/VariableNotFound.hpp
-        src/runtime/data/BuiltinFunction.cpp
-        src/runtime/data/BuiltinFunction.hpp
+        src/runtime/data/ExternFunction.cpp
+        src/runtime/data/ExternFunction.hpp
         src/runtime/err/NotCallable.cpp
         src/runtime/err/NotCallable.hpp
         src/parser/pass/expression/functions.hpp
@@ -142,6 +142,12 @@ set(SOURCE_FILES
         src/runtime/err/DuplicateName.cpp
         src/runtime/data/TypeConversion.hpp
         src/runtime/data/INumeric.hpp
+        src/runtime/data/Dictionary.cpp
+        src/runtime/data/Dictionary.hpp
+        src/utils/hash.hpp
+        src/utils/hash.cpp
+        src/runtime/err/InvalidCast.cpp
+        src/runtime/err/InvalidCast.hpp
 )
 
 

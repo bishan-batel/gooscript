@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <bitset>
-
 #include "preamble.hpp"
 #include "data/TypeConversion.hpp"
 #include "meta/Identifier.hpp"
@@ -14,7 +12,7 @@
 
 namespace goos::runtime {
   class Intepreter;
-  class BuiltinFunction;
+  class ExternFunction;
 
   class Variable final {
     meta::Mutability mutability;
@@ -46,7 +44,10 @@ namespace goos::runtime {
     RefMut<Intepreter> intepreter;
 
   public:
-    auto define_builtin(WideString name, const RcMut<BuiltinFunction> &function) -> void;
+    auto define_builtin(WideString name, const RcMut<ExternFunction> &function) -> void;
+
+    template<typename F>
+    auto define_builtin(WideString name, F function) -> void;
 
     static auto get_standard_environment(Intepreter &intepreter) -> RcMut<Environment>;
 
@@ -77,6 +78,16 @@ namespace goos::runtime {
 
     auto runtime() const -> Intepreter&;
   };
+
+  namespace lambda {
+    template<typename F>
+    static auto from(F function) -> RcMut<ExternFunction>;
+  };
+
+  template<typename F>
+  auto Environment::define_builtin(WideString name, F function) -> void {
+    define_builtin(std::move(name), lambda::from(function));
+  }
 
   template<typename IntoIdentifier, typename ValueTy> requires
     std::is_constructible_v<meta::Identifier, IntoIdentifier> and

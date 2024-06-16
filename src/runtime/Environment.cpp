@@ -6,9 +6,8 @@
 
 #include <utility>
 
-#include "data/Boolean.hpp"
-#include "data/BuiltinFunction.hpp"
-#include "data/GString.hpp"
+#include "data/ExternFunction.hpp"
+#include "Intepreter.hpp"
 #include "data/TypeConversion.hpp"
 #include "data/Unit.hpp"
 #include "data/IValue.hpp"
@@ -37,7 +36,7 @@ namespace goos::runtime {
     this->value = std::move(value);
   }
 
-  auto Environment::define_builtin(WideString name, const RcMut<BuiltinFunction> &function) -> void {
+  auto Environment::define_builtin(WideString name, const RcMut<ExternFunction> &function) -> void {
     push_variable(
       meta::Identifier{std::move(name)},
       meta::Mutability::IMMUTABLE,
@@ -50,12 +49,12 @@ namespace goos::runtime {
 
     env->define_constant("PI", type::to_goos(std::numbers::pi));
 
-    env->push_variable(meta::Identifier{L"true"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(true));
+    // env->push_variable(meta::Identifier{L"true"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(true));
     // env->push_variable(meta::Identifier{L"false"}, meta::Mutability::IMMUTABLE, crab::make_rc_mut<Boolean>(false));
 
     env->define_builtin(
       L"funny_number",
-      BuiltinFunction::from(
+      ExternFunction::from(
         0,
         [](Environment &, const Vec<Any> &) -> Result<Any> {
           return crab::ok(type::to_goos_any(42069LL));
@@ -64,8 +63,38 @@ namespace goos::runtime {
     );
 
     env->define_builtin(
+      L"log",
+      ExternFunction::from(
+        1,
+        [](Environment &, const Vec<Any> &args) -> Result<Any> {
+          const auto v = type::try_from_goose<i64>(args.at(0));
+
+          std::cout << "[builtin:log] " << v << std::endl;
+
+          return ok(Unit::value());
+        }
+      )
+    );
+
+    env->define_builtin(
+      L"log",
+      [](const IValue &first) {
+        std::wcout << "[builtin:log2] " << first.to_string() << std::endl;
+        return ok(Unit::value());
+      }
+    );
+
+    env->define_builtin(
+      L"min",
+      [](const i64 a, const i64 b) {
+        return ok(crab::make_rc_mut<Integer>(std::min(a, b)));
+      }
+    );
+
+    //
+    env->define_builtin(
       L"readline",
-      BuiltinFunction::from(
+      ExternFunction::from(
         0,
         [](Environment &, const Vec<Any> &) -> Result<Any> {
           WideString str;
@@ -77,7 +106,7 @@ namespace goos::runtime {
 
     env->define_builtin(
       L"print",
-      BuiltinFunction::varargs(
+      ExternFunction::varargs(
         [](Environment &, const Vec<Any> &args) -> Result<Any> {
           for (const auto &arg: args) {
             std::wcout << arg->to_string();
@@ -119,7 +148,10 @@ namespace goos::runtime {
     return get_variable(identifier);
   }
 
-  auto Environment::set_value(const meta::Identifier &identifier, RcMut<IValue> value) const -> Result<RcMut<Variable>> {
+  auto Environment::set_value(
+    const meta::Identifier &identifier,
+    RcMut<IValue> value
+  ) const -> Result<RcMut<Variable>> {
     Result<RcMut<Variable>> var = get_variable(identifier);
 
     if (var.is_ok()) {
