@@ -20,6 +20,7 @@ namespace goos::parser::pass::expr {
 
       return decltype(ORDER_OF_OPERATIONS){
         {},
+        {Operator::COLON, Operator::DOT},
         {Operator::MUL, Operator::DIV, Operator::MOD},
         {Operator::ADD, Operator::SUB},
         // Vec{Operator::BitShiftLeft, Operator::BitShiftRight},
@@ -81,7 +82,7 @@ namespace goos::parser::pass::expr {
   // Optional Factor Passes
 
   inline static const std::vector FACTOR_PASSES{
-    meta::transmute([](auto& s) { return block(s); }),
+    meta::transmute([](auto &s) { return block(s); }),
     meta::transmute(grouping),
     meta::transmute(if_condition),
     meta::transmute(while_loop),
