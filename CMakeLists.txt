@@ -148,6 +148,10 @@ set(SOURCE_FILES
         src/utils/hash.cpp
         src/runtime/err/InvalidCast.cpp
         src/runtime/err/InvalidCast.hpp
+        src/ast/expression/PropertyAccess.cpp
+        src/ast/expression/PropertyAccess.hpp
+        src/runtime/data/LValue.cpp
+        src/runtime/data/LValue.hpp
 )
 
 

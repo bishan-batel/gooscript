@@ -7,18 +7,25 @@
 #include <fstream>
 #include <ref.hpp>
 #include <sstream>
+#include <sstream>
+#include <fstream>
+#include <codecvt>
 
 namespace goos {
   auto SourceFile::from_file(const std::filesystem::path &path) -> Result<SourceFile, io::Error> {
     errno = 0;
-    const std::wifstream stream{path};
+    std::wifstream stream{path};
 
     if (stream.bad()) return err(io::Error{errno});;
+
+    stream.imbue(std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>));
+    WideStringStream collector{};
+    collector << stream.rdbuf();
 
     return crab::ok(
       SourceFile(
         path.string(),
-        (WideStringStream{} << stream.rdbuf()).str()
+        collector.str()
       )
     );
   }
@@ -39,7 +46,7 @@ namespace goos {
   }
 
   auto SourceFile::clamp_index(const usize i) const -> usize {
-    return std::min(i, contents->size());
+    return std::min(i, contents->size() - 1);
   }
 
   auto SourceFile::get_char(const usize position) const -> widechar {
