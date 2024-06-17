@@ -13,7 +13,7 @@
 namespace goos::runtime {
   class Dictionary final : public IValue {
   public:
-    using Pair = std::pair<Rc<IValue>, Any>;
+    using Pair = std::pair<RcMut<IValue>, Any>;
 
   private:
     ::Dictionary<utils::hash_code, Pair> pairs;
@@ -60,6 +60,8 @@ namespace goos::runtime {
 
     auto get(const meta::Identifier &key) const -> Option<Any>;
 
+    auto get(const Any &key) const -> Option<Any> ;
+
     template<type::value_type T=IValue>
     auto get_lvalue(const T &key) -> Option<RcMut<LValue>>;
 
@@ -76,6 +78,10 @@ namespace goos::runtime {
     auto has_key(const T &hashed_key) const -> bool;
 
     auto has_key_index(utils::hash_code hashed_key) const -> bool;
+
+    [[nodiscard]] auto get_pairs() -> const ::Dictionary<utils::hash_code, Pair>&;
+
+    [[nodiscard]] auto length() const -> usize;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 

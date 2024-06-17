@@ -17,6 +17,10 @@
 #include "err/VariableNotFound.hpp"
 #include <ref.hpp>
 
+#include "parser/TokenStream.hpp"
+#include "parser/pass/statement/block.hpp"
+#include "token/Array.hpp"
+
 namespace goos::runtime {
   Variable::Variable(const meta::Mutability mutability, Any value)
     : mutability{mutability},
@@ -89,6 +93,33 @@ namespace goos::runtime {
     }
 
     env->define_builtin(
+      L"typeof",
+      [](const IValue &obj) {
+        return str::convert((StringStream{} << obj.get_type()).str());
+      }
+    );
+
+    env->define_builtin(
+      L"clone",
+      [](const IValue &obj) { return obj.clone(); }
+    );
+
+    // ReSharper disable once CppPassValueParameterByConstReference
+    env->define_builtin(
+      L"import",
+      [](const RcMut<GString> file) {
+        SourceFile source = SourceFile::from_file(*file->get()).take_unchecked();
+        lexer::TokenList list{lexer::Lexer::tokenize(std::move(source)).take_unchecked()};
+
+        if (list.empty()) {
+          return ok(Unit::value());
+        }
+        parser::TokenStream stream{std::move(list)};
+        return Intepreter{}.evaluate(parser::pass::block_top_level(stream).take_unchecked());
+      }
+    );
+
+    env->define_builtin(
       L"fmt",
       ExternFunction::from(
         1,
@@ -128,10 +159,63 @@ namespace goos::runtime {
     );
 
     env->define_builtin(
+      L"len",
+      [](Any any) -> usize {
+        if (auto dict = any.downcast<Dictionary>()) {
+          return dict.take_unchecked()->length();
+        }
+
+        if (auto arr = any.downcast<Array>()) {
+          return arr.take_unchecked()->length();
+        }
+
+        return 0;
+      }
+    );
+
+    env->define_builtin(
+      L"each",
+      [](Any any, const ExternFunction &func) -> Result<Any> {
+        if (auto arr = any.downcast<Array>()) {
+          for (const auto &v: arr.get_unchecked()->get_values()) {
+            if (auto result = func.call(env, {v}); result.is_err())
+              return result.take_err_unchecked();
+          }
+        }
+
+        if (auto arr = any.downcast<Dictionary>()) {
+          for (const auto &[_, pair]: arr.get_unchecked()->get_pairs()) {
+            auto [key, value] = pair;
+            if (auto result = func.call(env, {key, value}); result.is_err())
+              return result.take_err_unchecked();
+          }
+        }
+        return ok(Unit::value());
+      }
+    );
+
+    env->define_builtin(
       L"💀",
       [] {
         std::wcerr << std::endl << "skull emogi lol" << std::endl;
         std::exit(69);
+      }
+    );
+
+    env->define_builtin(
+      L"idx",
+      [](const Array &arr, const usize i) {
+        if (i >= arr.length()) return Any{Unit::value()};
+        return arr.get_values().at(i);
+      }
+    );
+    env->define_builtin(
+      L"get",
+      [](const Dictionary &dict, const GString &str) {
+        if (auto v = dict.get(str)) {
+          return v.take_unchecked();
+        }
+        return Any{Unit::value()};
       }
     );
 

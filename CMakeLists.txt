@@ -152,6 +152,10 @@ set(SOURCE_FILES
         src/ast/expression/PropertyAccess.hpp
         src/runtime/data/LValue.cpp
         src/runtime/data/LValue.hpp
+        src/token/Array.cpp
+        src/token/Array.hpp
+        src/ast/expression/ArrayIndex.cpp
+        src/ast/expression/ArrayIndex.hpp
 )
 
 

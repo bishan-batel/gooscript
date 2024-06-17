@@ -43,6 +43,10 @@ namespace goos::runtime {
     return crab::some(value);
   }
 
+  auto Dictionary::get(const Any &key) const -> Option<Any> {
+    return get<IValue>(key.get());
+  }
+
   auto Dictionary::get_lvalue(const meta::Identifier &key) -> Option<RcMut<LValue>> {
     Option<RefMut<Pair>> pair_opt = index(utils::hash_together(key.get_hash(), meta::VariantType::STRING));
     if (pair_opt.is_none()) return crab::none;
@@ -69,6 +73,12 @@ namespace goos::runtime {
 
   auto Dictionary::has_key_index(const utils::hash_code hashed_key) const -> bool {
     return pairs.contains(hashed_key);
+  }
+
+  auto Dictionary::get_pairs() -> const ::Dictionary<utils::hash_code, Pair>& { return pairs; }
+
+  auto Dictionary::length() const -> usize {
+    return pairs.size();
   }
 
   auto Dictionary::to_string() const -> WideString {
