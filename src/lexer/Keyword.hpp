@@ -66,6 +66,10 @@ namespace goos::lexer {
     {L"is", Keyword::CONST},
 
     {L"true", Keyword::TRUE},
+    {L"ongod", Keyword::TRUE},
+
+    {L"🧢", Keyword::FALSE},
+    {L"cap", Keyword::FALSE},
     {L"false", Keyword::FALSE},
   };
 
