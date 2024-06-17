@@ -45,12 +45,14 @@ TEST_CASE("AST Into String", "[ast_string]") {
   SECTION("StringLiteral") { TEST_CLONE(LR"("what")", expression::StringLiteral, L"what") }
   SECTION("Lambda") { TEST_CLONE(L"fn () = unit", Lambda, {}, u.clone_expr()) }
   SECTION("If") { TEST_CLONE(L"if unit then { unit } else { unit }", If, expr, expr, expr) }
-  SECTION("ScopeBlock") { TEST_CLONE(L"block { eval (unit); }", ScopeBlock, {}) }
+  SECTION("ScopeBlock") {
+    TEST_CLONE(L"block { unit; }", ScopeBlock, {})
+  }
   SECTION("While") { TEST_CLONE(L"while unit { unit }", While, expr, expr) }
   SECTION("Binary") { TEST_CLONE(L"(unit) and (unit)", Binary, expr, goos::lexer::Operator::AND, expr); }
   SECTION("Unary") { TEST_CLONE(L"not (unit)", Unary, goos::lexer::Operator::NOT, expr); }
   SECTION("FunctionCall") { TEST_CLONE(L"funcall(unit)()", FunctionCall, expr, {}); }
-  SECTION("IdentifierBinding") { TEST_CLONE(L"wha", IdentifierBinding, meta::Identifier{L"wha"}); }
+  SECTION("IdentifierBinding") { TEST_CLONE(L"wha", IdentifierBinding, meta::Identifier::from(L"wha")); }
   SECTION("Eval") { TEST_CLONE(L"eval (unit)", Eval, expr) }
   SECTION("Return") { TEST_CLONE(L"return unit", Return, expr) }
   SECTION("Nil") { TEST_CLONE(L"nil", Nil) }
@@ -88,7 +90,7 @@ auto scope(std::array<Box<Statement>, N> statements) {
 }
 
 #define UNIT crab::make_box<expression::Unit>()
-#define DECL_VARIABLE(name, mut, expr) Box<Statement>::wrap_unchecked(new VariableDeclaration {goos::meta::Identifier{name}, meta::Mutability:: mut, expr})
+#define DECL_VARIABLE(name, mut, expr) Box<Statement>::wrap_unchecked(new VariableDeclaration {goos::meta::Identifier::from(name), meta::Mutability:: mut, expr})
 
 #define SCOPE(...) scope(std::array{__VA_ARGS__})
 
