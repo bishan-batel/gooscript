@@ -28,7 +28,7 @@ namespace goos::runtime {
   }
 
   auto Boolean::base_hash() const -> usize {
-    return std::hash<bool>()(state);
+    return utils::hash(state);
   }
 
   auto Boolean::clone() const -> Any {

@@ -32,7 +32,7 @@ namespace goos::runtime {
   }
 
   auto Integer::base_hash() const -> usize {
-    return std::hash<i64>{}(value);
+    return utils::hash(value);
   }
 
   auto Integer::clone() const -> Any {

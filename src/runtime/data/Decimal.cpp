@@ -34,7 +34,7 @@ namespace goos::runtime {
   }
 
   auto Decimal::base_hash() const -> usize {
-    return std::hash<f64>{}(value);
+    return utils::hash(value);
   }
 
   auto Decimal::clone() const -> Any {

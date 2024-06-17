@@ -8,6 +8,8 @@
 namespace goos::runtime {
   class Nil final : public IValue {
   public:
+    static constexpr meta::VariantType TYPE{meta::VariantType::NIL};
+
     static auto value() -> RcMut<Nil>;
 
     Nil() = default;

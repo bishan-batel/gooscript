@@ -11,6 +11,8 @@ namespace goos::runtime {
     f64 value;
 
   public:
+    static constexpr meta::VariantType TYPE{meta::VariantType::DECIMAL};
+
     using Contained = f64;
 
     explicit Decimal(f64 value = 0.f);

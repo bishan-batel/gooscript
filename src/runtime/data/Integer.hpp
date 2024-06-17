@@ -13,6 +13,8 @@ namespace goos::runtime {
   public:
     using Contained = i64;
 
+    static constexpr meta::VariantType TYPE{meta::VariantType::INTEGER};
+
     explicit Integer(i64 value = 0);
 
     [[nodiscard]] auto to_string() const -> WideString override;

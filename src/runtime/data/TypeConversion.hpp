@@ -17,13 +17,21 @@ namespace goos::runtime::type {
 
   struct no_matching_wrapper {};
 
+  /**
+   * @brief Any type that can be used as some form of IValue
+   */
   template<typename T>
-  concept is_value = std::derived_from<T, IValue> ;
+  concept value_type = std::derived_from<T, IValue> ;
 
+  /**
+   * @brief Any type
+   */
   template<typename T>
-  concept is_concrete_value = is_value<T> and not std::is_abstract_v<T>;
+  concept specialized_value = value_type<T> and not std::is_abstract_v<T>;
 
-  template<typename T> requires std::derived_from<T, IValue>
+  static_assert(not specialized_value<IValue>);
+
+  template<typename T> requires value_type<T>
   struct goos_to_primitive {
     using type = no_matching_primitive;
   };
@@ -43,8 +51,7 @@ namespace goos::runtime::type {
    * @brief Is 'Primitive' a type that can be converted from C++ -> Goos
    */
   template<typename Primitive>
-  concept is_convertible_primitive = not std::is_same_v<typename primitive_to_goose_t<Primitive>::type,
-    no_matching_primitive>;
+  concept convertible_primitive = not std::is_same_v<primitive_to_goose_t<Primitive>, no_matching_primitive>;
 
   // Specific Template Instantiations
 
@@ -59,6 +66,11 @@ namespace goos::runtime::type {
   struct goos_to_primitive<wrapper> {\
     using type = cpp_primitive;\
   };
+
+  // Identities
+  goos_define_from_cpp(IValue, IValue);
+
+  goos_define_to_cpp(IValue, RcMut<IValue>);
 
   // Boolean
   goos_define_from_cpp(bool, Boolean);
@@ -98,9 +110,11 @@ namespace goos::runtime::type {
   // String Types
   goos_define_from_cpp(WideString, GString);
 
+  goos_define_from_cpp(Rc<WideString>, GString);
+
   goos_define_from_cpp(WideStringView, GString);
 
-  goos_define_to_cpp(GString, const WideString&);
+  goos_define_to_cpp(GString, Rc<WideString>);
 
   // Monostate / 0 sized types
   goos_define_from_cpp(unit, Unit);
@@ -112,16 +126,18 @@ namespace goos::runtime::type {
   #undef goos_define_from_cpp
 
   // Conversions
-  template<typename Wrapper> requires is_concrete_value<Wrapper>
+  template<specialized_value Wrapper>
   auto from_goos(RcMut<Wrapper> wrapper) -> goos_to_primitive_t<Wrapper> {
     return wrapper->get();
   }
 
   template<typename T>
   auto to_goos(T primitive) -> RcMut<primitive_to_goose_t<T>> {
-    return crab::make_rc_mut<primitive_to_goose_t<T>>(
-      static_cast<goos_to_primitive_t<primitive_to_goose_t<T>>>(std::move(primitive))
-    );
+    // return crab::make_rc_mut<primitive_to_goose_t<T>>(
+    //   static_cast<goos_to_primitive_t<primitive_to_goose_t<T>>>(std::move(primitive))
+    // );
+    // TODO double check this to make sure the top part can be omitted
+    return crab::make_rc_mut<primitive_to_goose_t<T>>(std::move(primitive));
   }
 
   template<typename Primitive>
@@ -131,10 +147,15 @@ namespace goos::runtime::type {
     }
 
     // Identity case.
-    if constexpr (is_concrete_value<Primitive>) {
+    if constexpr (specialized_value<Primitive>) {
       return wrapper.downcast<Primitive>();
     }
     return crab::none;
+  }
+
+  template<value_type T>
+  auto try_from_goose(Ref<RcMut<T>> wrapper) -> Option<primitive_to_goose_t<T>> {
+    return type::try_from_goose(*wrapper);
   }
 
   template<>
@@ -144,10 +165,17 @@ namespace goos::runtime::type {
 
   template<typename T>
   auto to_goos_any(T primitive) -> Any {
-    return to_goos(std::move(primitive));
+    return type::to_goos(std::move(primitive));
+  }
+
+  template<value_type T>
+  auto to_goos_any(RcMut<T> primitive) -> Any {
+    return primitive;
   }
 
   // Identitiy function if trying to convert a value to a value
   template<typename T> requires std::is_base_of_v<T, IValue>
   auto to_goos(RcMut<T> primitive) -> RcMut<T> { return primitive; }
 }
+
+static_assert(goos::runtime::type::convertible_primitive<i64>);

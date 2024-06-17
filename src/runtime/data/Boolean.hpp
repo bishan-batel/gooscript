@@ -10,6 +10,8 @@ namespace goos::runtime {
     bool state;
 
   public:
+    static constexpr meta::VariantType TYPE{meta::VariantType::BOOLEAN};
+
     explicit Boolean(bool state = false);
 
     // auto set(bool v) -> void;
@@ -20,7 +22,7 @@ namespace goos::runtime {
 
     [[nodiscard]] auto get_type() const -> meta::VariantType override;
 
-    auto is_truthy() const -> bool override;
+    [[nodiscard]] auto is_truthy() const -> bool override;
 
     [[nodiscard]] auto base_hash() const -> usize override;
 
