@@ -536,9 +536,9 @@ namespace goos::runtime {
     }
 
     const meta::Identifier property = property_access.get_property();
-    RcMut<Dictionary> dict = casted_opt.take_unchecked();
+    Dictionary &dict = casted_opt.take_unchecked();
 
-    if (auto value = dict->get_lvalue(property); value.is_some()) {
+    if (auto value = dict.get_lvalue(property); value.is_some()) {
       return ok(value.take_unchecked());
     }
 
