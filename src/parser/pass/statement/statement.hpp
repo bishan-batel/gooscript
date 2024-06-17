@@ -22,6 +22,8 @@ namespace goos::parser::pass {
 
   [[nodiscard]] auto return_statement(TokenStream &stream) -> OptionalResult<ast::Return>;
 
+  [[nodiscard]] auto fn_statement(TokenStream &stream) -> OptionalResult<ast::VariableDeclaration>;
+
   [[nodiscard]] auto eval(TokenStream &stream) -> OptionalResult<ast::Eval>;
 
   namespace meta {
@@ -45,6 +47,7 @@ namespace goos::parser::pass {
 
   inline static const std::vector STATEMENT_PASSES{
     meta::transmute([](auto &s) { return block(s); }),
+    meta::transmute(fn_statement),
     meta::transmute(variable_declare),
     meta::transmute(return_statement),
     meta::transmute(eval),
