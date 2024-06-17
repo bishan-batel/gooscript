@@ -17,6 +17,8 @@ namespace goos::runtime {
   using Any = RcMut<struct IValue>;
 
   struct IValue {
+    constexpr static meta::VariantType TYPE = meta::VariantType::ANY;
+
     IValue() = default;
 
     IValue(IValue &) = delete;
@@ -43,12 +45,14 @@ namespace goos::runtime {
 
     [[nodiscard]] virtual auto is_truthy() const -> bool { return false; }
 
-    [[nodiscard]] virtual auto base_hash() const -> usize = 0;
+    [[nodiscard]] virtual auto base_hash() const -> utils::hash_code = 0;
 
-    [[nodiscard]] auto hash() const -> usize {
-      return utils::combine_hash(base_hash(), static_cast<usize>(get_type()));
-    }
+    [[nodiscard]] auto hash() const -> utils::hash_code;
   };
+
+  inline auto IValue::hash() const -> utils::hash_code {
+    return utils::hash_together(base_hash(), get_type());
+  }
 
   template<typename T>
   auto IValue::coerce() -> Option<RefMut<T>> {
@@ -63,7 +67,7 @@ namespace goos::runtime {
 
 template<>
 struct std::hash<goos::runtime::IValue> {
-  auto operator()(const goos::runtime::IValue &value) const noexcept -> usize {
+  auto operator()(const goos::runtime::IValue &value) const noexcept -> goos::utils::hash_code {
     return value.base_hash();
   }
 };
