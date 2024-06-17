@@ -14,6 +14,8 @@ namespace goos::ast::expression {
   public:
     explicit Array(Vec<Box<Expression>> values);
 
+    [[nodiscard]] auto get_values() const -> const Vec<Box<Expression>>&;
+
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto clone_expr() const -> Box<Expression> override;

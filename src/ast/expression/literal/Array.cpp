@@ -14,6 +14,10 @@
 namespace goos::ast::expression {
   Array::Array(Vec<Box<Expression>> values) : values{std::move(values)} {}
 
+  auto Array::get_values() const -> const Vec<Box<Expression>> & {
+    return values;
+  }
+
   auto Array::to_string() const -> WideString {
     WideStringStream stream{};
     stream << '[';

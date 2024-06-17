@@ -10,6 +10,7 @@
 #include "ast/expression/FunctionCall.hpp"
 #include "ast/expression/Unary.hpp"
 #include "ast/expression/PropertyAccess.hpp"
+#include "ast/expression/ArrayIndex.hpp"
 
 namespace goos::parser::pass::expr {
   auto factor(TokenStream &stream) -> MustEvalResult<ast::Expression> {
@@ -64,24 +65,48 @@ namespace goos::parser::pass::expr {
     return crab::err(stream.unexpected("Expression"));
   }
 
-  auto consume_binary_expression(TokenStream &stream, const usize op_index) -> MustEvalResult<ast::Expression> {
-    if (op_index == 0) {
-      MustEvalResult<ast::Expression> expr_result = factor(stream);
-      if (expr_result.is_err()) return expr_result.take_err_unchecked();
+  auto postfix_pass(TokenStream &stream, Box<ast::Expression> expr) -> MustEvalResult<ast::Expression> {
+    if (stream.try_consume(lexer::Operator::DOT) or stream.try_consume(lexer::Operator::COLON)) {
+      Result<goos::meta::Identifier> ident = stream.consume_identifier();
+      if (ident.is_err()) return ident.take_err_unchecked();
 
-      Box<ast::Expression> expr = expr_result.take_unchecked();
-
-      while (stream.try_consume(lexer::Operator::DOT) or stream.try_consume(lexer::Operator::COLON)) {
-        Result<goos::meta::Identifier> ident = stream.consume_identifier();
-        if (ident.is_err()) return ident.take_err_unchecked();
-
-        expr = crab::make_box<ast::expression::PropertyAccess>(
+      return postfix_pass(
+        stream,
+        crab::make_box<ast::expression::PropertyAccess>(
           std::move(expr),
           ident.take_unchecked()
-        );
+        )
+      );
+    }
+
+    if (stream.try_consume(lexer::Operator::BRACKET_OPEN)) {
+      MustEvalResult<ast::Expression> index = expression(stream);
+      if (index.is_err()) return index.take_err_unchecked();
+
+      if (auto err = stream.consume_operator(lexer::Operator::BRACKET_CLOSE); err.is_err()) {
+        return err.take_err_unchecked();
       }
 
-      return expr;
+      return postfix_pass(
+        stream,
+        crab::make_box<ast::expression::ArrayIndex>(
+          std::move(expr),
+          index.take_unchecked()
+        )
+      );
+    }
+    return expr;
+  }
+
+  auto postfix(TokenStream &stream) -> MustEvalResult<ast::Expression> {
+    MustEvalResult<ast::Expression> expr_result = factor(stream);
+    if (expr_result.is_err()) return expr_result.take_err_unchecked();
+    return postfix_pass(stream, expr_result.take_unchecked());
+  }
+
+  auto consume_binary_expression(TokenStream &stream, const usize op_index) -> MustEvalResult<ast::Expression> {
+    if (op_index == 0) {
+      return postfix(stream);
     }
     const auto parse{
       [&stream, op_index] { return consume_binary_expression(stream, op_index - 1); }

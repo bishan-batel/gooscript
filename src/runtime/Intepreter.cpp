@@ -31,10 +31,12 @@
 #include "data/IValue.hpp"
 #include "err/NotCallable.hpp"
 #include "Environment.hpp"
+#include "ast/expression/ArrayIndex.hpp"
 #include "ast/expression/PropertyAccess.hpp"
 #include "ast/expression/Unary.hpp"
 #include "ast/expression/literal/Dictionary.hpp"
 #include "data/Dictionary.hpp"
+#include "token/Array.hpp"
 #include "utils/str.hpp"
 
 namespace goos::runtime {
@@ -143,7 +145,19 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_array([[maybe_unused]] const ast::expression::Array &array) -> Result<Any> {
-    throw std::logic_error("Not implemented");
+    const RcMut<Array> arr = crab::make_rc_mut<Array>();
+
+    for (const auto &val: array.get_values()) {
+      Result<Any> result = evaluate(val);
+
+      if (result.is_err()) return result.take_err_unchecked();
+
+      if (should_halt_control_flow()) return ok(Unit::value());
+
+      arr->push(result.take_unchecked());
+    }
+
+    return ok(arr);
   }
 
   auto Intepreter::visit_dictionary([[maybe_unused]] const ast::expression::Dictionary &dictionary) -> Result<Any> {
@@ -529,5 +543,39 @@ namespace goos::runtime {
     }
 
     return ok(Unit::value());
+  }
+
+  auto Intepreter::visit_array_index(const ast::expression::ArrayIndex &array_index) -> Result<Any> {
+    Result<Any> obj_result = evaluate(array_index.get_object());
+    if (obj_result.is_err()) return obj_result.take_err_unchecked();
+
+    if (should_halt_control_flow()) return ok(Unit::value());
+
+    Result<Any> index_result = evaluate(array_index.get_index());
+    if (index_result.is_err()) return index_result.take_err_unchecked();
+
+    if (should_halt_control_flow()) return ok(Unit::value());
+
+    const Any obj = obj_result.take_unchecked();
+    const Any index = index_result.take_unchecked();
+
+    if (auto opt = obj.downcast<Dictionary>()) {
+      const Dictionary &dict = *opt.take_unchecked();
+      if (auto res = dict.get(index)) {
+        return res.take_unchecked();
+      }
+      return ok(Unit::value());
+    }
+
+    if (auto opt = obj.downcast<Array>()) {
+      const Array &dict = *opt.take_unchecked();
+
+      // TODO, make an error for invalid index type
+      return dict.get_values().at(type::try_from_goose<usize>(index).take_unchecked());
+    }
+
+    // TODO, make an error
+    // throw std::logic_error("Not implemented");
+    return ok(Nil::value());
   }
 }

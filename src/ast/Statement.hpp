@@ -18,6 +18,10 @@
 #include "runtime/err/RuntimeError.hpp"
 
 namespace goos::ast::expression {
+  class ArrayIndex;
+}
+
+namespace goos::ast::expression {
   class PropertyAccess;
 }
 
@@ -103,6 +107,10 @@ namespace goos {
 
         virtual auto visit_property_access(
           const expression::PropertyAccess &property_access
+        ) -> runtime::Result<runtime::Any> = 0;
+
+        virtual auto visit_array_index(
+          const expression::ArrayIndex &array_index
         ) -> runtime::Result<runtime::Any> = 0;
       };
 

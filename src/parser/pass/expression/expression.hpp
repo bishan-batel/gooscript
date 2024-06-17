@@ -51,6 +51,10 @@ namespace goos::parser::pass::expr {
 
   auto factor(TokenStream &stream) -> MustEvalResult<ast::Expression>;
 
+  auto postfix(TokenStream &stream, Box<ast::Expression> expression) -> OptionalResult<ast::Expression>;
+
+  auto postfix(TokenStream &stream) -> MustEvalResult<ast::Expression>;
+
   auto consume_binary_expression(TokenStream &stream, usize op_index) -> MustEvalResult<ast::Expression>;
 
   /**

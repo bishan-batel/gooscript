@@ -91,5 +91,7 @@ namespace goos::runtime {
     auto visit_while(const ast::expression::While &while_expr) -> Result<Any> override;
 
     auto visit_property_access(const ast::expression::PropertyAccess &property_access) -> Result<Any> override;
+
+    auto visit_array_index(const ast::expression::ArrayIndex &array_index) -> Result<Any> override;
   };
 }
