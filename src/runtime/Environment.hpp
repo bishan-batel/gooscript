@@ -11,16 +11,20 @@
 #include "meta/VariantType.hpp"
 
 namespace goos::runtime {
+  class LValue;
+}
+
+namespace goos::runtime {
   class Intepreter;
   class ExternFunction;
 
   class Variable final {
     meta::Mutability mutability;
-    RcMut<IValue> value;
+    Any value;
     meta::VariantType type;
 
   public:
-    Variable(meta::Mutability mutability, RcMut<IValue> value);
+    Variable(meta::Mutability mutability, Any value);
 
     Variable(const Variable &) = delete;
 
@@ -30,11 +34,13 @@ namespace goos::runtime {
 
     [[nodiscard]] auto get_mutability() const -> meta::Mutability;
 
-    [[nodiscard]] auto get_value() const -> RcMut<IValue>;
+    [[nodiscard]] auto get_value() const -> Any;
 
     [[nodiscard]] auto get_type() const -> meta::VariantType;
 
-    auto set_value(RcMut<IValue> value) -> void;
+    [[nodiscard]] auto as_lvalue() -> RcMut<LValue>;
+
+    auto set_value(Any value) -> void;
   };
 
   class Environment final {
@@ -57,10 +63,11 @@ namespace goos::runtime {
 
     static auto enclose(RcMut<Environment> enclosing) -> RcMut<Environment>;
 
-    template<typename IntoIdentifier, typename ValueTy> requires
-      std::is_constructible_v<meta::Identifier, IntoIdentifier> and
-      type::is_value<ValueTy>
+    template<typename IntoIdentifier, type::value_type ValueTy>
     auto define_constant(IntoIdentifier identifier, RcMut<ValueTy> value) -> Result<RcMut<Variable>>;
+
+    template<typename IntoIdentifier, type::convertible_primitive IntoValue>
+    auto define_constant(IntoIdentifier identifier, IntoValue value) -> Result<RcMut<Variable>>;
 
     auto push_variable(
       meta::Identifier identifier,
@@ -89,11 +96,14 @@ namespace goos::runtime {
     define_builtin(std::move(name), lambda::from(function));
   }
 
-  template<typename IntoIdentifier, typename ValueTy> requires
-    std::is_constructible_v<meta::Identifier, IntoIdentifier> and
-    type::is_value<ValueTy>
+  template<typename IntoIdentifier, type::value_type ValueTy>
   auto Environment::define_constant(IntoIdentifier identifier, RcMut<ValueTy> value) -> Result<RcMut<Variable>> {
-    return push_variable(meta::Identifier{identifier}, meta::Mutability::IMMUTABLE, Any{value});
+    return push_variable(meta::Identifier::from(identifier), meta::Mutability::IMMUTABLE, Any{value});
+  }
+
+  template<typename IntoIdentifier, type::convertible_primitive IntoValue>
+  auto Environment::define_constant(IntoIdentifier identifier, IntoValue value) -> Result<RcMut<Variable>> {
+    return define_constant(identifier, type::to_goos_any(value));
   }
 
   // template<typename T, typename V> requires std::is_constructible_v<meta::Identifier, T>
