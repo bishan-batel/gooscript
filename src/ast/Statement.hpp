@@ -17,6 +17,10 @@
 #include "runtime/data/IValue.hpp"
 #include "runtime/err/RuntimeError.hpp"
 
+namespace goos::ast::expression {
+  class PropertyAccess;
+}
+
 namespace goos {
   namespace runtime {
     struct IValue;
@@ -96,6 +100,10 @@ namespace goos {
         virtual auto visit_scope(const expression::ScopeBlock &scope) -> runtime::Result<runtime::Any> = 0;
 
         virtual auto visit_while(const expression::While &while_expr) -> runtime::Result<runtime::Any> = 0;
+
+        virtual auto visit_property_access(
+          const expression::PropertyAccess &property_access
+        ) -> runtime::Result<runtime::Any> = 0;
       };
 
       Statement() = default;
