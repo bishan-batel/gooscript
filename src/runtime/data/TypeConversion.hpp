@@ -110,6 +110,8 @@ namespace goos::runtime::type {
   // String Types
   goos_define_from_cpp(WideString, GString);
 
+  goos_define_from_cpp(const WideString&, GString);
+
   goos_define_from_cpp(Rc<WideString>, GString);
 
   goos_define_from_cpp(WideStringView, GString);
