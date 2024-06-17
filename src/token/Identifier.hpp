@@ -9,43 +9,19 @@
 #include "meta/Identifier.hpp"
 
 namespace goos::token {
-  inline static const Set<widechar> INVALID_IDENTIFIER_CHARS{
-    L'[',
-    L']',
-    L'(',
-    L')',
-    L'!',
-    L'@',
-    L'#',
-    L'$',
-    L'%',
-    L'^',
-    L'&',
-    L'*',
-    L'(',
-    L')',
-    L'-',
-    L'+',
-    L'{',
-    L'}',
-    L'<',
-    L'>',
-    L',',
-    L'.',
-    L'`',
-    L'~',
-    L'/',
-    L'\\',
-    L';',
-    L':',
-    L'\'',
-    L'"',
-    L'\t',
-    L'\n',
-    L'\r',
-    L'\0',
-    L' ',
-  };
+  inline static const Set<widechar> INVALID_IDENTIFIER_CHARS = [] {
+    constexpr WideStringView INVALID{
+      L"[]()!@#%^|&*()-+={}<>,.`~/\\;:\'\" \t\n\r"
+    };
+
+    std::unordered_set<widechar> chars{'\0'};
+
+    for (widechar c: INVALID) {
+      chars.insert(c);
+    }
+
+    return chars;
+  }();
 
   class Identifier final : public Token {
     meta::Identifier identifier;

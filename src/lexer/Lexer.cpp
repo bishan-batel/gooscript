@@ -82,10 +82,10 @@ namespace goos::lexer {
       const std::array<std::function<Result<bool>()>, 6> passes{
         [&] { return lexer.whitespace(); },
         [&] { return lexer.comment(); },
-        [&] { return lexer.operator_tok(); },
         [&] { return lexer.number_literal(); },
         [&] { return lexer.string_literal(); },
-        [&] { return lexer.identifier(); }
+        [&] { return lexer.identifier(); },
+        [&] { return lexer.operator_tok(); },
       };
 
       bool found_working_pass = false;
@@ -248,6 +248,15 @@ namespace goos::lexer {
 
     const Range<> text_range{crab::range(begin, position)};
     WideString word{file.slice(text_range)};
+
+    const WideStringView view{word};
+    for (const auto &[key, op]: STR_TO_OPERATOR_MAP) {
+      // if (key.size() != view.size()) continue;
+      if (view == key) {
+        emplace<token::Operator>(file, text_range, op);
+        return crab::ok(true);
+      }
+    }
 
     if (auto keyword = identifier_to_keyword(word)) {
       emplace<token::Keyword>(file, text_range, keyword.get_unchecked());

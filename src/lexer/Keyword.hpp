@@ -4,7 +4,7 @@
 
 namespace goos::lexer {
   enum class Keyword {
-    MODULE,
+    // MODULE,
     USE,
     LET,
     VAR,
@@ -16,7 +16,6 @@ namespace goos::lexer {
     UNTIL,
     FOR,
     DO,
-    IN,
     NIL,
     UNIT,
     MATCH,
@@ -32,7 +31,7 @@ namespace goos::lexer {
   };
 
   inline static const Dictionary<WideStringView, Keyword> STR_TO_KEYWORD_TABLE{
-    {L"module", Keyword::MODULE},
+    // {L"module", Keyword::MODULE},
     {L"use", Keyword::USE},
 
     {L"let", Keyword::LET},
@@ -50,7 +49,6 @@ namespace goos::lexer {
     {L"until", Keyword::UNTIL},
     {L"for", Keyword::FOR},
     {L"do", Keyword::DO},
-    {L"in", Keyword::IN},
     {L"unit", Keyword::UNIT},
     {L"none", Keyword::NIL},
     {L"null", Keyword::NIL},
