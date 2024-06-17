@@ -31,6 +31,8 @@
 #include "data/IValue.hpp"
 #include "err/NotCallable.hpp"
 #include "Environment.hpp"
+#include "ast/expression/PropertyAccess.hpp"
+#include "ast/expression/Unary.hpp"
 #include "ast/expression/literal/Dictionary.hpp"
 #include "data/Dictionary.hpp"
 #include "utils/str.hpp"
@@ -78,12 +80,30 @@ namespace goos::runtime {
   }
 
   auto Intepreter::evaluate(const ast::Expression &expr) -> Result<Any> {
+    Result<Any> res = evaluate_shallow(expr);
+    if (res.is_err()) return res.take_err_unchecked();
+
+    Any value = res.take_unchecked();
+
+    if (auto lvalue = value.downcast<LValue>(); lvalue.is_some()) {
+      // expand out lvalue
+      return ok(lvalue.take_unchecked()->get());
+    }
+
+    return value;
+  }
+
+  auto Intepreter::evaluate_shallow(const ast::Expression &expr) -> Result<Any> {
     return expr.accept_expr(*this);
   }
 
   auto Intepreter::visit_eval([[maybe_unused]] const ast::Eval &eval) -> VoidResult {
     auto expr = evaluate(eval.get_expression());
     if (expr.is_err()) return some(expr.take_err_unchecked());
+
+    if (should_halt_control_flow()) {
+      return crab::none;
+    }
 
     halt(ControlFlowFlag::EVAL, expr.take_unchecked());
 
@@ -93,6 +113,10 @@ namespace goos::runtime {
   auto Intepreter::visit_return([[maybe_unused]] const ast::Return &ret) -> VoidResult {
     auto expr = evaluate(ret.get_expression());
     if (expr.is_err()) return some(expr.take_err_unchecked());
+
+    if (should_halt_control_flow()) {
+      return crab::none;
+    }
 
     halt(ControlFlowFlag::RETURN, expr.take_unchecked());
 
@@ -105,6 +129,10 @@ namespace goos::runtime {
     auto initial = evaluate(variable_declaration.get_initializer());
 
     if (initial.is_err()) return some(initial.take_err_unchecked());
+
+    if (should_halt_control_flow()) {
+      return crab::none;
+    }
 
     current_environment->push_variable(
       variable_declaration.get_name(),
@@ -167,7 +195,7 @@ namespace goos::runtime {
 
           for (usize i = 0; i < count; i++) {
             env.push_variable(
-              meta::Identifier{params[i]},
+              meta::Identifier::from(params[i]),
               meta::Mutability::IMMUTABLE,
               args[i]
             );
@@ -210,32 +238,34 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_unit([[maybe_unused]] const ast::expression::Unit &unit) -> Result<Any> {
-    return ok(Unit::value());
+    return ok(crab::make_rc_mut<Unit>());
   }
 
   auto Intepreter::visit_binary([[maybe_unused]] const ast::expression::Binary &binary) -> Result<Any> {
     if (binary.get_op() == lexer::Operator::ASSIGN) {
-      const auto lhs_val = binary
-                           .get_lhs()
-                           .try_as<ast::expression::IdentifierBinding>()
-                           .take_unchecked();
+      Result<Any> lhs_result = evaluate_shallow(binary.get_lhs());
+      if (lhs_result.is_err()) return lhs_result.take_err_unchecked();
+
+      if (should_halt_control_flow()) {
+        return ok(Unit::value());
+      }
+
+      const RcMut<LValue> lvalue = lhs_result.take_unchecked().downcast<LValue>().take_unchecked();
 
       Result<Any> value_result = evaluate(binary.get_rhs());
-
       if (value_result.is_err()) {
-        return crab::err(value_result.take_err_unchecked());
+        return value_result.take_err_unchecked();
       }
 
       const Any value = value_result.take_unchecked();
 
       if (should_halt_control_flow()) {
-        return ok(value);
+        return ok(Unit::value());
       }
 
-      if (auto err = current_environment->set_value(lhs_val->get_identifier(), value); err.is_err())
-        return crab::err(err.take_err_unchecked());
+      lvalue->set(value);
 
-      return ok(value);
+      return ok(lvalue);
     }
 
     if (binary.get_op() == lexer::Operator::DOT) {
@@ -267,19 +297,27 @@ namespace goos::runtime {
       return ok(Nil::value());
     }
 
-    auto lhs_result{evaluate(binary.get_lhs())};
-    auto rhs_result{evaluate(binary.get_rhs())};
+    // LHS
+    Result<Any> lhs_result{evaluate(binary.get_lhs())};
+    if (lhs_result.is_err()) return lhs_result.take_err_unchecked();
 
-    if (lhs_result.is_err()) return crab::err(lhs_result.take_err_unchecked());
-    if (rhs_result.is_err()) return crab::err(rhs_result.take_err_unchecked());
+    if (should_halt_control_flow()) return ok(Unit::value());
 
-    const auto lhs_val = lhs_result.take_unchecked();
-    const auto rhs_val = rhs_result.take_unchecked();
+    const Any lhs_val{lhs_result.take_unchecked()};
+
+    // RHS
+    Result<Any> rhs_result{evaluate(binary.get_rhs())};
+
+    if (rhs_result.is_err()) return rhs_result.take_err_unchecked();
+
+    if (should_halt_control_flow()) return ok(Unit::value());
+    const Any rhs_val{rhs_result.take_unchecked()};
+
     // TODO all assign cases
 
     using namespace primitive_operators;
 
-    if (const Operands index{lhs_val->get_type(), rhs_val->get_type(), binary.get_op()}; BINARY_FUNCTIONS.
+    if (const BinaryOperands index{lhs_val->get_type(), rhs_val->get_type(), binary.get_op()}; BINARY_FUNCTIONS.
       contains(
         index
       )) {
@@ -355,17 +393,34 @@ namespace goos::runtime {
       return crab::err(var.take_err_unchecked());
     }
 
-    return crab::ok(var.take_unchecked()->get_value());
+    return ok(var.take_unchecked()->as_lvalue());
   }
 
   auto Intepreter::visit_unary([[maybe_unused]] const ast::expression::Unary &unary) -> Result<Any> {
-    throw std::logic_error("Not implemented: unary");
+    auto value_result{evaluate(unary.get_expression())};
+
+    if (value_result.is_err()) return value_result.take_err_unchecked();
+
+    if (should_halt_control_flow()) {
+      return ok(Unit::value());
+    }
+
+    auto value = value_result.take_unchecked();
+
+    using namespace primitive_operators;
+    if (const UnaryOperands index{value->get_type(), unary.get_op()};
+      UNARY_FUNCTIONS.contains(index)
+    ) {
+      return ok(UNARY_FUNCTIONS.at(index)(std::move(value)));
+    }
+
+    return Any{Unit::value()};
   }
 
   auto Intepreter::visit_if([[maybe_unused]] const ast::expression::If &if_expr) -> Result<Any> {
     Result<Any> condition = evaluate(if_expr.get_condition());
 
-    if (condition.is_err()) return crab::err(condition.take_err_unchecked());
+    if (condition.is_err()) return condition.take_err_unchecked();
 
     if (should_halt_control_flow()) {
       return ok(Unit::value());
@@ -373,13 +428,13 @@ namespace goos::runtime {
 
     if (condition.take_unchecked()->is_truthy()) {
       Result<Any> then = evaluate(if_expr.get_then());
-      if (then.is_err()) return crab::err(then.take_err_unchecked());
+      if (then.is_err()) return then.take_err_unchecked();
 
       if (should_halt_control_flow()) {
         return ok(Unit::value());
       }
 
-      return ok(then.take_unchecked());
+      return then.take_unchecked();
     }
 
     Result<Any> else_then = evaluate(if_expr.get_else_then());
@@ -428,6 +483,10 @@ namespace goos::runtime {
       Result<Any> condition = evaluate(while_expr.get_condition());
       if (condition.is_err()) return crab::err(condition.take_err_unchecked());
 
+      if (should_halt_control_flow()) {
+        return ok(Unit::value());
+      }
+
       if (not condition.take_unchecked()->is_truthy()) {
         break;
       }
@@ -446,5 +505,29 @@ namespace goos::runtime {
     }
 
     return ok(eval);
+  }
+
+  auto Intepreter::visit_property_access(const ast::expression::PropertyAccess &property_access) -> Result<Any> {
+    Result<Any> obj_result = evaluate(property_access.get_object());
+    if (obj_result.is_err()) return obj_result;
+
+    if (should_halt_control_flow()) {
+      return ok(Unit::value());
+    }
+
+    auto casted_opt = obj_result.take_unchecked().downcast<Dictionary>();
+
+    if (casted_opt.is_none()) {
+      return ok(Unit::value());
+    }
+
+    const meta::Identifier property = property_access.get_property();
+    RcMut<Dictionary> dict = casted_opt.take_unchecked();
+
+    if (auto value = dict->get_lvalue(property); value.is_some()) {
+      return ok(value.take_unchecked());
+    }
+
+    return ok(Unit::value());
   }
 }

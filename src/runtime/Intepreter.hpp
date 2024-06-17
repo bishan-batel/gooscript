@@ -44,6 +44,10 @@ namespace goos::runtime {
 
     auto evaluate(const ast::Expression &expr) -> Result<Any>;
 
+    auto evaluate_shallow(const ast::Expression &expr) -> Result<Any>;
+
+    // auto shallow_evaluate(const ast::Expression &expr) -> Result<Any>;
+
     auto visit_eval(const ast::Eval &eval) -> VoidResult override;
 
     auto visit_return(const ast::Return &ret) -> VoidResult override;
@@ -85,5 +89,7 @@ namespace goos::runtime {
     auto visit_scope(const ast::expression::ScopeBlock &scope) -> Result<Any> override;
 
     auto visit_while(const ast::expression::While &while_expr) -> Result<Any> override;
+
+    auto visit_property_access(const ast::expression::PropertyAccess &property_access) -> Result<Any> override;
   };
 }
