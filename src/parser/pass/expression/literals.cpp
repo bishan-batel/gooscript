@@ -162,11 +162,7 @@ namespace goos::parser::pass::expr {
 
       pairs.push_back({key.take_unchecked(), value.take_unchecked()});
 
-      if (stream.try_consume(lexer::Operator::COMMA)) {
-        continue;
-      }
-
-      break;
+      [[maybe_unused]] auto ignored = stream.try_consume(lexer::Operator::COMMA);
     }
 
     // expect a '[' at end of the array
