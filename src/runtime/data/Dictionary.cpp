@@ -4,46 +4,70 @@
 
 #include "Dictionary.hpp"
 
+#include <algorithm>
+
 #include "utils/hash.hpp"
 #include "utils/str.hpp"
+#include "numeric"
 
 namespace goos::runtime {
   Dictionary::Dictionary() {
     cached_hash = base_hash();
   }
 
-  auto Dictionary::insert_with_precomputed_hash(const usize hash_code, Any key, Any value) -> void {
-    pairs.insert_or_assign(hash_code, Pair{std::move(key), std::move(value)});
-  }
-
-  auto Dictionary::set(const meta::Identifier &identifier, Any value) -> void {
-    insert_with_precomputed_hash(
-      identifier.get_hash(),
-      crab::make_rc_mut<GString>(identifier),
-      std::move(value)
+  auto Dictionary::insert_with_precomputed_hash(const utils::hash_code hash_code, Any key, Any value) -> void {
+    // just insert it directly
+    pairs.insert_or_assign(
+      hash_code,
+      Pair{
+        std::move(key),
+        std::move(value)
+      }
     );
   }
 
+  auto Dictionary::set(const meta::Identifier &identifier, Any value) -> void {
+    set(Any{crab::make_rc_mut<GString>(identifier)}, std::move(value));
+  }
+
   auto Dictionary::set(Any key, Any value) -> void {
-    insert_with_precomputed_hash(key->base_hash(), std::move(key), std::move(value));
+    // get the hash on the fly
+    insert_with_precomputed_hash(key->hash(), std::move(key), std::move(value));
   }
 
   auto Dictionary::get(const meta::Identifier &key) const -> Option<Any> {
-    auto pair = index(key.get_hash());
-    if (pair.is_none()) return crab::none;
+    Option<Pair> pair_opt = index(utils::hash_together(key.get_hash(), meta::VariantType::STRING));
+    if (pair_opt.is_none()) return crab::none;
 
-    return crab::some(pair.take_unchecked()->second);
+    const auto &[_, value] = pair_opt.take_unchecked();
+    return crab::some(value);
   }
 
-  auto Dictionary::index(const usize hashed_key) const -> Option<Ref<Pair>> {
-    if (has_key_index(hashed_key)) {
+  auto Dictionary::get_lvalue(const meta::Identifier &key) -> Option<RcMut<LValue>> {
+    Option<RefMut<Pair>> pair_opt = index(utils::hash_together(key.get_hash(), meta::VariantType::STRING));
+    if (pair_opt.is_none()) return crab::none;
+
+    auto &[_, value] = *pair_opt.take_unchecked();
+    return crab::some(LValue::wrap(value));
+  }
+
+  auto Dictionary::index(const utils::hash_code hashed_key) const -> Option<Pair> {
+    if (not has_key_index(hashed_key)) {
       return crab::none;
     }
 
-    return crab::some(Ref{pairs.at(hashed_key)});
+    return crab::some(pairs.at(hashed_key));
   }
 
-  auto Dictionary::has_key_index(const usize hashed_key) const -> bool {
+  auto Dictionary::index(const utils::hash_code hashed_key) -> Option<RefMut<Pair>> {
+    if (not has_key_index(hashed_key)) {
+      return crab::none;
+    }
+
+    return crab::some(RefMut{pairs.at(hashed_key)});
+  }
+
+  auto Dictionary::has_key_index(const utils::hash_code hashed_key) const -> bool {
     return pairs.contains(hashed_key);
   }
 
@@ -79,7 +103,7 @@ namespace goos::runtime {
     return meta::VariantType::OBJECT;
   }
 
-  auto Dictionary::base_hash() const -> usize {
+  auto Dictionary::base_hash() const -> utils::hash_code {
     if (is_cache_dirty) {
       force_recompute_hash();
     }
@@ -92,7 +116,6 @@ namespace goos::runtime {
 
     for (const auto &[key_hash, pair]: pairs) {
       const auto &[key, value] = pair;
-
       copy->insert_with_precomputed_hash(key_hash, key->clone(), value->clone());
     }
 
@@ -100,15 +123,13 @@ namespace goos::runtime {
   }
 
   auto Dictionary::force_recompute_hash() const -> void {
-    usize hash = 0;
-
-    for (const auto &[key_hash, pair]: pairs) {
-      const auto &[_, value] = pair;
-      hash = utils::combine_hash(hash, key_hash);
-      hash = utils::combine_hash(hash, value->base_hash());
-    }
-
-    cached_hash = hash;
+    cached_hash = std::ranges::fold_left(
+      pairs,
+      0,
+      [](utils::hash_code lhs, auto pair) {
+        return utils::hash_code_mix(lhs, pair.first, pair.second.second->hash());
+      }
+    );
 
     is_cache_dirty = false;
   }
