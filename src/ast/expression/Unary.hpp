@@ -17,6 +17,8 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto get_expression() const -> const Expression&;
 
+    [[nodiscard]] auto get_op() const -> lexer::Operator;
+
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto clone_expr() const -> Box<Expression> override;

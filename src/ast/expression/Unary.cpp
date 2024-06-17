@@ -14,6 +14,10 @@ namespace goos::ast::expression {
 
   auto Unary::get_expression() const -> const Expression& { return expr; }
 
+  auto Unary::get_op() const -> lexer::Operator {
+    return op;
+  }
+
   auto Unary::to_string() const -> WideString {
     return fmt::format(L"{} ({})", lexer::OPERATOR_TO_STR_MAP.at(op), expr->to_string());
   }

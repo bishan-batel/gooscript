@@ -6,14 +6,24 @@
 
 namespace goos::runtime::primitive_operators {} // goos
 
-auto std::hash<goos::runtime::primitive_operators::Operands>::operator()(
-  const goos::runtime::primitive_operators::Operands &ty
+auto std::hash<goos::runtime::primitive_operators::BinaryOperands>::operator()(
+  const goos::runtime::primitive_operators::BinaryOperands &ty
 ) const noexcept -> usize {
-  return static_cast<usize>(ty.lhs) * 2 + static_cast<usize>(ty.rhs) * 3 + static_cast<usize>(ty.op) * 5;
+  return goos::utils::hash_together(ty.lhs, ty.rhs, ty.op);
 }
 
-auto goos::runtime::primitive_operators::Operands::operator==(
-  const Operands &other
-) const -> bool {
-  return lhs == other.lhs and rhs == other.rhs and op == other.op;
+auto std::hash<goos::runtime::primitive_operators::UnaryOperands>::operator()(
+  const goos::runtime::primitive_operators::UnaryOperands &ty
+) const noexcept -> usize {
+  return goos::utils::hash_together(ty.op, ty.operand);
+}
+
+namespace goos::runtime::primitive_operators {
+  auto BinaryOperands::operator==(const BinaryOperands &other) const -> bool {
+    return lhs == other.lhs and rhs == other.rhs and op == other.op;
+  }
+
+  auto UnaryOperands::operator==(const UnaryOperands &other) const -> bool {
+    return op == other.op and operand == other.operand;
+  }
 }

@@ -15,35 +15,53 @@
 #include "data/Decimal.hpp"
 #include "data/Integer.hpp"
 #include "data/GString.hpp"
+#include "data/TypeConversion.hpp"
 
 namespace goos::runtime::primitive_operators {
-  struct Operands;
+  struct BinaryOperands;
+  struct UnaryOperands;
 }
 
 template<>
-struct std::hash<goos::runtime::primitive_operators::Operands> {
+struct std::hash<goos::runtime::primitive_operators::BinaryOperands> {
   hash() = default;
 
-  auto operator()(const goos::runtime::primitive_operators::Operands &ty) const noexcept -> usize;
+  auto operator()(const goos::runtime::primitive_operators::BinaryOperands &ty) const noexcept -> usize;
+};
+
+template<>
+struct std::hash<goos::runtime::primitive_operators::UnaryOperands> {
+  hash() = default;
+
+  auto operator()(const goos::runtime::primitive_operators::UnaryOperands &ty) const noexcept -> usize;
 };
 
 namespace goos::runtime::primitive_operators {
-  struct Operands {
+  struct BinaryOperands {
     meta::VariantType lhs, rhs;
     lexer::Operator op;
 
-    auto operator==(const Operands &other) const -> bool;
+    auto operator==(const BinaryOperands &other) const -> bool;
+  };
+
+  struct UnaryOperands {
+    meta::VariantType operand;
+    lexer::Operator op;
+
+    auto operator==(const UnaryOperands &other) const -> bool;
   };
 
   using BinaryFunction = std::function<Any(Any lhs, Any rhs)>;
+  using UnaryFunction = std::function<Any(Any val)>;
 
   namespace meta {
     template<lexer::Operator op, typename Lhs, typename Rhs=Lhs, typename WrapperOutput=Lhs, typename F>
     auto binary(
       F function
-    ) -> std::pair<Operands, BinaryFunction> {
+    ) -> std::pair<BinaryOperands, BinaryFunction> {
+      static_assert(is_binary(op));
       return {
-        Operands{Lhs{}.get_type(), Rhs{}.get_type(), op},
+        BinaryOperands{Lhs{}.get_type(), Rhs{}.get_type(), op},
         [function](Any lhs_any, Any rhs_any) {
           RcMut<Lhs> lhs = crab::unwrap(lhs_any.downcast<Lhs>());
           RcMut<Rhs> rhs = crab::unwrap(rhs_any.downcast<Rhs>());
@@ -51,157 +69,93 @@ namespace goos::runtime::primitive_operators {
         }
       };
     }
+
+    template<lexer::Operator op, type::specialized_value Input, type::specialized_value WrapperOutput, typename F>
+    auto unary(
+      F function
+    ) -> std::pair<UnaryOperands, UnaryFunction> {
+      static_assert(is_unary(op));
+      return {
+        UnaryOperands{Input{}.get_type(), op},
+        [function](Any value) {
+          return crab::make_rc_mut<WrapperOutput>(
+            function(
+              crab::unwrap(value.downcast<Input>())->get()
+            )
+          );
+        }
+      };
+    }
   }
 
-  inline static const Dictionary<Operands, BinaryFunction> BINARY_FUNCTIONS = [] {
+  inline static const Dictionary<BinaryOperands, BinaryFunction> BINARY_FUNCTIONS = [] {
     using namespace meta;
     using lexer::Operator;
 
-    Dictionary<Operands, BinaryFunction> map{
-      binary<Operator::AND, Boolean>(
-        [](const auto &lhs, const auto &rhs) { return lhs and rhs; }
-      ),
+    #define operation(op, Lhs, Rhs, Output, lambda) binary<Operator::op, Lhs, Rhs, Output>([](const auto&lhs, const auto&rhs) {  return lambda; } )
 
-      binary<Operator::NOT_EQUALS, Boolean>(
-        [](const auto &lhs, const auto &rhs) { return lhs != rhs; }
-      ),
+    Dictionary<BinaryOperands, BinaryFunction> map{
+      // Bolean Operations
+      operation(AND, Boolean, Boolean, Boolean, lhs and rhs),
+      operation(NOT_EQUALS, Boolean, Boolean, Boolean, lhs != rhs),
+      operation(OR, Boolean, Boolean, Boolean, lhs or rhs),
 
-      binary<Operator::OR, Boolean>(
-        [](const auto &lhs, const auto &rhs) { return lhs or rhs; }
-      ),
+      // String Concatanation
+      operation(ADD, GString, GString, GString, *lhs + *rhs),
+      operation(ADD, GString, Integer, GString, *lhs + std::to_wstring(rhs)),
+      operation(ADD, GString, Decimal, GString, *lhs + std::to_wstring(rhs)),
 
-      binary<Operator::ADD, GString>(
-        [](const auto &lhs, const auto &rhs) { return lhs + rhs; }
-      ),
-
-      binary<Operator::ADD, GString, Integer>(
-        [](const auto &lhs, const auto &rhs) { return lhs + std::to_wstring(rhs); }
-      ),
-
-      binary<Operator::ADD, GString, Decimal>(
-        [](const auto &lhs, const auto &rhs) { return lhs + std::to_wstring(rhs); }
-      ),
-
-      binary<Operator::ADD, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs + rhs; }
-      ),
-
-      binary<Operator::XOR, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs xor rhs; }
-      ),
-
-      binary<Operator::BIT_OR, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs bitor rhs; }
-      ),
-
-      binary<Operator::BIT_AND, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs bitand rhs; }
-      ),
-
-      binary<Operator::EQUALS, Integer, Integer, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs == rhs; }
-      ),
-
-      binary<Operator::NOT_EQUALS, Integer, Integer, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs != rhs; }
-      ),
-
-      binary<Operator::GREATER, Integer, Integer, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs > rhs; }
-      ),
-
-      binary<Operator::LESS, Integer, Integer, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs < rhs; }
-      ),
-
-      binary<Operator::GREATER_OR_EQUALS, Integer, Integer, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs >= rhs; }
-      ),
-
-      binary<Operator::LESS_OR_EQUALS, Integer, Integer, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs <= rhs; }
-      ),
-
-      binary<Operator::SHIFT_LEFT, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs << rhs; }
-      ),
-
-      binary<Operator::SHIFT_RIGHT, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs >> rhs; }
-      ),
-
-      binary<Operator::ADD, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs + rhs; }
-      ),
-
-      binary<Operator::SUB, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs - rhs; }
-      ),
-
-      binary<Operator::MUL, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs * rhs; }
-      ),
-
-      binary<Operator::DIV, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs / rhs; }
-      ),
-
-      binary<Operator::MOD, Integer>(
-        [](const auto lhs, const auto rhs) { return lhs % rhs; }
-      ),
+      // Base Integer Operations
+      operation(ADD, Integer, Integer, Integer, lhs + rhs),
+      operation(XOR, Integer, Integer, Integer, lhs xor rhs),
+      operation(BIT_OR, Integer, Integer, Integer, lhs bitor rhs),
+      operation(BIT_AND, Integer, Integer, Integer, lhs bitand rhs),
+      operation(EQUALS, Integer, Integer, Boolean, lhs == rhs),
+      operation(NOT_EQUALS, Integer, Integer, Boolean, lhs != rhs),
+      operation(GREATER, Integer, Integer, Boolean, lhs > rhs),
+      operation(LESS, Integer, Integer, Boolean, lhs < rhs),
+      operation(GREATER_OR_EQUALS, Integer, Integer, Boolean, lhs >= rhs),
+      operation(LESS_OR_EQUALS, Integer, Integer, Boolean, lhs <= rhs),
+      operation(SHIFT_LEFT, Integer, Integer, Integer, lhs << rhs),
+      operation(SHIFT_RIGHT, Integer, Integer, Integer, lhs >> rhs),
+      operation(ADD, Integer, Integer, Integer, lhs + rhs),
+      operation(SUB, Integer, Integer, Integer, lhs - rhs),
+      operation(MUL, Integer, Integer, Integer, lhs * rhs),
+      operation(DIV, Integer, Integer, Integer, lhs / rhs),
+      operation(MOD, Integer, Integer, Integer, lhs % rhs),
 
       // Floating Point
-      binary<Operator::ADD, Decimal>(
-        [](const auto lhs, const auto rhs) { return lhs + rhs; }
-      ),
-
-      binary<Operator::EQUALS, Decimal, Decimal, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs == rhs; }
-      ),
-
-      binary<Operator::NOT_EQUALS, Decimal, Decimal, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs != rhs; }
-      ),
-
-      binary<Operator::GREATER, Decimal, Decimal, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs > rhs; }
-      ),
-
-      binary<Operator::LESS, Decimal, Decimal, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs < rhs; }
-      ),
-
-      binary<Operator::GREATER_OR_EQUALS, Decimal, Decimal, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs >= rhs; }
-      ),
-
-      binary<Operator::LESS_OR_EQUALS, Decimal, Decimal, Boolean>(
-        [](const auto lhs, const auto rhs) { return lhs <= rhs; }
-      ),
-
-      binary<Operator::ADD, Decimal>(
-        [](const auto lhs, const auto rhs) { return lhs + rhs; }
-      ),
-
-      binary<Operator::SUB, Decimal>(
-        [](const auto lhs, const auto rhs) { return lhs - rhs; }
-      ),
-
-      binary<Operator::MUL, Decimal>(
-        [](const auto lhs, const auto rhs) { return lhs * rhs; }
-      ),
-
-      binary<Operator::DIV, Decimal>(
-        [](const auto lhs, const auto rhs) { return lhs / rhs; }
-      ),
-
-      binary<Operator::MOD, Decimal>(
-        [](const auto lhs, const auto rhs) { return std::fmod(lhs, rhs); }
-      )
-
+      operation(ADD, Decimal, Decimal, Decimal, lhs + rhs),
+      operation(EQUALS, Decimal, Decimal, Boolean, lhs == rhs),
+      operation(NOT_EQUALS, Decimal, Decimal, Boolean, lhs != rhs),
+      operation(GREATER, Decimal, Decimal, Boolean, lhs > rhs),
+      operation(LESS, Decimal, Decimal, Boolean, lhs < rhs),
+      operation(GREATER_OR_EQUALS, Decimal, Decimal, Boolean, lhs >= rhs),
+      operation(LESS_OR_EQUALS, Decimal, Decimal, Boolean, lhs <= rhs),
+      operation(ADD, Decimal, Decimal, Decimal, lhs + rhs),
+      operation(SUB, Decimal, Decimal, Decimal, lhs - rhs),
+      operation(MUL, Decimal, Decimal, Decimal, lhs * rhs),
+      operation(DIV, Decimal, Decimal, Decimal, lhs / rhs),
+      operation(MOD, Decimal, Decimal, Decimal, std::fmod(lhs, rhs)),
     };
+    #undef operation
+
     return map;
   }();
 
-  class PrimitiveOperations {};
-} // goos
+  inline static const Dictionary<UnaryOperands, UnaryFunction> UNARY_FUNCTIONS = [] {
+    using namespace meta;
+    using lexer::Operator;
+
+    #define operation(op, Input, Output, lambda) unary<Operator::op, Input, Output>([](const auto& val) {  return lambda; } )
+
+    Dictionary<UnaryOperands, UnaryFunction> map{
+      operation(NOT, Boolean, Boolean, not val),
+      operation(SUB, Integer, Integer, -val),
+      operation(SUB, Decimal, Decimal, -val),
+    };
+
+    #undef operation
+    return map;
+  }();
+}
