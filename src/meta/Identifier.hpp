@@ -9,6 +9,10 @@
 #include "ast/expression/literal/Array.hpp"
 #include "utils/str.hpp"
 
+namespace goos::runtime {
+  class GString;
+}
+
 namespace goos::meta {
   class Identifier {
   public:
@@ -16,16 +20,26 @@ namespace goos::meta {
 
   private:
     Rc<WideString> name;
-    Hash hash = 0;
+    Hash hash{0};
+
+    explicit Identifier(Rc<WideString> name);
 
   public:
-    explicit Identifier(WideString name);
+    static auto wrap(Rc<WideString> name) -> Identifier;
 
-    template<typename T> requires std::is_convertible_v<T, WideString>
-    explicit Identifier(T name);
+    static auto from(WideString name) -> Identifier;
 
-    template<typename T> requires std::is_convertible_v<T, StringView>
-    explicit Identifier(T name);
+    static auto from(StringView name) -> Identifier;
+
+    static auto from(const runtime::GString &name) -> Identifier;
+
+    // explicit Identifier(WideString name);
+    //
+    // explicit Identifier(const runtime::GString &name);
+    //
+    // explicit Identifier(WideStringView name);
+    //
+    // explicit Identifier(StringView name);
 
     // ReSharper disable once CppNonExplicitConversionOperator
     operator // NOLINT(*-explicit-constructor)
@@ -38,16 +52,7 @@ namespace goos::meta {
     [[nodiscard]] auto get_hash() const -> Hash;
 
     auto operator==(const Identifier &identifier) const -> bool;
-
-  private:
-    auto compute_hash() -> void;
   };
-
-  template<typename T> requires std::is_convertible_v<T, WideString>
-  Identifier::Identifier(T name) : Identifier{static_cast<WideString>(std::move(name))} {}
-
-  template<typename T> requires std::is_convertible_v<T, StringView>
-  Identifier::Identifier(T name) : Identifier{str::convert(static_cast<StringView>(name))} {}
 }
 
 template<>

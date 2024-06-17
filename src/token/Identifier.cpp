@@ -7,7 +7,7 @@
 
 namespace goos::token {
   Identifier::Identifier(SourceFile file, const Range<> range, WideString identifier)
-    : Token{std::move(file), range}, identifier{std::move(identifier)} {}
+    : Token{std::move(file), range}, identifier{meta::Identifier::from(std::move(identifier))} {}
 
   auto Identifier::get_identifier() const -> const meta::Identifier& { return identifier; }
 
