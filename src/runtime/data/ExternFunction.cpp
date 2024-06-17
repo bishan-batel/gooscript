@@ -49,7 +49,7 @@ namespace goos::runtime {
 
   auto ExternFunction::base_hash() const -> usize {
     // All builtin functions are unique.
-    return reinterpret_cast<usize>(this);
+    return utils::hash(this);
   }
 
   auto ExternFunction::clone() const -> Any {

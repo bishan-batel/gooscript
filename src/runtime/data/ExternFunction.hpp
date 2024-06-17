@@ -8,6 +8,8 @@
 #include <option.hpp>
 #include "ICallable.hpp"
 #include "IValue.hpp"
+#include "runtime/err/InvalidCast.hpp"
+#include "runtime/err/NotCallable.hpp"
 
 namespace goos::runtime {
   class ExternFunction final : public ICallable {
@@ -18,6 +20,8 @@ namespace goos::runtime {
     explicit ExternFunction(decltype(function) function, usize arity, ArityType arity_type);
 
   public:
+    static constexpr meta::VariantType TYPE{meta::VariantType::FUNCTION};
+
     static auto from(usize arity, decltype(function) function) -> RcMut<ExternFunction>;
 
     static auto varargs(const decltype(function) &function) -> RcMut<ExternFunction>;
@@ -52,35 +56,172 @@ namespace goos::runtime {
   // }
 
   namespace lambda {
-    template<typename T>
-    struct into_crab {
-      using type = T;
+    template<typename>
+    struct transmute_argument {
+      static constexpr meta::VariantType into_type
+          = meta::VariantType::ANY;
+    };
+
+    // template<typename Into> requires (not type::convertible_primitive<Into>)
+    // struct transmute_argument<Into> {
+    //   auto operator()(const Any &) const -> Option<Into> {
+    //     return crab::none;
+    //   }
+    // };
+
+    template<>
+    struct transmute_argument<Any> {
+      static constexpr meta::VariantType into_type
+          = meta::VariantType::ANY;
+
+      auto operator()(Any any) const -> Option<Any> {
+        return Option<Any>{std::move(any)};
+      }
+    };
+
+    template<type::specialized_value T>
+    struct transmute_argument<RcMut<T>> {
+      static constexpr meta::VariantType into_type
+          = T::TYPE;
+
+      auto operator()(Any any) const -> Option<RcMut<T>> {
+        return any.downcast<T>();
+      }
+    };
+
+    template<type::value_type T>
+    struct transmute_argument<Ref<T>> {
+      static constexpr meta::VariantType into_type
+          = T::TYPE;
+
+      auto operator()(Any any) const -> Option<Ref<T>> {
+        Option<RcMut<T>> casted = any.downcast<T>();
+        if (casted.is_none()) return crab::none;
+        return crab::some(Ref{*casted.take_unchecked()});
+      }
+    };
+
+    template<type::value_type T>
+    struct transmute_argument<RefMut<T>> {
+      static constexpr meta::VariantType into_type
+          = T::TYPE;
+
+      auto operator()(Any any) const -> Option<RefMut<T>> {
+        Option<RcMut<T>> casted = any.downcast<T>();
+        if (casted.is_none()) return crab::none;
+        return crab::some(RefMut{*casted.take_unchecked()});
+      }
+    };
+
+    template<>
+    struct transmute_argument<Ref<Any>> {
+      static constexpr meta::VariantType into_type
+          = meta::VariantType::ANY;
+
+      auto operator()(Any any) const -> Option<Any> {
+        return Option{std::move(any)};
+      }
+    };
+
+    template<type::convertible_primitive Primitive>
+    struct transmute_argument<Primitive> {
+      static constexpr meta::VariantType into_type
+          = type::primitive_to_goose_t<Primitive>::TYPE;
+
+      auto operator()(const Any &any) const -> Option<Primitive> {
+        return type::try_from_goose<Primitive>(any);
+      }
     };
 
     template<typename T>
-    struct into_crab<T&> {
-      using type = RefMut<T>;
+    struct transmute_argument<Option<T>> {
+      static constexpr meta::VariantType into_type = transmute_argument<T>::into_type;
+
+      auto operator()(const Any &any) const -> Option<Option<T>> {
+        return Option{transmute_argument<T>{}(any)};
+      }
     };
 
-    template<typename T>
-    struct into_crab<const T&> {
-      using type = Ref<T>;
+    template<typename>
+    struct transmute_return {};
+
+    // Identity Case
+    template<>
+    struct transmute_return<Result<Any>> {
+      auto operator()(Result<Any> result) const -> Result<Any> {
+        return result;
+      }
+    };
+
+    template<type::specialized_value T>
+    struct transmute_return<RcMut<T>> {
+      auto operator()(RcMut<T> returned) const -> Result<Any> {
+        return Result<Any>{Any{returned}};
+      }
+    };
+
+    template<type::specialized_value T>
+    struct transmute_return<Result<RcMut<T>>> {
+      auto operator()(Result<RcMut<T>> returned) const -> Result<Any> {
+        if (returned.is_err()) {
+          return returned.take_err_unchecked();
+        }
+        return Result<Any>{Any{returned.take_unchecked()}};
+      }
+    };
+
+    template<type::convertible_primitive T>
+    struct transmute_return<T> {
+      auto operator()(T returned) const -> Result<Any> {
+        return Result<Any>{type::to_goos_any(returned)};
+      }
+    };
+
+    template<type::convertible_primitive T>
+    struct transmute_return<Result<T>> {
+      auto operator()(Result<T> returned) const -> Result<Any> {
+        if (returned.is_err()) return returned.take_err_unchecked();
+        return Result<Any>{type::to_goos_any(returned)};
+      }
     };
 
     template<typename Into>
-    auto transmute_argument(Any any) -> Option<Into> {}
+    auto opt_to_err(const Vec<Any> &args, const usize index) -> Option<Box<err::Error>> {
+      using transmute_t = transmute_argument<typename crab::ref::decay_type<Into>::type>;
 
-    template<>
-    inline auto transmute_argument(Any any) -> Option<Any> { return any; }
+      constexpr transmute_t transmute{};
 
-    template<typename T> requires type::is_concrete_value<T>
-    auto transmute_argument(Any any) -> Option<RcMut<T>> { return any.downcast<T>(); }
+      if (index >= args.size()) {
+        return err::make<err::InvalidCast>(meta::VariantType::NIL, transmute_t::into_type).value;
+      }
 
-    template<typename Primitive> requires type::is_convertible_primitive<Primitive>
-    auto transmute_argument(const Any any) -> Option<Primitive> { return type::try_from_goose<Primitive>(any); }
+      const Any &arg = args[index];
 
-    template<typename... Parameters>
-    static auto from_function(const std::function<Result<Any>(Parameters...)> &function) -> RcMut<ExternFunction> {
+      if (transmute(arg).is_some()) {
+        return crab::none;
+      }
+
+      return err::make<err::InvalidCast>(arg->get_type(), transmute_t::into_type).value;
+    }
+
+    template<typename T>
+    auto fold_option() -> Option<T> { return crab::none; }
+
+    template<typename T>
+    auto fold_option(Option<T> first) -> Option<T> { return first; }
+
+    template<typename T, typename... R>
+    auto fold_option(Option<T> first, Option<R>... args) -> Option<T> {
+      if (first.is_some()) {
+        return first;
+      }
+
+      return lambda::fold_option<R...>(std::move(args)...);
+    }
+
+    //
+    template<typename Output, typename... Parameters>
+    static auto from_function(const std::function<Output(Parameters...)> &function) -> RcMut<ExternFunction> {
       constexpr usize arity = sizeof...(Parameters);
 
       return ExternFunction::from(
@@ -89,17 +230,31 @@ namespace goos::runtime {
           usize i = 0;
           auto next = [&i] { return i++; };
 
-          // TODO type checking
-          return function(
-            (transmute_argument<typename into_crab<Parameters>::type>(args.at(next())).take_unchecked())...
-          );
+          if (auto typed_args = lambda::fold_option<Box<err::Error>>(
+            lambda::opt_to_err<Parameters>(args, next())...
+          ); typed_args.is_some()) {
+            return crab::err(typed_args.take_unchecked());
+          }
+
+          i = 0;
+
+          if constexpr (not std::is_same_v<Output, void>) {
+            // TODO type checking
+            return transmute_return<Output>{}(
+              function(
+                transmute_argument<typename crab::ref::decay_type<Parameters>::type>{}(args.at(next())).take_unchecked()
+                ...
+              )
+            );
+          }
+          return ok(Unit::value());
         }
       );
     }
 
     template<typename F>
     static auto from(const F function) -> RcMut<ExternFunction> {
-      return from_function(std::function{function});
+      return lambda::from_function(std::function{function});
     }
   };
 
