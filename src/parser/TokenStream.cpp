@@ -111,7 +111,7 @@ namespace goos::parser {
       return crab::ok(identifier.get_unchecked()->get_identifier());
     }
 
-    return crab::err(error<err::ExpectedToken>("Expected an Identifier.", curr().clone()));
+    return crab::err(error<err::ExpectedToken>("Identifier.", curr().clone()));
   }
 
   auto TokenStream::is_eof() const -> bool {
