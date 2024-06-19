@@ -5,7 +5,6 @@
 #pragma once
 #include <option.hpp>
 
-#include "IValue.hpp"
 #include "runtime/Environment.hpp"
 
 namespace goos::runtime {
@@ -14,11 +13,10 @@ namespace goos::runtime {
     Finite
   };
 
-  class ICallable : public IValue {
-  public:
-    static constexpr meta::VariantType TYPE = meta::VariantType::FUNCTION;
+  struct ICallable : IValue {
+    static constexpr auto TYPE = meta::VariantType::FUNCTION;
 
-    [[nodiscard]] virtual auto call(Environment &env, const Vec<Any> &values) const -> Result<Any> = 0;
+    [[nodiscard]] virtual auto call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any> = 0;
 
     [[nodiscard]] virtual auto get_arity_type() const -> ArityType = 0;
 

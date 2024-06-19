@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "IValue.hpp"
+#include "interfaces/IValue.hpp"
 
 namespace goos::runtime {
   class Unit final : public IValue {

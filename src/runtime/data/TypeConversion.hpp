@@ -13,10 +13,6 @@
 #include "ast/Statement.hpp"
 
 namespace goos::runtime::type {
-  struct no_matching_primitive {};
-
-  struct no_matching_wrapper {};
-
   /**
    * @brief Any type that can be used as some form of IValue
    */
@@ -24,26 +20,26 @@ namespace goos::runtime::type {
   concept value_type = std::derived_from<T, IValue> ;
 
   /**
-   * @brief Any type
+   * @brief Any non-abstract value type.
    */
   template<typename T>
   concept specialized_value = value_type<T> and not std::is_abstract_v<T>;
 
-  static_assert(not specialized_value<IValue>);
-
   template<typename T> requires value_type<T>
-  struct goos_to_primitive {
-    using type = no_matching_primitive;
-  };
+  struct goos_to_primitive {};
 
   template<typename>
-  struct primitive_to_goos {
-    using type = no_matching_wrapper;
-  };
+  struct primitive_to_goos {};
 
+  /**
+   * @brief If exists, this defines the type conversion from a standard goose type into a C++ 'native' type
+   */
   template<typename T>
   using goos_to_primitive_t = typename goos_to_primitive<T>::type;
 
+  /**
+   * @brief If exists, this defines the standard goose type associated with the given datatype.
+   */
   template<typename T>
   using primitive_to_goose_t = typename primitive_to_goos<T>::type;
 
@@ -51,7 +47,30 @@ namespace goos::runtime::type {
    * @brief Is 'Primitive' a type that can be converted from C++ -> Goos
    */
   template<typename Primitive>
-  concept convertible_primitive = not std::is_same_v<primitive_to_goose_t<Primitive>, no_matching_primitive>;
+  concept convertible_primitive = requires() {
+    typeid(primitive_to_goose_t<Primitive>);
+  };
+
+  template<typename>
+  struct type_to_goose {};
+
+  template<typename T>
+  using type_to_goose_t = typename type_to_goose<T>::type;
+
+  template<convertible_primitive T>
+  struct type_to_goose<T> {
+    using type = primitive_to_goose_t<T>;
+  };
+
+  template<value_type T>
+  struct type_to_goose<T> {
+    using type = T;
+  };
+
+  template<typename T>
+  concept convertible_type = requires() {
+    typename type_to_goose_t<T>::type;
+  };
 
   // Specific Template Instantiations
 
@@ -68,10 +87,6 @@ namespace goos::runtime::type {
   };
 
   // Identities
-  goos_define_from_cpp(IValue, IValue);
-
-  goos_define_to_cpp(IValue, RcMut<IValue>);
-
   // Boolean
   goos_define_from_cpp(bool, Boolean);
 
@@ -142,7 +157,7 @@ namespace goos::runtime::type {
     return crab::make_rc_mut<primitive_to_goose_t<T>>(std::move(primitive));
   }
 
-  template<typename Primitive>
+  template<convertible_primitive Primitive>
   auto try_from_goose(Any wrapper) -> Option<Primitive> {
     if (auto specialized = wrapper.downcast<primitive_to_goose_t<Primitive>>()) {
       return crab::some(static_cast<Primitive>(specialized.take_unchecked()->get()));
@@ -160,8 +175,7 @@ namespace goos::runtime::type {
     return type::try_from_goose(*wrapper);
   }
 
-  template<>
-  inline auto try_from_goose<Any>(Any wrapper) -> Option<Any> {
+  inline auto try_from_goose(Any wrapper) -> Option<Any> {
     return crab::some(std::move(wrapper));
   }
 
@@ -179,5 +193,3 @@ namespace goos::runtime::type {
   template<typename T> requires std::is_base_of_v<T, IValue>
   auto to_goos(RcMut<T> primitive) -> RcMut<T> { return primitive; }
 }
-
-static_assert(goos::runtime::type::convertible_primitive<i64>);

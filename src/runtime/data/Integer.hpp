@@ -3,8 +3,8 @@
 //
 
 #pragma once
-#include "INumeric.hpp"
-#include "IValue.hpp"
+#include "interfaces/INumeric.hpp"
+#include "interfaces/IValue.hpp"
 
 namespace goos::runtime {
   class Integer final : public INumeric {

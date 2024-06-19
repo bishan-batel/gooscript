@@ -4,14 +4,21 @@
 
 #pragma once
 #include "meta/VariantType.hpp"
-#include "runtime/data/IValue.hpp"
+#include "../runtime/data/interfaces/IValue.hpp"
+#include "runtime/data/LValue.hpp"
 
 namespace goos::runtime {
   class Array final : public IValue {
     Vec<Any> values{};
 
   public:
+    explicit Array(Vec<Any> values = {});
+
     auto push(Any value) -> void;
+
+    auto at(usize i) -> RcMut<LValue>;
+
+    auto operator[](usize i) -> RcMut<LValue>;
 
     [[nodiscard]] auto clone() const -> Any override;
 
@@ -21,10 +28,10 @@ namespace goos::runtime {
 
     [[nodiscard]] auto base_hash() const -> utils::hash_code override;
 
-    [[nodiscard]] auto get_values()  const -> Vec<Any>;
+    [[nodiscard]] auto get() const -> const Vec<Any>&;
 
     [[nodiscard]] auto length() const -> usize;
 
-    constexpr static meta::VariantType TYPE = meta::VariantType::ARRAY;
+    constexpr static auto TYPE = meta::VariantType::ARRAY;
   };
 } // goos

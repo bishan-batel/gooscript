@@ -26,9 +26,9 @@ namespace goos::runtime {
     );
   }
 
-  auto ExternFunction::call(Environment &env, const Vec<Any> &values) const -> Result<Any> {
+  auto ExternFunction::call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any> {
     // TODO error checking
-    return function(env, values);
+    return function(runtime, values);
   }
 
   auto ExternFunction::to_string() const -> WideString {

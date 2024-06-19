@@ -16,7 +16,7 @@ namespace goos::ast::expression {
   auto IdentifierBinding::get_identifier() const -> const meta::Identifier& { return identifier; }
 
   auto IdentifierBinding::to_string() const -> WideString {
-    return identifier;
+    return identifier.get_string();
   }
 
   auto IdentifierBinding::clone_expr() const -> Box<Expression> {

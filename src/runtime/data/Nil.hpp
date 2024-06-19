@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "IValue.hpp"
+#include "interfaces/IValue.hpp"
 
 namespace goos::runtime {
   class Nil final : public IValue {

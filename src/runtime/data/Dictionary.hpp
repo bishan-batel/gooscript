@@ -4,7 +4,7 @@
 
 #pragma once
 #include "ExternFunction.hpp"
-#include "IValue.hpp"
+#include "interfaces/IValue.hpp"
 #include "LValue.hpp"
 #include "TypeConversion.hpp"
 #include "ast/Statement.hpp"
@@ -60,7 +60,7 @@ namespace goos::runtime {
 
     auto get(const meta::Identifier &key) const -> Option<Any>;
 
-    auto get(const Any &key) const -> Option<Any> ;
+    auto get(const Any &key) const -> Option<Any>;
 
     template<type::value_type T=IValue>
     auto get_lvalue(const T &key) -> Option<RcMut<LValue>>;
@@ -69,6 +69,8 @@ namespace goos::runtime {
     auto get_lvalue(const Rc<T> &key) -> Option<RcMut<LValue>>;
 
     auto get_lvalue(const meta::Identifier &key) -> Option<RcMut<LValue>>;
+
+    auto get_or_insert_lvalue(const Any &key) -> RcMut<LValue>;
 
     auto index(utils::hash_code hashed_key) const -> Option<Pair>;
 
@@ -116,7 +118,7 @@ namespace goos::runtime {
 
   template<typename Key, typename Value> requires type::value_type<Key> && type::value_type<Value>
   auto Dictionary::set(RcMut<Key> key, RcMut<Value> value) -> void {
-    set(*key, Any{value});
+    set(Any{key}, Any{value});
   }
 
   template<typename IntoIdentifier, type::value_type ValueTy>
@@ -162,7 +164,7 @@ namespace goos::runtime {
 
   template<type::value_type T>
   auto Dictionary::get_lvalue(const Rc<T> &key) -> Option<RcMut<LValue>> {
-    return this->get<T>(*key);
+    return this->get_lvalue<T>(*key);
   }
 
   template<type::value_type T>

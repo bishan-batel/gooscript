@@ -55,6 +55,16 @@ namespace goos::runtime {
     return crab::some(LValue::wrap(value));
   }
 
+  auto Dictionary::get_or_insert_lvalue(const Any &key) -> RcMut<LValue> {
+    if (auto opt = get_lvalue(Rc<IValue>{key})) {
+      return opt.take_unchecked();
+    }
+
+    set(key, Unit::value());
+
+    return get_lvalue(*key).take_unchecked();
+  }
+
   auto Dictionary::index(const utils::hash_code hashed_key) const -> Option<Pair> {
     if (not has_key_index(hashed_key)) {
       return crab::none;

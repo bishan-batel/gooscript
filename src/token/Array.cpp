@@ -6,9 +6,23 @@
 
 #include <sstream>
 
+#include "runtime/data/LValue.hpp"
+
 namespace goos {
+  runtime::Array::Array(Vec<Any> values): values{std::move(values)} {}
+
   auto runtime::Array::push(Any value) -> void {
     values.push_back(std::move(value));
+  }
+
+  auto runtime::Array::at(const usize i) -> RcMut<LValue> {
+    // TODO error hadnling + dependency handling bc fuckin RefMut<> moment
+
+    return LValue::wrap(values[i]);
+  }
+
+  auto runtime::Array::operator[](const usize i) -> RcMut<LValue> {
+    return at(i);
   }
 
   auto runtime::Array::clone() const -> Any {
@@ -44,7 +58,7 @@ namespace goos {
     return code;
   }
 
-  auto runtime::Array::get_values() const -> Vec<Any> {
+  auto runtime::Array::get() const -> const Vec<Any>& {
     return values;
   }
 
