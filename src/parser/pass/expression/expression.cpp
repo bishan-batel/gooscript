@@ -36,28 +36,6 @@ namespace goos::parser::pass::expr {
       Box<ast::Expression> expr = option.take_unchecked();
 
       // Function Call
-      if (stream.try_consume(lexer::Operator::PAREN_OPEN)) {
-        Vec<Box<ast::Expression>> arguments;
-        while (not stream.is_curr(lexer::Operator::PAREN_CLOSE)) {
-          // consume parameter
-          auto param{expression(stream)};
-          if (param.is_err()) return crab::err(param.take_err_unchecked());
-          arguments.push_back(param.take_unchecked());
-
-          // if no comma then list is at the end
-          if (not stream.try_consume(lexer::Operator::COMMA)) {
-            break;
-          }
-        }
-
-        if (auto err = stream.consume_operator(lexer::Operator::PAREN_CLOSE); err.is_err()) {
-          return crab::err(err.take_err_unchecked());
-        }
-
-        return crab::ok(
-          Box<ast::Expression>{crab::make_box<ast::expression::FunctionCall>(std::move(expr), std::move(arguments))}
-        );
-      }
 
       // just a normal expression
       return crab::ok(std::move(expr));
@@ -93,6 +71,30 @@ namespace goos::parser::pass::expr {
           std::move(expr),
           index.take_unchecked()
         )
+      );
+    }
+
+    if (stream.try_consume(lexer::Operator::PAREN_OPEN)) {
+      Vec<Box<ast::Expression>> arguments;
+      while (not stream.is_curr(lexer::Operator::PAREN_CLOSE)) {
+        // consume parameter
+        auto param{expression(stream)};
+        if (param.is_err()) return crab::err(param.take_err_unchecked());
+        arguments.push_back(param.take_unchecked());
+
+        // if no comma then list is at the end
+        if (not stream.try_consume(lexer::Operator::COMMA)) {
+          break;
+        }
+      }
+
+      if (auto err = stream.consume_operator(lexer::Operator::PAREN_CLOSE); err.is_err()) {
+        return crab::err(err.take_err_unchecked());
+      }
+
+      return postfix_pass(
+        stream,
+        crab::make_box<ast::expression::FunctionCall>(std::move(expr), std::move(arguments))
       );
     }
     return expr;

@@ -14,8 +14,12 @@
 #include "json/Value.hpp"
 #include <result.hpp>
 
-#include "runtime/data/IValue.hpp"
+#include "../runtime/data/interfaces/IValue.hpp"
 #include "runtime/err/RuntimeError.hpp"
+
+namespace goos::parser::pass::expr {
+  class Match;
+}
 
 namespace goos::ast::expression {
   class ArrayIndex;
@@ -112,6 +116,8 @@ namespace goos {
         virtual auto visit_array_index(
           const expression::ArrayIndex &array_index
         ) -> runtime::Result<runtime::Any> = 0;
+
+        virtual auto visit_match(const parser::pass::expr::Match &match) -> runtime::Result<runtime::Any> = 0;
       };
 
       Statement() = default;

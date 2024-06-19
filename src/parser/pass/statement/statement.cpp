@@ -94,7 +94,7 @@ namespace goos::parser::pass {
     if (name_result.is_err()) return name_result.take_err_unchecked();
     goos::meta::Identifier name = name_result.take_unchecked();
 
-    Vec<WideString> parameters{};
+    Vec<goos::meta::Identifier> parameters{};
 
     if (stream.try_consume(lexer::Operator::PAREN_OPEN)) {
       while (not stream.is_curr(lexer::Operator::PAREN_CLOSE)) {
