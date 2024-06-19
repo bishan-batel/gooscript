@@ -36,9 +36,8 @@ namespace goos::utils {
 
   /**
    * @brief Hashes together multiple hash codes.
-   * https://stackoverflow.com/questions/2590677/how-do-i-combine-hash-values-in-c0x
    */
-  auto hash_code_mix(hash_code seed, hash_code next) -> hash_code;
+  constexpr auto hash_code_mix(hash_code seed, hash_code next) -> hash_code;
 
   /**
    * @brief Hashes together multiple hash codes.
@@ -60,6 +59,11 @@ namespace goos::utils {
   auto hash_together(FirstItem first) -> hash_code;
 
   // Template Impl
+
+  constexpr auto hash_code_mix(const hash_code seed, const hash_code next) -> hash_code {
+    // https://stackoverflow.com/questions/2590677/how-do-i-combine-hash-values-in-c0x
+    return next + 0x9e3779b9 + (seed << 6) + (seed >> 2) ^ seed;
+  }
 
   template<hashable T>
   auto hash(const T &value) -> hash_code {
