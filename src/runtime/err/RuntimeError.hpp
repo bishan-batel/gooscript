@@ -4,7 +4,7 @@
 
 #pragma once
 #include "parser/Error.hpp"
-#include "runtime/data/IValue.hpp"
+#include "../data/interfaces/IValue.hpp"
 
 namespace goos::runtime {
   namespace err {
