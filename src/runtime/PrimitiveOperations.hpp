@@ -16,6 +16,7 @@
 #include "data/Integer.hpp"
 #include "data/GString.hpp"
 #include "data/TypeConversion.hpp"
+#include "token/Array.hpp"
 
 namespace goos::runtime::primitive_operators {
   struct BinaryOperands;
@@ -90,6 +91,7 @@ namespace goos::runtime::primitive_operators {
 
   inline static const Dictionary<BinaryOperands, BinaryFunction> BINARY_FUNCTIONS = [] {
     using namespace meta;
+    using namespace goos::meta;
     using lexer::Operator;
 
     #define operation(op, Lhs, Rhs, Output, lambda) binary<Operator::op, Lhs, Rhs, Output>([](const auto&lhs, const auto&rhs) {  return lambda; } )
@@ -104,6 +106,31 @@ namespace goos::runtime::primitive_operators {
       operation(ADD, GString, GString, GString, *lhs + *rhs),
       operation(ADD, GString, Integer, GString, *lhs + std::to_wstring(rhs)),
       operation(ADD, GString, Decimal, GString, *lhs + std::to_wstring(rhs)),
+      operation(EQUALS, GString, GString, Boolean, *lhs == *rhs),
+
+      // TODO remove this for better method solution, this shit cringe af
+      #define ARRAY_APPEND(ty) std::make_pair<BinaryOperands, BinaryFunction>(\
+        BinaryOperands{VariantType::ARRAY, VariantType::ty, Operator::ADD_ASSIGN},\
+        [](Any lhs, Any rhs) {\
+          RcMut<Array> lhs_arr = crab::unwrap(lhs.downcast<Array>());\s_arr->push(std::move(rhs));\
+          return lhs;\
+        }\
+      )
+
+      ARRAY_APPEND(BOOLEAN),
+      ARRAY_APPEND(ARRAY),
+      ARRAY_APPEND(INTEGER),
+      ARRAY_APPEND(DECIMAL),
+      ARRAY_APPEND(STRING),
+      ARRAY_APPEND(BOOLEAN),
+      ARRAY_APPEND(OBJECT),
+      ARRAY_APPEND(ARRAY),
+      ARRAY_APPEND(FUNCTION),
+      ARRAY_APPEND(NIL),
+      ARRAY_APPEND(UNIT),
+      ARRAY_APPEND(REFERENCE),
+      ARRAY_APPEND(ANY),
+      #undef ARRAY_APPEND
 
       // Base Integer Operations
       operation(ADD, Integer, Integer, Integer, lhs + rhs),
