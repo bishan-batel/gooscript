@@ -18,7 +18,7 @@ namespace goos {
 
     if (stream.bad()) return err(io::Error{errno});;
 
-    stream.imbue(std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>));
+    stream.imbue(std::locale(std::locale{}, new std::codecvt_utf8<widechar>));
     WideStringStream collector{};
     collector << stream.rdbuf();
 
