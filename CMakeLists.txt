@@ -13,7 +13,6 @@ project(gooscript VERSION 1.0)
 
 #file(GLOB_RECURSE SOURCE_FILES "src/*.hpp")
 set(SOURCE_FILES
-        src/main.cpp
         src/lexer/Keyword.cpp
         src/lexer/Operator.cpp
         src/token/Token.cpp
@@ -108,7 +107,7 @@ set(SOURCE_FILES
         src/parser/pass/expression/conditionals.cpp
         src/runtime/Intepreter.cpp
         src/runtime/Intepreter.hpp
-        src/runtime/data/IValue.hpp
+        src/runtime/data/interfaces/IValue.hpp
         src/runtime/data/Nil.cpp
         src/runtime/data/Nil.hpp
         src/runtime/data/Integer.cpp
@@ -125,7 +124,7 @@ set(SOURCE_FILES
         src/meta/Identifier.hpp
         src/runtime/data/GString.cpp
         src/runtime/data/GString.hpp
-        src/runtime/data/ICallable.hpp
+        src/runtime/data/interfaces/ICallable.hpp
         src/runtime/err/RuntimeError.cpp
         src/runtime/err/RuntimeError.hpp
         src/runtime/err/VariableNotFound.cpp
@@ -141,7 +140,7 @@ set(SOURCE_FILES
         src/runtime/err/DuplicateName.hpp
         src/runtime/err/DuplicateName.cpp
         src/runtime/data/TypeConversion.hpp
-        src/runtime/data/INumeric.hpp
+        src/runtime/data/interfaces/INumeric.hpp
         src/runtime/data/Dictionary.cpp
         src/runtime/data/Dictionary.hpp
         src/utils/hash.hpp
@@ -156,6 +155,12 @@ set(SOURCE_FILES
         src/token/Array.hpp
         src/ast/expression/ArrayIndex.cpp
         src/ast/expression/ArrayIndex.hpp
+        src/runtime/data/interfaces/ICallable.hpp
+        src/runtime/data/interfaces/INumeric.hpp
+        src/runtime/data/Closure.cpp
+        src/runtime/data/Closure.hpp
+        src/ast/expression/compound/Match.cpp
+        src/ast/expression/compound/Match.hpp
 )
 
 
