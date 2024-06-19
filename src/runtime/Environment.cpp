@@ -5,6 +5,7 @@
 #include "Environment.hpp"
 
 #include <cmath>
+#include <fstream>
 #include <utility>
 
 #include "data/ExternFunction.hpp"
@@ -12,11 +13,14 @@
 #include "data/Dictionary.hpp"
 #include "data/TypeConversion.hpp"
 #include "data/Unit.hpp"
-#include "data/IValue.hpp"
+#include "data/interfaces/IValue.hpp"
 #include "err/DuplicateName.hpp"
 #include "err/VariableNotFound.hpp"
 #include <ref.hpp>
 
+#include <fmt/xchar.h>
+
+#include "data/interfaces/ICallable.hpp"
 #include "parser/TokenStream.hpp"
 #include "parser/pass/statement/block.hpp"
 #include "token/Array.hpp"
@@ -56,16 +60,16 @@ namespace goos::runtime {
   }
 
   auto Environment::get_standard_environment(Intepreter &intepreter) -> RcMut<Environment> {
-    static auto env = crab::make_rc_mut<Environment>(RefMut{intepreter});
+    static auto global = crab::make_rc_mut<Environment>(RefMut{intepreter});
     static bool initialised = false;
 
-    if (initialised) return env;
+    if (initialised) return global;
     initialised = true;
 
     // Math
     {
       const RcMut<Dictionary> math = crab::make_rc_mut<Dictionary>();
-      env->define_constant("math", math);
+      global->define_constant("math", math);
       math->set("PI", std::numbers::pi);
       math->set("π", std::numbers::pi);
 
@@ -88,27 +92,38 @@ namespace goos::runtime {
       math->set_func("round", [](const f64 a) { return std::round(a); });
       math->set_func("hypot", [](const f64 a, const f64 b) { return std::hypot(a, b); });
     } {
+      const RcMut<Dictionary> str = crab::make_rc_mut<Dictionary>();
+      global->define_constant("str", str);
+      str->set("empty", WideString{});
+      str->set_func(
+        "parse_number",
+        [](const WideString &string) {
+          f64 num;
+          WideStringStream{string} >> num;
+          return num;
+        }
+      );
       // const RcMut<Dictionary> fmt = crab::make_rc_mut<Dictionary>();
       // env->define_constant("fmt", fmt);
     }
 
-    env->define_builtin(
+    global->define_builtin(
       L"typeof",
       [](const IValue &obj) {
         return str::convert((StringStream{} << obj.get_type()).str());
       }
     );
 
-    env->define_builtin(
+    global->define_builtin(
       L"clone",
       [](const IValue &obj) { return obj.clone(); }
     );
 
     // ReSharper disable once CppPassValueParameterByConstReference
-    env->define_builtin(
+    global->define_builtin(
       L"import",
-      [](const RcMut<GString> file) {
-        SourceFile source = SourceFile::from_file(*file->get()).take_unchecked();
+      [](const WideString &file) {
+        SourceFile source = SourceFile::from_file(file + L".goo").take_unchecked();
         lexer::TokenList list{lexer::Lexer::tokenize(std::move(source)).take_unchecked()};
 
         if (list.empty()) {
@@ -119,74 +134,91 @@ namespace goos::runtime {
       }
     );
 
-    env->define_builtin(
-      L"fmt",
-      ExternFunction::from(
-        1,
-        [](const Environment &inner_env, const Vec<Any> &args) -> Result<Any> {
-          const WideString &fmt_string = args.at(0)->coerce_unchecked<GString>().get().get();
+    global->define_builtin(
+      L"include_str",
+      [](const WideString &path)-> WideString {
+        std::wifstream stream{str::convert(path)};
 
-          const usize len = fmt_string.length();
+        if (stream.bad()) return L"";
 
-          WideStringStream os{};
-
-          for (usize i = 0; i < len; i++) {
-            if (const widechar c = fmt_string.at(i); c != '{') {
-              os << c;
-              continue;
-            }
-
-            i++;
-            if (i < len and fmt_string.at(i) == '{') {
-              continue;
-            }
-
-            WideStringStream name{};
-            for (usize j = i; j < len; j++) {
-              if (fmt_string.at(j) == '}') {
-                break;
-              }
-              name << fmt_string.at(j);
-              i++;
-            }
-
-            os << inner_env.get_variable(meta::Identifier::from(name.str())).take_unchecked()->get_value()->to_string();
-          }
-
-          return ok(crab::make_rc_mut<GString>(std::move(os).str()));
-        }
-      )
+        stream.imbue(std::locale(std::locale{}, new std::codecvt_utf8<widechar>));
+        WideStringStream collector{};
+        collector << stream.rdbuf();
+        return collector.str();
+      }
     );
 
-    env->define_builtin(
+    global->define_builtin(
+      L"fmt",
+      [](const Intepreter &runtime, const WideString &fmt_string) {
+        const usize len = fmt_string.length();
+
+        WideStringStream os{};
+
+        for (usize i = 0; i < len; i++) {
+          if (const widechar c = fmt_string.at(i); c != '{') {
+            os << c;
+            continue;
+          }
+
+          i++;
+          if (i < len and fmt_string.at(i) == '{') {
+            continue;
+          }
+
+          WideStringStream name{};
+          for (usize j = i; j < len; j++) {
+            if (fmt_string.at(j) == '}') {
+              break;
+            }
+            name << fmt_string.at(j);
+            i++;
+          }
+
+          os << runtime.env()
+                       .get_variable(meta::Identifier::from(name.str()))
+                       .take_unchecked()
+                       ->get_value()->
+                       to_string();
+        }
+
+        return std::move(os).str();
+      }
+    );
+
+    global->define_builtin(
       L"len",
-      [](Any any) -> usize {
-        if (auto dict = any.downcast<Dictionary>()) {
+      [](IValue &any) -> usize {
+        if (auto dict = any.coerce<Dictionary>()) {
           return dict.take_unchecked()->length();
         }
 
-        if (auto arr = any.downcast<Array>()) {
+        if (auto arr = any.coerce<Array>()) {
           return arr.take_unchecked()->length();
+        }
+
+        if (auto str = any.coerce<GString>()) {
+          return str.take_unchecked()->get()->length();
         }
 
         return 0;
       }
     );
 
-    env->define_builtin(
+    global->define_builtin(
       L"each",
-      [](Any any, const ExternFunction &func) -> Result<Any> {
-        if (auto arr = any.downcast<Array>()) {
-          for (const auto &v: arr.get_unchecked()->get_values()) {
-            if (auto result = func.call(env, {v}); result.is_err())
+      [](Intepreter &runtime, IValue &any, const ICallable &func) -> Result<Any> {
+        if (auto arr = any.coerce<Array>()) {
+          for (const auto &v: arr.get_unchecked()->get()) {
+            if (auto result = func.call(runtime, {v}); result.is_err())
               return result.take_err_unchecked();
           }
         }
 
-        if (auto arr = any.downcast<Dictionary>()) {
-          for (const auto &[_, pair]: arr.get_unchecked()->get_pairs()) {
+        if (auto arr = any.coerce<Dictionary>()) {
+          for (const auto &pair: arr.get_unchecked()->get_pairs() | std::views::values) {
             auto [key, value] = pair;
-            if (auto result = func.call(env, {key, value}); result.is_err())
+            if (auto result = func.call(runtime, {key, value}); result.is_err())
               return result.take_err_unchecked();
           }
         }
@@ -194,22 +226,29 @@ namespace goos::runtime {
       }
     );
 
-    env->define_builtin(
-      L"💀",
-      [] {
+    global->define_builtin(
+      L"fatal",
+      [](const i32 x) {
         std::wcerr << std::endl << "skull emogi lol" << std::endl;
-        std::exit(69);
+        std::exit(x);
       }
     );
 
-    env->define_builtin(
+    global->define_builtin(
+      L"push",
+      [](const RcMut<Array> &arr, Any value) {
+        arr->push(std::move(value));
+      }
+    );
+
+    global->define_builtin(
       L"idx",
       [](const Array &arr, const usize i) {
         if (i >= arr.length()) return Any{Unit::value()};
-        return arr.get_values().at(i);
+        return arr.get().at(i);
       }
     );
-    env->define_builtin(
+    global->define_builtin(
       L"get",
       [](const Dictionary &dict, const GString &str) {
         if (auto v = dict.get(str)) {
@@ -219,7 +258,7 @@ namespace goos::runtime {
       }
     );
 
-    env->define_builtin(
+    global->define_builtin(
       L"readline",
       [] {
         WideString str;
@@ -228,10 +267,10 @@ namespace goos::runtime {
       }
     );
 
-    env->define_builtin(
+    global->define_builtin(
       L"print",
       ExternFunction::varargs(
-        [](Environment &, const Vec<Any> &args) -> Result<Any> {
+        [](Intepreter &, const Vec<Any> &args) -> Result<Any> {
           for (const auto &arg: args) {
             std::wcout << arg->to_string();
           }
@@ -241,7 +280,11 @@ namespace goos::runtime {
       )
     );
 
-    return env;
+    return global;
+  }
+
+  auto Environment::top_level_enviornment(Intepreter &intepreter) -> RcMut<Environment> {
+    return crab::make_rc_mut<Environment>(RefMut{intepreter}, crab::none);
   }
 
   Environment::Environment(Intepreter &intepreter, RcMut<Environment> parent)
@@ -262,14 +305,15 @@ namespace goos::runtime {
     meta::Identifier identifier,
     const meta::Mutability mutability,
     Any value
-  ) -> Result<RcMut<Variable>> {
+  ) -> void {
+    RcMut<Variable> var = crab::make_rc_mut<Variable>(mutability, std::move(value));
+
     if (get_variable(identifier).is_ok()) {
-      return err::make<err::DuplicateName>(identifier);
+      bindings.emplace(std::move(identifier), var);
+      return;
     }
 
-    bindings.emplace(std::move(identifier), crab::make_rc_mut<Variable>(mutability, std::move(value)));
-
-    return get_variable(identifier);
+    bindings.emplace(std::move(identifier), var);
   }
 
   auto Environment::set_value(

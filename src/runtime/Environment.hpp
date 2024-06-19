@@ -50,32 +50,38 @@ namespace goos::runtime {
     RefMut<Intepreter> intepreter;
 
   public:
+    explicit Environment(Intepreter &intepreter, RcMut<Environment> parent);
+
+    explicit Environment(Intepreter &intepreter, Option<RcMut<Environment>> parent = crab::none);
+
+    static auto get_standard_environment(Intepreter &intepreter) -> RcMut<Environment>;
+
+    static auto top_level_enviornment(Intepreter &intepreter) -> RcMut<Environment>;
+
+
+    static auto enclose(RcMut<Environment> enclosing) -> RcMut<Environment>;
+
     auto define_builtin(WideString name, const RcMut<ExternFunction> &function) -> void;
 
     template<typename F>
     auto define_builtin(WideString name, F function) -> void;
 
-    static auto get_standard_environment(Intepreter &intepreter) -> RcMut<Environment>;
-
-    explicit Environment(Intepreter &intepreter, RcMut<Environment> parent);
-
-    explicit Environment(Intepreter &intepreter, Option<RcMut<Environment>> parent = crab::none);
-
-    static auto enclose(RcMut<Environment> enclosing) -> RcMut<Environment>;
-
     template<typename IntoIdentifier, type::value_type ValueTy>
-    auto define_constant(IntoIdentifier identifier, RcMut<ValueTy> value) -> Result<RcMut<Variable>>;
+    auto define_constant(IntoIdentifier identifier, RcMut<ValueTy> value) -> void;
 
     template<typename IntoIdentifier, type::convertible_primitive IntoValue>
-    auto define_constant(IntoIdentifier identifier, IntoValue value) -> Result<RcMut<Variable>>;
+    auto define_constant(IntoIdentifier identifier, IntoValue value) -> void;
 
     auto push_variable(
       meta::Identifier identifier,
       meta::Mutability mutability,
       RcMut<IValue> value
-    ) -> Result<RcMut<Variable>>;
+    ) -> void;
 
-    auto set_value(const meta::Identifier &identifier, RcMut<IValue> value) const -> Result<RcMut<Variable>>;
+    [[nodiscard]] auto set_value(
+      const meta::Identifier &identifier,
+      RcMut<IValue> value
+    ) const -> Result<RcMut<Variable>>;
 
     [[nodiscard]] auto get_variable(const meta::Identifier &identifier) const -> Result<RcMut<Variable>>;
 
@@ -97,13 +103,13 @@ namespace goos::runtime {
   }
 
   template<typename IntoIdentifier, type::value_type ValueTy>
-  auto Environment::define_constant(IntoIdentifier identifier, RcMut<ValueTy> value) -> Result<RcMut<Variable>> {
-    return push_variable(meta::Identifier::from(identifier), meta::Mutability::IMMUTABLE, Any{value});
+  auto Environment::define_constant(IntoIdentifier identifier, RcMut<ValueTy> value) -> void {
+    push_variable(meta::Identifier::from(identifier), meta::Mutability::IMMUTABLE, Any{value});
   }
 
   template<typename IntoIdentifier, type::convertible_primitive IntoValue>
-  auto Environment::define_constant(IntoIdentifier identifier, IntoValue value) -> Result<RcMut<Variable>> {
-    return define_constant(identifier, type::to_goos_any(value));
+  auto Environment::define_constant(IntoIdentifier identifier, IntoValue value) -> void {
+    define_constant(identifier, type::to_goos_any(value));
   }
 
   // template<typename T, typename V> requires std::is_constructible_v<meta::Identifier, T>
