@@ -58,7 +58,6 @@ namespace goos::runtime {
 
     static auto top_level_enviornment(Intepreter &intepreter) -> RcMut<Environment>;
 
-
     static auto enclose(RcMut<Environment> enclosing) -> RcMut<Environment>;
 
     auto define_builtin(WideString name, const RcMut<ExternFunction> &function) -> void;
