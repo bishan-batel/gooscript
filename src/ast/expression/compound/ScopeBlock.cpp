@@ -42,7 +42,7 @@ namespace goos::ast::expression {
       statements.push_back(statement->clone());
     }
 
-    return crab::make_box<ScopeBlock>(std::move(statements));
+    return crab::make_box<ScopeBlock>(std::move(statements), eval->clone_expr());
   }
 
   auto ScopeBlock::operator==(const Statement &statement) const -> bool {
