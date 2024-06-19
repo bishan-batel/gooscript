@@ -5,7 +5,7 @@
 #include "parser/TokenStream.hpp"
 #include "parser/pass/statement/block.hpp"
 #include "runtime/Intepreter.hpp"
-#include "runtime/data/IValue.hpp"
+#include "../src/runtime/data/interfaces/IValue.hpp"
 #include "runtime/data/TypeConversion.hpp"
 #include "source/SourceFile.hpp"
 #include <fmt/format.h>
@@ -55,7 +55,7 @@ auto parse(const i32 argc, const char *argv[]) -> Dictionary<String, Vec<String>
       return {};
     }
   );
-  result["__executable__"].push_back(argv[0]);
+  result["__executable__"].emplace_back(argv[0]);
   return result;
 }
 
