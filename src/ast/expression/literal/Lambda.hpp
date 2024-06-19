@@ -6,21 +6,22 @@
 #include <box.hpp>
 
 #include "ast/Expression.hpp"
+#include "meta/Identifier.hpp"
 
 namespace goos::ast::expression {
   class Lambda final : public Expression {
-    Vec<WideString> params;
+    Vec<meta::Identifier> params;
     Box<Expression> body;
 
   public:
     explicit Lambda(
-      Vec<WideString> params,
+      Vec<meta::Identifier> params,
       Box<Expression> body
     );
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
-    [[nodiscard]] auto get_params() const -> const Vec<WideString>&;
+    [[nodiscard]] auto get_params() const -> const Vec<meta::Identifier>&;
 
     [[nodiscard]] auto get_body() const -> const Expression&;
 

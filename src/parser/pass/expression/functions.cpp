@@ -12,7 +12,7 @@ namespace goos::parser::pass::expr {
       return OptionalResult<ast::expression::Lambda>{crab::none};
     }
 
-    Vec<WideString> parameters{};
+    Vec<goos::meta::Identifier> parameters{};
 
     if (stream.try_consume(lexer::Operator::PAREN_OPEN)) {
       while (not stream.is_curr(lexer::Operator::PAREN_CLOSE)) {

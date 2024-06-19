@@ -14,16 +14,17 @@
 #include "json/Array.hpp"
 #include "json/Object.hpp"
 #include "json/Text.hpp"
+#include "meta/Identifier.hpp"
 
 namespace goos::ast::expression {
-  Lambda::Lambda(Vec<WideString> params, Box<Expression> body)
+  Lambda::Lambda(Vec<meta::Identifier> params, Box<Expression> body)
     : params{std::move(params)}, body{std::move(body)} {}
 
   auto Lambda::to_string() const -> WideString {
     WideStringStream stream{};
 
     for (const auto &param: params) {
-      stream << fmt::format(L"{}, ", param);
+      stream << fmt::format(L"{}, ", param.get_string());
     }
     return fmt::format(L"fn ({}) = {}", stream.str(), body->to_string());
   }
@@ -70,7 +71,7 @@ namespace goos::ast::expression {
     return visitor.visit_lambda(*this);
   }
 
-  auto Lambda::get_params() const -> const Vec<WideString>& {
+  auto Lambda::get_params() const -> const Vec<meta::Identifier>& {
     return params;
   }
 }
