@@ -5,6 +5,7 @@
 #include "Intepreter.hpp"
 
 #include <memory>
+#include <utility>
 
 #include "PrimitiveOperations.hpp"
 #include "ast/expression/Binary.hpp"
@@ -23,26 +24,42 @@
 #include "data/Boolean.hpp"
 #include "data/ExternFunction.hpp"
 #include "data/Decimal.hpp"
-#include "data/ICallable.hpp"
+#include "data/interfaces/ICallable.hpp"
 #include "data/Integer.hpp"
 #include "data/Nil.hpp"
 #include "data/GString.hpp"
 #include "data/Unit.hpp"
-#include "data/IValue.hpp"
+#include "data/interfaces/IValue.hpp"
 #include "err/NotCallable.hpp"
 #include "Environment.hpp"
 #include "ast/expression/ArrayIndex.hpp"
 #include "ast/expression/PropertyAccess.hpp"
 #include "ast/expression/Unary.hpp"
 #include "ast/expression/literal/Dictionary.hpp"
+#include "data/Closure.hpp"
 #include "data/Dictionary.hpp"
 #include "token/Array.hpp"
-#include "utils/str.hpp"
 
 namespace goos::runtime {
-  auto Intepreter::push_env() -> Environment& {
-    current_environment = Environment::enclose(current_environment);
+  Intepreter::Intepreter(RcMut<Environment> globals) : current_environment{std::move(globals)} {}
+
+  Intepreter::Intepreter() : Intepreter{Environment::get_standard_environment(*this)} {}
+
+  auto Intepreter::set_env(RcMut<Environment> environment) -> void {
+    current_environment = std::move(environment);
+  }
+
+  auto Intepreter::get_env() -> RcMut<Environment> {
     return current_environment;
+  }
+
+  auto Intepreter::push_env(RcMut<Environment> environment) -> Environment& {
+    set_env(Environment::enclose(std::move(environment)));
+    return current_environment;
+  }
+
+  auto Intepreter::push_env() -> Environment& {
+    return push_env(std::move(current_environment));
   }
 
   auto Intepreter::pop_env() -> Environment& {
@@ -74,8 +91,6 @@ namespace goos::runtime {
     }
     return crab::none;
   }
-
-  Intepreter::Intepreter() : current_environment{Environment::get_standard_environment(*this)} {}
 
   auto Intepreter::execute(const ast::Statement &statement) -> VoidResult {
     return statement.accept(*this);
@@ -162,7 +177,6 @@ namespace goos::runtime {
 
   auto Intepreter::visit_dictionary([[maybe_unused]] const ast::expression::Dictionary &dictionary) -> Result<Any> {
     const auto dict = crab::make_rc_mut<Dictionary>();
-    // throw std::logic_error("Not implemented");
 
     for (const auto &[key , value]: dictionary.get_pairs()) {
       Any key_expr = Unit::value();
@@ -195,38 +209,13 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_lambda([[maybe_unused]] const ast::expression::Lambda &lambda) -> Result<Any> {
-    // TODO
-
-    const auto closure = Rc<ast::Expression>::from_owned_unchecked(
-      Box<ast::Expression>::unwrap(lambda.get_body().clone_expr())
-    );
+    using namespace ast;
+    using namespace expression;
 
     return ok(
-      ExternFunction::varargs(
-        [closure, &lambda](Environment &env, const Vec<Any> &args) -> Result<Any> {
-          const auto &params = lambda.get_params();
-          const usize count = std::min(args.size(), params.size());
-
-          for (usize i = 0; i < count; i++) {
-            env.push_variable(
-              meta::Identifier::from(params[i]),
-              meta::Mutability::IMMUTABLE,
-              args[i]
-            );
-          }
-
-          auto value = env.runtime().evaluate(closure);
-
-          if (value.is_err()) {
-            return crab::err(value.take_err_unchecked());
-          }
-
-          if (auto ret = env.runtime().consume_halt_flag(ControlFlowFlag::RETURN)) {
-            return crab::ok(ret.take_unchecked());
-          }
-
-          return crab::ok(value.take_unchecked());
-        }
+      crab::make_rc_mut<Closure>(
+        get_env(),
+        Box<Lambda>::wrap_unchecked(dynamic_cast<Lambda*>(Box<Expression>::unwrap(lambda.clone_expr())))
       )
     );
   }
@@ -362,13 +351,14 @@ namespace goos::runtime {
       return function_result;
     }
 
-    auto callable_any = function_result.take_unchecked();
+    const auto callable_any = function_result.take_unchecked();
 
     auto callable_option = callable_any.downcast<ICallable>();
 
+    // TODO
     if (callable_option.is_none()) {
       return crab::err<Box<err::Error>>(
-        crab::make_box<err::NotCallable>(std::move(callable_any))
+        crab::make_box<err::NotCallable>(callable_any)
       );
     }
 
@@ -394,7 +384,7 @@ namespace goos::runtime {
     }
 
     push_env();
-    auto result = callable->call(current_environment, arguments);
+    auto result = callable->call(*this, arguments);
     pop_env();
     return result;
   }
@@ -477,11 +467,17 @@ namespace goos::runtime {
       }
     }
 
-    Result<Any> value = evaluate(scope.get_eval());
+    Result<Any> value_res = evaluate(scope.get_eval());
 
-    if (value.is_err()) return crab::err(value.take_err_unchecked());
+    if (value_res.is_err()) return crab::err(value_res.take_err_unchecked());
 
     pop_env();
+
+    Any value = value_res.take_unchecked();
+
+    if (auto evaluation = consume_halt_flag(ControlFlowFlag::EVAL)) {
+      return ok(evaluation.take_unchecked());
+    }
 
     if (should_halt_control_flow()) {
       return ok(Unit::value());
@@ -542,7 +538,9 @@ namespace goos::runtime {
       return ok(value.take_unchecked());
     }
 
-    return ok(Unit::value());
+    dict.set(property, Unit::value());
+
+    return ok(dict.get_lvalue(property).take_unchecked());
   }
 
   auto Intepreter::visit_array_index(const ast::expression::ArrayIndex &array_index) -> Result<Any> {
@@ -560,22 +558,29 @@ namespace goos::runtime {
     const Any index = index_result.take_unchecked();
 
     if (auto opt = obj.downcast<Dictionary>()) {
-      const Dictionary &dict = *opt.take_unchecked();
-      if (auto res = dict.get(index)) {
-        return res.take_unchecked();
-      }
-      return ok(Unit::value());
+      return ok(opt.take_unchecked()->get_or_insert_lvalue(index));
     }
 
     if (auto opt = obj.downcast<Array>()) {
-      const Array &dict = *opt.take_unchecked();
+      Array &arr = *opt.take_unchecked();
 
       // TODO, make an error for invalid index type
-      return dict.get_values().at(type::try_from_goose<usize>(index).take_unchecked());
+      return ok(arr[type::try_from_goose<usize>(index).take_unchecked()]);
+    }
+
+    if (auto opt = obj.downcast<GString>()) {
+      const GString &str = *opt.take_unchecked();
+
+      // TODO, make an error for invalid index type
+      const widechar c = str.get()->at(type::try_from_goose<usize>(index).take_unchecked());
+      return ok(crab::make_rc_mut<GString>(WideString{c}));
     }
 
     // TODO, make an error
-    // throw std::logic_error("Not implemented");
     return ok(Nil::value());
+  }
+
+  auto Intepreter::visit_match(const parser::pass::expr::Match &) -> Result<Any> {
+    throw std::logic_error("Not implemented");
   }
 }

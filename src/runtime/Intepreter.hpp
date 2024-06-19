@@ -9,6 +9,7 @@
 #include "ast/Statement.hpp"
 #include <result.hpp>
 
+#include "Environment.hpp"
 #include "data/Unit.hpp"
 
 namespace goos::runtime {
@@ -25,6 +26,17 @@ namespace goos::runtime {
     std::bitset<sizeof(ControlFlowFlag) * 8> halt_flags;
     Option<Any> halt_evaluation;
 
+  public:
+    explicit Intepreter(RcMut<Environment> globals);
+
+    explicit Intepreter();
+
+    auto set_env(RcMut<Environment> environment) -> void;
+
+    auto get_env() -> RcMut<Environment>;
+
+    auto push_env(RcMut<Environment> environment) -> Environment&;
+
     auto push_env() -> Environment&;
 
     auto pop_env() -> Environment&;
@@ -35,10 +47,7 @@ namespace goos::runtime {
 
     auto consume_halt_flag(ControlFlowFlag flag) -> Option<Any>;
 
-  public:
     [[nodiscard]] auto env() const -> Environment&;
-
-    Intepreter();
 
     auto execute(const ast::Statement &statement) -> VoidResult;
 
@@ -93,5 +102,7 @@ namespace goos::runtime {
     auto visit_property_access(const ast::expression::PropertyAccess &property_access) -> Result<Any> override;
 
     auto visit_array_index(const ast::expression::ArrayIndex &array_index) -> Result<Any> override;
+
+    auto visit_match(const parser::pass::expr::Match &match) -> Result<Any> override;
   };
 }

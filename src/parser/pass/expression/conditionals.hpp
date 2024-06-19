@@ -15,5 +15,5 @@ namespace goos::parser::pass::expr {
 
   auto for_loop(TokenStream &stream) -> OptionalResult<ast::expression::If>;
 
-
+  auto match_statement(TokenStream &stream) -> OptionalResult<ast::expression::If>;
 }

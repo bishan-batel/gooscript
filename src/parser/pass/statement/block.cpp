@@ -13,7 +13,7 @@
 namespace goos::parser::pass {
   auto block(TokenStream &stream, const bool require_do) -> OptionalResult<ast::expression::ScopeBlock> {
     if (require_do and not stream.try_consume(lexer::Keyword::DO)) {
-      return OptionalResult<ast::expression::ScopeBlock>(crab::none);
+      return {crab::none};
     }
 
     if (auto err = stream.consume_operator(lexer::Operator::CURLY_OPEN); err.is_err()) {
