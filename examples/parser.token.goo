@@ -1,0 +1,50 @@
+let $ = {};
+
+$:STRING_LITERAL = 0
+$:NUMBER = 1
+$:BOOL = 2
+$:OPEN_CURLY = 3
+$:CLOSE_CURLY = 4
+$:OPEN_BRACKET = 5
+$:CLOSE_BRACKET = 6
+$:COLON = 7
+$:COMMA = 8
+
+$:TY_TO_STR = [
+  "STRING_LITERAL",
+  "NUMBER",
+  "BOOL",
+  "OPEN_CURLY",
+  "CLOSE_CURLY",
+  "OPEN_BRACKET",
+  "CLOSE_BRACKET", 
+  "COLON",
+  "COMMA"
+]
+
+fn new(ty, data, to_string) => {
+  type = ty
+  data = data
+  to_string = fn() => $:TY_TO_STR[ty]  + ": " + to_string()
+}
+
+
+$:string = fn(data) => new($:STRING_LITERAL, data, fn() => "'" + data  + "'"); 
+
+$:num = fn(data) => new($:NUMBER, data, fn() => data); 
+
+$:bool = fn(data) => new($:BOOL, data, fn() => if data then "true" else "false"); 
+
+$:open_curly = fn () => new($:OPEN_CURLY, unit, fn => "{{"[0] );
+
+$:close_curly = fn () => new($:CLOSE_CURLY, unit, fn => "}");
+
+$:open_bracket = fn () => new($:OPEN_BRACKET, unit, fn => "[");
+
+$:close_bracket = fn () => new($:CLOSE_BRACKET, unit, fn => "]")
+
+$:colon = fn () => new($:COLON, unit, fn => ":")
+
+$:comma = fn () => new($:COMMA, unit, fn => ",")
+
+$

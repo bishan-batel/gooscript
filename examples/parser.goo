@@ -1,0 +1,229 @@
+let Token = import("parser.token.goo")
+let original = import("fizzbuzz.goo.json")
+
+fn error(fmt_str) {
+  print("[ERROR] ", fmt_str)
+  fatal(42)
+}
+
+fn tokenize(source) {
+  let length = len(source)
+
+
+  let tokens = []
+
+  var i = 0
+
+
+  let WHITESPACE = "\t\r\n ";
+
+
+  fn not_eof() => i < length;
+
+  fn curr() => if not_eof() then (source[i]) else "";
+
+  fn next() { 
+    i = i + 1
+    curr()
+  }
+
+  fn digit() {
+    unless str:is_digit(curr()) {
+      return false;
+    }
+
+    var num = curr()
+
+    
+    while str:is_digit(next()) { 
+      num = num + curr()
+    }
+
+
+    if (curr() == ".") {
+      num = num + "."
+      while str:is_digit(next()) { 
+        num = num + curr()
+      }
+    }
+
+    push(tokens,Token:num(str:parse_number(num)))
+
+    true
+  }
+
+
+  # let QUOTE = ("\" ");
+
+  fn string() => if curr() == str:quote {
+    let str_literal = "";
+
+    until next() == str:quote {
+      str_literal = str_literal + curr();
+    }
+
+    next();
+
+    push(tokens, Token:string(str_literal));
+    true
+  } else {
+    false
+  }
+
+  while not_eof() {
+    if str:contains(WHITESPACE, curr()) { 
+      next()
+      return unit
+    } else if curr() == "{{"[0] { 
+      push(tokens, Token:open_curly())
+      next()
+      return unit
+    } else if curr() == "}" { 
+      push(tokens, Token:close_curly());
+      next()
+      return unit
+    } else if curr() == "[" { 
+      push(tokens, Token:open_bracket()); 
+      next();
+      return unit
+    } else if curr() == "]" { 
+      push(tokens, Token:close_bracket()); 
+      next();
+    } else if curr() == ":" { 
+      push(tokens, Token:colon()); 
+      next();
+    } else if curr() == "," { 
+      push(tokens, Token:comma()); 
+      next();
+    } else if digit() { 
+    } else if string() {
+    }else {
+      error("Invalid character: '" + curr() + "'");
+    }
+
+  }
+
+  return tokens;
+}
+
+
+
+let toks = tokenize(include_str("fizzbuzz.goo.json"))
+let tok_len = len(toks)
+var pos = 0;
+
+fn curr => toks[pos];
+
+fn is_curr(ty) {
+  curr().type == ty
+}
+
+fn next => pos = pos + 1;
+
+
+fn any => if is_curr(Token:OPEN_CURLY) {
+  obj()
+} else if is_curr(Token:OPEN_BRACKET) {
+  array()
+} else {
+  let data = curr().data
+  next()
+
+  data
+}
+
+fn obj {
+  next();
+  let object = {};
+
+  until is_curr(Token:CLOSE_CURLY) {
+    let key = any()
+    next();
+
+    object[key] = any();
+
+    if is_curr(Token:COMMA) then next()
+  }
+  next()
+
+  object
+}
+
+fn array {
+  next();
+  let arr = [];
+
+  until is_curr(Token:CLOSE_BRACKET) {
+    push(arr, any())
+
+    if is_curr(Token:COMMA) then next()
+  }
+  next()
+
+  arr
+}
+
+
+let parsed = any();
+
+fn is_eq(a, b) { 
+  let result = (fn {
+    let ty = typeof(a);
+
+    if ty != typeof(b) {
+      return unless a == b {
+        print(0)
+        false
+      } else true
+    } else if ty == "object" {
+      let equals = true
+      each(a, fn(k, v) {
+        unless is_eq(v, b[k]) {
+      print(1)
+          equals = false;
+        }
+      })
+      return equals
+    } else if ty == "array" {
+      if len(a) != len(b) {
+        print(2)
+        return false;
+      }
+
+      var i = 0
+
+      while i < len(a) {
+        unless is_eq(a[i], b[i]) {
+          print(3)
+          return false
+        }
+        i = i + 1
+      }
+      return true
+    } else if ty == "unit" or ty == "nil" {
+      print(5)
+      return true
+    } else if a == b {
+      return true;
+    } else {
+      false
+      return false;
+    }
+
+  })() 
+
+
+  unless result {
+    if a == b {
+      return true;
+    }
+    fatal(1);
+  }
+
+  result
+}
+
+# print(original);
+print(parsed == original)
+
+is_eq(parsed, original)
