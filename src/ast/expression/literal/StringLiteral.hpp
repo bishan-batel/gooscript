@@ -7,13 +7,12 @@
 
 namespace goos::ast::expression {
   class StringLiteral final : public Expression {
-    // TODO convert to Rc<WideString> to prevent copying from Lexer -> Parser -> Runtime
-    WideString literal;
+    Rc<WideString> literal;
 
   public:
-    explicit StringLiteral(WideString literal);
+    explicit StringLiteral(Rc<WideString> literal);
 
-    [[nodiscard]] auto get_string() const -> const WideString&;
+    [[nodiscard]] auto get_string() const -> Rc<WideString>;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 

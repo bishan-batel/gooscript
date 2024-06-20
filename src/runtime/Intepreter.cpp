@@ -168,7 +168,7 @@ namespace goos::runtime {
 
       if (result.is_err()) return result.take_err_unchecked();
 
-      if (should_halt_control_flow()) return ok(Unit::value());
+      if (should_halt_control_flow()) return Unit::ok();
 
       arr->push(result.take_unchecked());
     }
@@ -190,7 +190,7 @@ namespace goos::runtime {
 
         if (should_halt_control_flow()) {
           // return unit
-          return ok(Unit::value());
+          return Unit::ok();
         }
 
         key_expr = key_result.take_unchecked();
@@ -201,7 +201,7 @@ namespace goos::runtime {
 
       if (should_halt_control_flow()) {
         // return unit
-        return ok(Unit::value());
+        return Unit::ok();
       }
       dict->set(std::move(key_expr), value_result.take_unchecked());
     }
@@ -238,7 +238,7 @@ namespace goos::runtime {
   }
 
   auto Intepreter::visit_nil([[maybe_unused]] const ast::expression::Nil &nil) -> Result<Any> {
-    return ok(Nil::value());
+    return Nil::ok();
   }
 
   auto Intepreter::visit_unit([[maybe_unused]] const ast::expression::Unit &unit) -> Result<Any> {
@@ -251,7 +251,7 @@ namespace goos::runtime {
       if (lhs_result.is_err()) return lhs_result.take_err_unchecked();
 
       if (should_halt_control_flow()) {
-        return ok(Unit::value());
+        return Unit::ok();
       }
 
       const RcMut<LValue> lvalue = lhs_result.take_unchecked().downcast<LValue>().take_unchecked();
@@ -264,7 +264,7 @@ namespace goos::runtime {
       const Any value = value_result.take_unchecked();
 
       if (should_halt_control_flow()) {
-        return ok(Unit::value());
+        return Unit::ok();
       }
 
       lvalue->set(value);
@@ -289,7 +289,7 @@ namespace goos::runtime {
       // TODO: error handling
 
       if (should_halt_control_flow()) {
-        return ok(Unit::value());
+        return Unit::ok();
       }
 
       const RcMut<Dictionary> dict = dictionary_value.take_unchecked().downcast<Dictionary>().take_unchecked();
@@ -298,14 +298,14 @@ namespace goos::runtime {
         return ok(value.take_unchecked());
       }
 
-      return ok(Nil::value());
+      return Nil::ok();
     }
 
     // LHS
     Result<Any> lhs_result{evaluate(binary.get_lhs())};
     if (lhs_result.is_err()) return lhs_result.take_err_unchecked();
 
-    if (should_halt_control_flow()) return ok(Unit::value());
+    if (should_halt_control_flow()) return Unit::ok();
 
     const Any lhs_val{lhs_result.take_unchecked()};
 
@@ -314,7 +314,7 @@ namespace goos::runtime {
 
     if (rhs_result.is_err()) return rhs_result.take_err_unchecked();
 
-    if (should_halt_control_flow()) return ok(Unit::value());
+    if (should_halt_control_flow()) return Unit::ok();
     const Any rhs_val{rhs_result.take_unchecked()};
 
     // TODO all assign cases
@@ -335,7 +335,7 @@ namespace goos::runtime {
     switch (binary.get_op()) {
       case lexer::Operator::EQUALS: { return ok(crab::make_rc_mut<Boolean>(lhs_hash == rhs_hash)); }
       case lexer::Operator::NOT_EQUALS: { return ok(crab::make_rc_mut<Boolean>(lhs_hash != rhs_hash)); }
-      default: { return ok(Nil::value()); }
+      default: { return Nil::ok(); }
     }
   }
 
@@ -407,7 +407,7 @@ namespace goos::runtime {
     if (value_result.is_err()) return value_result.take_err_unchecked();
 
     if (should_halt_control_flow()) {
-      return ok(Unit::value());
+      return Unit::ok();
     }
 
     auto value = value_result.take_unchecked();
@@ -428,7 +428,7 @@ namespace goos::runtime {
     if (condition.is_err()) return condition.take_err_unchecked();
 
     if (should_halt_control_flow()) {
-      return ok(Unit::value());
+      return Unit::ok();
     }
 
     if (condition.take_unchecked()->is_truthy()) {
@@ -436,7 +436,7 @@ namespace goos::runtime {
       if (then.is_err()) return then.take_err_unchecked();
 
       if (should_halt_control_flow()) {
-        return ok(Unit::value());
+        return Unit::ok();
       }
 
       return then.take_unchecked();
@@ -446,7 +446,7 @@ namespace goos::runtime {
     if (else_then.is_err()) return crab::err(else_then.take_err_unchecked());
 
     if (should_halt_control_flow()) {
-      return ok(Unit::value());
+      return Unit::ok();
     }
 
     return ok(else_then.take_unchecked());
@@ -464,7 +464,7 @@ namespace goos::runtime {
           return ok(evaluation.take_unchecked());
         }
         pop_env();
-        return ok(Unit::value());
+        return Unit::ok();
       }
     }
 
@@ -481,7 +481,7 @@ namespace goos::runtime {
     }
 
     if (should_halt_control_flow()) {
-      return ok(Unit::value());
+      return Unit::ok();
     }
 
     return value;
@@ -495,7 +495,7 @@ namespace goos::runtime {
       if (condition.is_err()) return crab::err(condition.take_err_unchecked());
 
       if (should_halt_control_flow()) {
-        return ok(Unit::value());
+        return Unit::ok();
       }
 
       if (not condition.take_unchecked()->is_truthy()) {
@@ -510,7 +510,7 @@ namespace goos::runtime {
       }
 
       if (should_halt_control_flow()) {
-        return ok(Unit::value());
+        return Unit::ok();
       }
       eval = body.take_unchecked();
     }
@@ -523,13 +523,13 @@ namespace goos::runtime {
     if (obj_result.is_err()) return obj_result;
 
     if (should_halt_control_flow()) {
-      return ok(Unit::value());
+      return Unit::ok();
     }
 
     auto casted_opt = obj_result.take_unchecked().downcast<Dictionary>();
 
     if (casted_opt.is_none()) {
-      return ok(Unit::value());
+      return Unit::ok();
     }
 
     const meta::Identifier property = property_access.get_property();
@@ -563,7 +563,7 @@ namespace goos::runtime {
     }
 
     // TODO, make an error
-    return ok(Nil::value());
+    return Nil::ok();
   }
 
   auto Intepreter::visit_match(const parser::pass::expr::Match &) -> Result<Any> {

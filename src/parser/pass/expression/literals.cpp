@@ -43,10 +43,9 @@ namespace goos::parser::pass::expr {
 
   auto string(TokenStream &stream) -> OptionalResult<ast::expression::StringLiteral> {
     if (auto str = stream.try_consume<token::StringLiteral>()) {
-      const WideString literal{str.take_unchecked()->get_string()};
       return crab::ok(
         crab::some(
-          crab::make_box<ast::expression::StringLiteral>(std::move(literal))
+          crab::make_box<ast::expression::StringLiteral>(str.take_unchecked()->get_string())
         )
       );
     }

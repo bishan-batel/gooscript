@@ -9,12 +9,12 @@
 #include "json/Text.hpp"
 
 namespace goos::ast::expression {
-  StringLiteral::StringLiteral(WideString literal) : literal(std::move(literal)) {}
+  StringLiteral::StringLiteral(Rc<WideString> literal) : literal(std::move(literal)) {}
 
-  auto StringLiteral::get_string() const -> const WideString& { return literal; }
+  auto StringLiteral::get_string() const -> Rc<WideString> { return literal; }
 
   auto StringLiteral::to_string() const -> WideString {
-    return fmt::format(L"\"{}\"", literal);
+    return fmt::format(L"\"{}\"", *literal);
   }
 
   auto StringLiteral::clone_expr() const -> Box<Expression> {
