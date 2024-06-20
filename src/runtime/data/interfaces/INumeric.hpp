@@ -12,5 +12,9 @@ namespace goos::runtime {
     [[nodiscard]] virtual auto get_number() const -> f64 = 0;
 
     [[nodiscard]] virtual auto is_integral() const -> bool = 0;
+
+    [[nodiscard]] auto operator*() const -> f64 {
+      return get_number();
+    }
   };
 }
