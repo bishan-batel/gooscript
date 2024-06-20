@@ -20,6 +20,10 @@ namespace goos::runtime {
 
     explicit GString(WideString string = L"");
 
+    explicit GString(WideStringView string);
+
+    explicit GString(const widechar* string);
+
     explicit GString(const meta::Identifier &identifier);
 
     explicit GString(Rc<WideString> string);

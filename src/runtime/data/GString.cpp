@@ -9,6 +9,10 @@
 namespace goos::runtime {
   GString::GString(WideString string): GString{crab::make_rc<WideString>(std::move(string))} {}
 
+  GString::GString(const WideStringView string) : GString{WideString{string}} {}
+
+  GString::GString(const widechar *string) : GString{WideStringView{string}} {}
+
   GString::GString(const meta::Identifier &identifier)
     : text{identifier.get_string_ref_counted()},
       cached_hash{identifier.get_hash()} {}
