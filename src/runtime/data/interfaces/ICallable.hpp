@@ -8,6 +8,8 @@
 #include "runtime/Environment.hpp"
 
 namespace goos::runtime {
+  class Intepreter;
+
   enum class ArityType {
     Varargs,
     Finite
