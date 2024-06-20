@@ -46,6 +46,7 @@ namespace goos::runtime {
 
   Intepreter::Intepreter() : Intepreter{builtin::get_standard_enviornment()} {}
 
+  // Scope Functions
   auto Intepreter::set_env(RcMut<Environment> environment) -> void {
     current_environment = std::move(environment);
   }
@@ -74,6 +75,7 @@ namespace goos::runtime {
     return current_environment;
   }
 
+  // Halting / Breaking Functions
   auto Intepreter::halt(const ControlFlowFlag flag, Any value) -> void {
     halt_flags.set(static_cast<u32>(flag));
     debug_assert(halt_evaluation.is_none(), "Invaliod Halting");
@@ -114,6 +116,8 @@ namespace goos::runtime {
   auto Intepreter::evaluate_shallow(const ast::Expression &expr) -> Result<Any> {
     return expr.accept_expr(*this);
   }
+
+  // AST Expansion Methods
 
   auto Intepreter::visit_eval([[maybe_unused]] const ast::Eval &eval) -> VoidResult {
     auto expr = evaluate(eval.get_expression());
