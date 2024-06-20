@@ -4,6 +4,7 @@
 
 #pragma once
 #include "interfaces/IValue.hpp"
+#include "runtime/err/RuntimeError.hpp"
 
 namespace goos::runtime {
   class Unit final : public IValue {
@@ -11,6 +12,8 @@ namespace goos::runtime {
     static constexpr meta::VariantType TYPE{meta::VariantType::UNIT};
 
     static auto value() -> RcMut<Unit>;
+
+    static auto ok() -> Result<Any>;
 
     Unit();
 

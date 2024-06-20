@@ -7,7 +7,7 @@
 
 namespace goos::runtime {
   auto Nil::value() -> RcMut<Nil> {
-    static const RcMut<Nil> VALUE = crab::make_rc_mut<Nil>();
+    static const RcMut<Nil> VALUE = RcMut<Nil>::from_owned_unchecked(new Nil{});
     return VALUE;
   }
 
@@ -26,6 +26,6 @@ namespace goos::runtime {
   }
 
   auto Nil::clone() const -> Any {
-    return crab::make_rc_mut<Nil>();
+    return value();
   }
 }

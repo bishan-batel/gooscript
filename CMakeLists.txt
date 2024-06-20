@@ -151,8 +151,8 @@ set(SOURCE_FILES
         src/ast/expression/PropertyAccess.hpp
         src/runtime/data/LValue.cpp
         src/runtime/data/LValue.hpp
-        src/token/Array.cpp
-        src/token/Array.hpp
+        src/runtime/data/Array.cpp
+        src/runtime/data/Array.hpp
         src/ast/expression/ArrayIndex.cpp
         src/ast/expression/ArrayIndex.hpp
         src/runtime/data/interfaces/ICallable.hpp

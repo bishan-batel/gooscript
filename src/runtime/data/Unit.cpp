@@ -10,6 +10,10 @@ namespace goos::runtime {
     return VALUE;
   }
 
+  auto Unit::ok() -> Result<Any> {
+    return crab::ok<Any>(value());
+  }
+
   Unit::Unit() = default;
 
   auto Unit::to_string() const -> WideString {

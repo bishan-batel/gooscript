@@ -7,14 +7,14 @@
 
 namespace goos::runtime {
   class Nil final : public IValue {
+    Nil() = default;
+
+    explicit Nil(std::nullptr_t);
+
   public:
     static constexpr meta::VariantType TYPE{meta::VariantType::NIL};
 
     static auto value() -> RcMut<Nil>;
-
-    Nil() = default;
-
-    explicit Nil(std::nullptr_t);
 
     auto to_string() const -> WideString override;
 
