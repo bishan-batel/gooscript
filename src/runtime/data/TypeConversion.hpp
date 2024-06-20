@@ -131,6 +131,8 @@ namespace goos::runtime::type {
 
   goos_define_from_cpp(WideStringView, GString);
 
+  goos_define_from_cpp(const widechar*, GString);
+
   goos_define_to_cpp(GString, Rc<WideString>);
 
   // Monostate / 0 sized types
