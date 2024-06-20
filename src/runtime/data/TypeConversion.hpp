@@ -11,6 +11,7 @@
 #include "Nil.hpp"
 #include "Unit.hpp"
 #include "ast/Statement.hpp"
+#include "runtime/err/InvalidCast.hpp"
 
 namespace goos::runtime::type {
   /**
@@ -144,6 +145,9 @@ namespace goos::runtime::type {
 
   #undef goos_define_from_cpp
 
+  template<std::derived_from<IValue> T>
+  constexpr meta::VariantType variant_type_of = T::TYPE;
+
   // Conversions
   template<specialized_value Wrapper>
   auto from_goos(RcMut<Wrapper> wrapper) -> goos_to_primitive_t<Wrapper> {
@@ -189,6 +193,14 @@ namespace goos::runtime::type {
   template<value_type T>
   auto to_goos_any(RcMut<T> primitive) -> Any {
     return primitive;
+  }
+
+  template<value_type Into, value_type From>
+  auto coerce(RcMut<From> from) -> Result<RcMut<Into>> {
+    if (Option<RcMut<Into>> obj = from.template downcast<Into>(); obj.is_some())
+      return obj.take_unchecked();
+
+    return err::make<err::InvalidCast>(from->get_type(), variant_type_of<Into>);
   }
 
   // Identitiy function if trying to convert a value to a value
