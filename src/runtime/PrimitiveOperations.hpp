@@ -112,7 +112,8 @@ namespace goos::runtime::primitive_operators {
       #define ARRAY_APPEND(ty) std::make_pair<BinaryOperands, BinaryFunction>(\
         BinaryOperands{VariantType::ARRAY, VariantType::ty, Operator::ADD_ASSIGN},\
         [](Any lhs, Any rhs) {\
-          RcMut<Array> lhs_arr = crab::unwrap(lhs.downcast<Array>());\s_arr->push(std::move(rhs));\
+          RcMut<Array> lhs_arr = crab::unwrap(lhs.downcast<Array>());\
+          lhs_arr->push(std::move(rhs));\
           return lhs;\
         }\
       )
@@ -164,6 +165,9 @@ namespace goos::runtime::primitive_operators {
       operation(MUL, Decimal, Decimal, Decimal, lhs * rhs),
       operation(DIV, Decimal, Decimal, Decimal, lhs / rhs),
       operation(MOD, Decimal, Decimal, Decimal, std::fmod(lhs, rhs)),
+
+      operation(EQUALS, Integer, Decimal, Boolean, std::abs(static_cast<f64>(lhs) - rhs) < 1E-4_f64),
+      operation(EQUALS, Decimal, Integer, Boolean, std::abs(static_cast<f64>(rhs) - lhs) < 1E-4_f64),
     };
     #undef operation
 
