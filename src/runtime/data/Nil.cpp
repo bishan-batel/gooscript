@@ -11,6 +11,10 @@ namespace goos::runtime {
     return VALUE;
   }
 
+  auto Nil::ok() -> Result<Any> {
+    return Result<Any>{value()};
+  }
+
   Nil::Nil(std::nullptr_t) : Nil{} {}
 
   auto Nil::to_string() const -> WideString {

@@ -4,6 +4,7 @@
 
 #pragma once
 #include "interfaces/IValue.hpp"
+#include "runtime/err/RuntimeError.hpp"
 
 namespace goos::runtime {
   class Nil final : public IValue {
@@ -16,11 +17,13 @@ namespace goos::runtime {
 
     static auto value() -> RcMut<Nil>;
 
-    auto to_string() const -> WideString override;
+    static auto ok() -> Result<Any>;
 
-    auto get_type() const -> meta::VariantType override;
+    [[nodiscard]] auto to_string() const -> WideString override;
 
-    auto base_hash() const -> usize override;
+    [[nodiscard]] auto get_type() const -> meta::VariantType override;
+
+    [[nodiscard]] auto base_hash() const -> usize override;
 
     [[nodiscard]] auto clone() const -> Any override;
   };
