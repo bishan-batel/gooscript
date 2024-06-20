@@ -1,1 +1,184 @@
-{"eval":{"type":"unit"},"statements":[{"mutability":"let","initial":100,"name":"N","type":"declvar"},{"mutability":"let mut","initial":0,"name":"n","type":"declvar"},{"do":{"eval":{"type":"unit"},"statements":[{"mutability":"let","initial":{"ident":"n","type":"identifier"},"name":"fizz","type":"declvar"},{"ident":"mod","type":"identifier"},3,{"mutability":"let","initial":{"ident":"n","type":"identifier"},"name":"buzz","type":"declvar"},{"ident":"mod","type":"identifier"},5,{"else":{"type":"unit"},"then":{"eval":{"type":"unit"},"statements":[{"args":["{N}"],"function":{"ident":"log","type":"identifier"},"type":"funcall"}],"type":"scope"},"condition":{"expr":{"rhs":{"ident":"buzz","type":"identifier"},"lhs":{"ident":"fizz","type":"identifier"},"op":"or"},"op":"not"},"type":"if"},{"rhs":1,"lhs":{"ident":"n","type":"identifier"},"op":"+="}],"type":"scope"},"condition":{"rhs":10,"lhs":{"ident":"N","type":"identifier"},"op":"<"},"type":"while"},{"mutability":"let","initial":0,"name":"a","type":"declvar"},{"mutability":"let","initial":0,"name":"b","type":"declvar"},{"mutability":"let","initial":0,"name":"c","type":"declvar"},{"mutability":"let","initial":0,"name":"_","type":"declvar"},{"else":{"type":"unit"},"then":{"eval":{"type":"unit"},"statements":[],"type":"scope"},"condition":{"ident":"true","type":"identifier"},"type":"if"},{"do":{"eval":{"type":"unit"},"statements":[],"type":"scope"},"condition":{"rhs":10,"lhs":{"ident":"N","type":"identifier"},"op":"<"},"type":"while"},{"eval":{"args":[],"function":{"ident":"print","type":"identifier"},"type":"funcall"},"statements":[],"type":"scope"}],"type":"scope"}
+{
+  "eval": {
+    "type": "unit"
+  },
+  "statements": [
+    {
+      "mutability": "let",
+      "initial": 100.0,
+      "name": "N",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let mut",
+      "initial": 0,
+      "name": "n",
+      "type": "declvar"
+    },
+    {
+      "do": {
+        "eval": {
+          "type": "unit"
+        },
+        "statements": [
+          {
+            "mutability": "let",
+            "initial": {
+              "ident": "n",
+              "type": "identifier"
+            },
+            "name": "fizz",
+            "type": "declvar"
+          },
+          {
+            "ident": "mod",
+            "type": "identifier"
+          },
+          3,
+          {
+            "mutability": "let",
+            "initial": {
+              "ident": "n",
+              "type": "identifier"
+            },
+            "name": "buzz",
+            "type": "declvar"
+          },
+          {
+            "ident": "mod",
+            "type": "identifier"
+          },
+          5,
+          {
+            "else": {
+              "type": "unit"
+            },
+            "then": {
+              "eval": {
+                "type": "unit"
+              },
+              "statements": [
+                {
+                  "args": [
+                    "{N}"
+                  ],
+                  "function": {
+                    "ident": "log",
+                    "type": "identifier"
+                  },
+                  "type": "funcall"
+                }
+              ],
+              "type": "scope"
+            },
+            "condition": {
+              "expr": {
+                "rhs": {
+                  "ident": "buzz",
+                  "type": "identifier"
+                },
+                "lhs": {
+                  "ident": "fizz",
+                  "type": "identifier"
+                },
+                "op": "or"
+              },
+              "op": "not"
+            },
+            "type": "if"
+          },
+          {
+            "rhs": 1,
+            "lhs": {
+              "ident": "n",
+              "type": "identifier"
+            },
+            "op": "+="
+          }
+        ],
+        "type": "scope"
+      },
+      "condition": {
+        "rhs": 10,
+        "lhs": {
+          "ident": "N",
+          "type": "identifier"
+        },
+        "op": "<"
+      },
+      "type": "while"
+    },
+    {
+      "mutability": "let",
+      "initial": 0,
+      "name": "a",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let",
+      "initial": 0,
+      "name": "b",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let",
+      "initial": 0,
+      "name": "c",
+      "type": "declvar"
+    },
+    {
+      "mutability": "let",
+      "initial": 0,
+      "name": "_",
+      "type": "declvar"
+    },
+    {
+      "else": {
+        "type": "unit"
+      },
+      "then": {
+        "eval": {
+          "type": "unit"
+        },
+        "statements": [],
+        "type": "scope"
+      },
+      "condition": {
+        "ident": "true",
+        "type": "identifier"
+      },
+      "type": "if"
+    },
+    {
+      "do": {
+        "eval": {
+          "type": "unit"
+        },
+        "statements": [],
+        "type": "scope"
+      },
+      "condition": {
+        "rhs": 10,
+        "lhs": {
+          "ident": "N",
+          "type": "identifier"
+        },
+        "op": "<"
+      },
+      "type": "while"
+    },
+    {
+      "eval": {
+        "args": [],
+        "function": {
+          "ident": "print",
+          "type": "identifier"
+        },
+        "type": "funcall"
+      },
+      "statements": [],
+      "type": "scope"
+    }
+  ],
+  "type": "scope"
+}
