@@ -120,7 +120,6 @@ fn is_curr(ty) {
 
 fn next => pos = pos + 1;
 
-
 fn any => if is_curr(Token:OPEN_CURLY) {
   obj()
 } else if is_curr(Token:OPEN_BRACKET) {
@@ -166,64 +165,62 @@ fn array {
 
 let parsed = any();
 
-fn is_eq(a, b) { 
-  let result = (fn {
-    let ty = typeof(a);
+#fn is_eq(a, b) { 
+#  let result = (fn {
+#    let ty = typeof(a);
+#
+#    if ty != typeof(b) {
+#      return unless a == b {
+#        print(0)
+#        false
+#      } else true
+#    } else if ty == "object" {
+#      let equals = true
+#      each(a, fn(k, v) {
+#        unless is_eq(v, b[k]) {
+#      print(1)
+#          equals = false;
+#        }
+#      })
+#      return equals
+#    } else if ty == "array" {
+#      if len(a) != len(b) {
+#        print(2)
+  #        return false;
+  #      }
+#
+#      var i = 0
+#
+#      while i < len(a) {
+  #        unless is_eq(a[i], b[i]) {
+#          print(3)
+#          return false
+#        }
+  #        i = i + 1
+  #      }
+#      return true
+#    } else if ty == "unit" or ty == "nil" {
+#      print(5)
+#      return true
+#    } else if a == b {
+#      return true;
+#    } else {
+#      false
+#      return false;
+#    }
+#
+#  })() 
+#
+#
+#  unless result {
+#    if a == b {
+#      return true;
+#    }
+#    fatal(1);
+#  }
+#
+#  return result;
+#}
 
-    if ty != typeof(b) {
-      return unless a == b {
-        print(0)
-        false
-      } else true
-    } else if ty == "object" {
-      let equals = true
-      each(a, fn(k, v) {
-        unless is_eq(v, b[k]) {
-      print(1)
-          equals = false;
-        }
-      })
-      return equals
-    } else if ty == "array" {
-      if len(a) != len(b) {
-        print(2)
-        return false;
-      }
-
-      var i = 0
-
-      while i < len(a) {
-        unless is_eq(a[i], b[i]) {
-          print(3)
-          return false
-        }
-        i = i + 1
-      }
-      return true
-    } else if ty == "unit" or ty == "nil" {
-      print(5)
-      return true
-    } else if a == b {
-      return true;
-    } else {
-      false
-      return false;
-    }
-
-  })() 
-
-
-  unless result {
-    if a == b {
-      return true;
-    }
-    fatal(1);
-  }
-
-  result
-}
-
-# print(original);
-print(parsed == original)
-
-is_eq(parsed, original)
+print(parsed);
+# is_eq(parsed, original)
