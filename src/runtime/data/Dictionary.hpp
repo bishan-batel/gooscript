@@ -81,7 +81,7 @@ namespace goos::runtime {
 
     auto has_key_index(utils::hash_code hashed_key) const -> bool;
 
-    [[nodiscard]] auto get_pairs() -> const ::Dictionary<utils::hash_code, Pair>&;
+    [[nodiscard]] auto get_pairs() const -> const ::Dictionary<utils::hash_code, Pair>&;
 
     [[nodiscard]] auto length() const -> usize;
 

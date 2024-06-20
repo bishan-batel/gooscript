@@ -11,9 +11,7 @@
 #include "numeric"
 
 namespace goos::runtime {
-  Dictionary::Dictionary() {
-    cached_hash = base_hash();
-  }
+  Dictionary::Dictionary() : cached_hash{0}, is_cache_dirty{true} {}
 
   auto Dictionary::insert_with_precomputed_hash(const utils::hash_code hash_code, Any key, Any value) -> void {
     // just insert it directly
@@ -85,7 +83,7 @@ namespace goos::runtime {
     return pairs.contains(hashed_key);
   }
 
-  auto Dictionary::get_pairs() -> const ::Dictionary<utils::hash_code, Pair>& { return pairs; }
+  auto Dictionary::get_pairs() const -> const ::Dictionary<utils::hash_code, Pair>& { return pairs; }
 
   auto Dictionary::length() const -> usize {
     return pairs.size();
