@@ -36,6 +36,7 @@
 #include "ast/expression/PropertyAccess.hpp"
 #include "ast/expression/Unary.hpp"
 #include "ast/expression/literal/Dictionary.hpp"
+#include "builtin/StandardEnviornment.hpp"
 #include "data/Closure.hpp"
 #include "data/Dictionary.hpp"
 #include "token/Array.hpp"
@@ -43,7 +44,7 @@
 namespace goos::runtime {
   Intepreter::Intepreter(RcMut<Environment> globals) : current_environment{std::move(globals)} {}
 
-  Intepreter::Intepreter() : Intepreter{Environment::get_standard_environment(*this)} {}
+  Intepreter::Intepreter() : Intepreter{builtin::get_standard_enviornment()} {}
 
   auto Intepreter::set_env(RcMut<Environment> environment) -> void {
     current_environment = std::move(environment);
@@ -329,7 +330,7 @@ namespace goos::runtime {
     }
 
     const auto lhs_hash = lhs_val->hash();
-    const auto rhs_hash = lhs_val->hash();
+    const auto rhs_hash = rhs_val->hash();
 
     switch (binary.get_op()) {
       case lexer::Operator::EQUALS: { return ok(crab::make_rc_mut<Boolean>(lhs_hash == rhs_hash)); }
