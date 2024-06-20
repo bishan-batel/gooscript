@@ -3,11 +3,12 @@
 //
 
 #pragma once
+#include "interfaces/IIndexible.hpp"
 #include "interfaces/IValue.hpp"
 #include "meta/Identifier.hpp"
 
 namespace goos::runtime {
-  class GString final : public IValue {
+  class GString final : public IIndexible {
     Rc<WideString> text;
     // mutable usize cached_hash;
     mutable usize cached_hash;
@@ -22,7 +23,7 @@ namespace goos::runtime {
 
     explicit GString(WideStringView string);
 
-    explicit GString(const widechar* string);
+    explicit GString(const widechar *string);
 
     explicit GString(const meta::Identifier &identifier);
 
@@ -37,5 +38,7 @@ namespace goos::runtime {
     [[nodiscard]] auto base_hash() const -> usize override;
 
     [[nodiscard]] auto clone() const -> Any override;
+
+    [[nodiscard]] auto index(Any index) -> Result<Any> override;
   };
 }

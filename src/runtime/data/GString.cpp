@@ -6,6 +6,8 @@
 
 #include <fmt/xchar.h>
 
+#include "TypeConversion.hpp"
+
 namespace goos::runtime {
   GString::GString(WideString string): GString{crab::make_rc<WideString>(std::move(string))} {}
 
@@ -39,5 +41,15 @@ namespace goos::runtime {
 
   auto GString::clone() const -> Any {
     return crab::make_rc_mut<GString>(text);
+  }
+
+  auto GString::index(const Any index) -> Result<Any> {
+    auto integer = type::coerce<Integer>(index);
+
+    if (integer.is_err()) return integer.take_err_unchecked();
+
+    // TODO out of bounds index
+    const auto i = static_cast<usize>(integer.take_unchecked()->get());
+    return type::to_goos_any(WideStringView{&text->at(i), 1});
   }
 }

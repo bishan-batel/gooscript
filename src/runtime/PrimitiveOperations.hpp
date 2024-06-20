@@ -16,7 +16,7 @@
 #include "data/Integer.hpp"
 #include "data/GString.hpp"
 #include "data/TypeConversion.hpp"
-#include "token/Array.hpp"
+#include "data/Array.hpp"
 
 namespace goos::runtime::primitive_operators {
   struct BinaryOperands;

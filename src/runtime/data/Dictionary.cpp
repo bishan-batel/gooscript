@@ -63,6 +63,10 @@ namespace goos::runtime {
     return get_lvalue(*key).take_unchecked();
   }
 
+  auto Dictionary::index(const Any index) -> Result<Any> {
+    return ok(get_or_insert_lvalue(index));
+  }
+
   auto Dictionary::index(const utils::hash_code hashed_key) const -> Option<Pair> {
     if (not has_key_index(hashed_key)) {
       return crab::none;

@@ -23,7 +23,7 @@
 #include "data/interfaces/ICallable.hpp"
 #include "parser/TokenStream.hpp"
 #include "parser/pass/statement/block.hpp"
-#include "token/Array.hpp"
+#include "data/Array.hpp"
 
 namespace goos::runtime {
   Variable::Variable(const meta::Mutability mutability, Any value)

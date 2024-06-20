@@ -39,7 +39,7 @@
 #include "builtin/StandardEnviornment.hpp"
 #include "data/Closure.hpp"
 #include "data/Dictionary.hpp"
-#include "token/Array.hpp"
+#include "data/Array.hpp"
 
 namespace goos::runtime {
   Intepreter::Intepreter(RcMut<Environment> globals) : current_environment{std::move(globals)} {}
@@ -548,33 +548,18 @@ namespace goos::runtime {
     Result<Any> obj_result = evaluate(array_index.get_object());
     if (obj_result.is_err()) return obj_result.take_err_unchecked();
 
-    if (should_halt_control_flow()) return ok(Unit::value());
+    if (should_halt_control_flow()) return Unit::ok();
 
     Result<Any> index_result = evaluate(array_index.get_index());
     if (index_result.is_err()) return index_result.take_err_unchecked();
 
-    if (should_halt_control_flow()) return ok(Unit::value());
+    if (should_halt_control_flow()) return Unit::ok();
 
     const Any obj = obj_result.take_unchecked();
-    const Any index = index_result.take_unchecked();
+    Any index = index_result.take_unchecked();
 
-    if (auto opt = obj.downcast<Dictionary>()) {
-      return ok(opt.take_unchecked()->get_or_insert_lvalue(index));
-    }
-
-    if (auto opt = obj.downcast<Array>()) {
-      Array &arr = *opt.take_unchecked();
-
-      // TODO, make an error for invalid index type
-      return ok(arr[type::try_from_goose<usize>(index).take_unchecked()]);
-    }
-
-    if (auto opt = obj.downcast<GString>()) {
-      const GString &str = *opt.take_unchecked();
-
-      // TODO, make an error for invalid index type
-      const widechar c = str.get()->at(type::try_from_goose<usize>(index).take_unchecked());
-      return ok(crab::make_rc_mut<GString>(WideString{c}));
+    if (auto opt = obj.downcast<IIndexible>()) {
+      return opt.take_unchecked()->index(std::move(index));
     }
 
     // TODO, make an error

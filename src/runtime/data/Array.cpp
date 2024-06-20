@@ -6,7 +6,8 @@
 
 #include <sstream>
 
-#include "runtime/data/LValue.hpp"
+#include "LValue.hpp"
+#include "TypeConversion.hpp"
 
 namespace goos {
   runtime::Array::Array(Vec<Any> values): values{std::move(values)} {}
@@ -64,5 +65,14 @@ namespace goos {
 
   auto runtime::Array::length() const -> usize {
     return values.size();
+  }
+
+  auto runtime::Array::index(const Any index) -> Result<Any> {
+    auto integer = type::coerce<Integer>(index);
+    if (integer.is_err()) return integer.take_err_unchecked();
+
+    // TODO out of bounds index
+    const auto i = static_cast<usize>(integer.take_unchecked()->get());
+    return ok(LValue::wrap(values.at(i)));
   }
 } // goos

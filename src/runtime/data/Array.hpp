@@ -3,12 +3,13 @@
 //
 
 #pragma once
-#include "meta/VariantType.hpp"
-#include "../runtime/data/interfaces/IValue.hpp"
-#include "runtime/data/LValue.hpp"
+#include "../../meta/VariantType.hpp"
+#include "interfaces/IValue.hpp"
+#include "LValue.hpp"
+#include "interfaces/IIndexible.hpp"
 
 namespace goos::runtime {
-  class Array final : public IValue {
+  class Array final : public IIndexible {
     Vec<Any> values{};
 
   public:
@@ -31,6 +32,8 @@ namespace goos::runtime {
     [[nodiscard]] auto get() const -> const Vec<Any>&;
 
     [[nodiscard]] auto length() const -> usize;
+
+    [[nodiscard]] auto index(Any index) -> Result<Any> override;
 
     constexpr static auto TYPE = meta::VariantType::ARRAY;
   };
