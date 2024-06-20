@@ -11,10 +11,10 @@
 
 namespace goos::parser::err {
   class ErrorBase {
-    Box<token::Token> token;
+    Rc<token::Token> token;
 
   public:
-    explicit ErrorBase(Box<token::Token> token);
+    explicit ErrorBase(Rc<token::Token> token);
 
     ErrorBase(const ErrorBase &) = delete;
 
@@ -53,7 +53,7 @@ namespace goos::parser::err {
     String expected_type;
 
   public:
-    ExpectedToken(String expected_type, Box<token::Token> receieved);
+    ExpectedToken(String expected_type, Rc<token::Token> receieved);
 
     [[nodiscard]] auto what() const -> String override;
 
@@ -61,10 +61,10 @@ namespace goos::parser::err {
   };
 
   class ExpectedExpression final : public ErrorBase {
-    Box<token::Token> from;
+    Rc<token::Token> from;
 
   public:
-    ExpectedExpression(Box<token::Token> from, Box<token::Token> to);
+    ExpectedExpression(Rc<token::Token> from, Rc<token::Token> to);
 
     [[nodiscard]] auto what() const -> String override;
   };

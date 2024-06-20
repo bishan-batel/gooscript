@@ -12,8 +12,6 @@ namespace goos::token {
 
   auto Integer::get_number() const -> i64 { return number; }
 
-  auto Integer::clone() const -> Box<Token> { return crab::make_box<Integer>(get_file(), get_range(), number); }
-
   auto Integer::to_string() const -> WideString { return fmt::format(L"{}", number); }
 
   auto Integer::operator==(const Token &other) const -> bool {

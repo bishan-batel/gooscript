@@ -31,8 +31,6 @@ namespace goos::token {
 
     [[nodiscard]] auto get_identifier() const -> const meta::Identifier&;
 
-    [[nodiscard]] auto clone() const -> Box<Token> override;
-
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto operator==(const Token &other) const -> bool override;

@@ -40,7 +40,7 @@ namespace goos::lexer {
   template<typename T>
   using Result = Result<T, Error>;
 
-  using TokenList = Vec<Box<token::Token>>;
+  using TokenList = Vec<Rc<token::Token>>;
 
   static const Set<widechar> WHITESPACE_CHARS{L' ', L'\t', L'\n', L'\r'};
 
@@ -54,11 +54,11 @@ namespace goos::lexer {
 
     [[nodiscard]] auto error(Error::Type, usize begin) const -> Error;
 
-    auto push(Box<Token> token) -> void;
+    auto push(Rc<Token> token) -> void;
 
     template<typename T, typename... Args> requires std::is_constructible_v<T, Args...>
     auto emplace(Args... args) -> void {
-      push(crab::make_box<T>(args...));
+      push(crab::make_rc<T>(args...));
     }
 
     [[nodiscard]] auto curr() const -> widechar;

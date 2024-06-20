@@ -10,8 +10,6 @@ namespace goos::token {
   public:
     explicit EndOfFile(SourceFile file);
 
-    [[nodiscard]] auto clone() const -> Box<Token> override;
-
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto operator==(const Token &other) const -> bool override;

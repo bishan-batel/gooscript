@@ -74,7 +74,7 @@ namespace goos::parser::pass {
       return crab::ok(crab::some(crab::make_box<ast::Return>(crab::make_box<ast::expression::Unit>())));
     }
 
-    if (auto op = crab::ref::cast<token::Operator>(stream.curr());
+    if (auto op = stream.curr().downcast<token::Operator>();
       op and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
       return crab::ok(crab::some(crab::make_box<ast::Return>(crab::make_box<ast::expression::Unit>())));
     }
@@ -165,7 +165,7 @@ namespace goos::parser::pass {
       return crab::ok(crab::some(crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())));
     }
 
-    if (auto op = crab::ref::cast<token::Operator>(stream.curr());
+    if (auto op = stream.curr().downcast<token::Operator>();
       op and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
       return crab::ok(crab::some(crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())));
     }

@@ -11,10 +11,6 @@ namespace goos::token {
 
   auto Identifier::get_identifier() const -> const meta::Identifier& { return identifier; }
 
-  auto Identifier::clone() const -> Box<Token> {
-    return crab::make_box<Identifier>(get_file(), get_range(), identifier);
-  }
-
   auto Identifier::to_string() const -> WideString {
     return identifier.get_string();
   }

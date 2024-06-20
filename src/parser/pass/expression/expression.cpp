@@ -14,7 +14,7 @@
 
 namespace goos::parser::pass::expr {
   auto factor(TokenStream &stream) -> MustEvalResult<ast::Expression> {
-    if (auto op = crab::ref::cast<token::Operator>(stream.curr()); op and is_unary(op.get_unchecked()->get_op())) {
+    if (auto op = stream.curr().downcast<token::Operator>(); op and is_unary(op.get_unchecked()->get_op())) {
       stream.next();
       auto operand{factor(stream)};
 
@@ -128,7 +128,7 @@ namespace goos::parser::pass::expr {
     const Set<lexer::Operator> &operators = ORDER_OF_OPERATIONS.at(op_index);
 
     while (not stream.is_eof()) {
-      auto op_option{crab::ref::cast<token::Operator>(stream.curr())};
+      auto op_option{stream.curr().downcast<token::Operator>()};
       if (op_option.is_none())
         break;
 

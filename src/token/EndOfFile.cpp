@@ -7,10 +7,6 @@
 goos::token::EndOfFile::EndOfFile(SourceFile file)
   : Token{std::move(file), crab::range<usize>(0, 1)} {}
 
-auto goos::token::EndOfFile::clone() const -> Box<Token> {
-  return crab::make_box<EndOfFile>(get_file());
-}
-
 auto goos::token::EndOfFile::to_string() const -> WideString {
   return L"EOF";
 }

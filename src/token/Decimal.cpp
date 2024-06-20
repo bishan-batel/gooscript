@@ -11,8 +11,6 @@ namespace goos::token {
 
   auto Decimal::get_number() const -> f64 { return number; }
 
-  auto Decimal::clone() const -> Box<Token> { return crab::make_box<Decimal>(get_file(), get_range(), number); }
-
   auto Decimal::to_string() const -> WideString {
     return fmt::format(L"{}D", number);
   }

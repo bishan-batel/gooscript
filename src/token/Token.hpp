@@ -24,8 +24,6 @@ namespace goos::token {
 
     [[nodiscard]] virtual auto operator==(const Token &other) const -> bool = 0;
 
-    [[nodiscard]] virtual auto clone() const -> Box<Token> = 0;
-
     [[nodiscard]] auto get_file() const -> const SourceFile&;
 
     [[nodiscard]] auto get_range() const -> const Range<>&;

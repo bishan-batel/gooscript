@@ -48,7 +48,7 @@ namespace goos::lexer {
         );
   }
 
-  auto Error::get_type() const -> Error::Type { return type; }
+  auto Error::get_type() const -> Type { return type; }
 
   Lexer::Lexer(SourceFile content) : file{std::move(content)} {}
 
@@ -56,7 +56,7 @@ namespace goos::lexer {
     return Error{type, file, crab::range(begin, position)};
   }
 
-  auto Lexer::push(Box<Token> token) -> void {
+  auto Lexer::push(Rc<Token> token) -> void {
     tokens.push_back(std::move(token));
   }
 
@@ -211,7 +211,11 @@ namespace goos::lexer {
 
     next();
 
-    emplace<token::StringLiteral>(file, crab::range_inclusive(begin, position), literal.str());
+    emplace<token::StringLiteral>(
+      file,
+      crab::range_inclusive(begin, position),
+      crab::make_rc<WideString>(literal.str())
+    );
 
     return crab::ok(true);
   }

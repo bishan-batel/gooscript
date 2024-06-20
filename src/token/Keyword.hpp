@@ -15,8 +15,6 @@ namespace goos::token {
 
     [[nodiscard]] auto get_word() const -> lexer::Keyword;
 
-    [[nodiscard]] auto clone() const -> Box<Token> override;
-
     [[nodiscard]] auto to_string() const -> WideString override;
 
     [[nodiscard]] auto operator==(const Token &other) const -> bool override;

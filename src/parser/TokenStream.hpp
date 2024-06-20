@@ -46,7 +46,7 @@ namespace goos::parser {
   class TokenStream {
     lexer::TokenList list{};
     usize position{0};
-    token::EndOfFile eof;
+    Rc<token::EndOfFile> eof;
 
   public:
     explicit TokenStream(lexer::TokenList list);
@@ -55,13 +55,13 @@ namespace goos::parser {
      * Returns the current token
      */
     [[nodiscard]]
-    auto curr() const -> const token::Token&;
+    auto curr() const -> Rc<token::Token>;
 
     /**
      * @brief Advances by i times and returns the new current token
      * @param i How much to advance
      */
-    auto next(usize i = 1) -> const token::Token&;
+    auto next(usize i = 1) -> Rc<token::Token>;
 
     /**
      * @brief Queries if the current token is of type T
@@ -96,7 +96,7 @@ namespace goos::parser {
      */
     template<typename T> requires std::is_base_of_v<token::Token, T>
     [[nodiscard]]
-    auto try_consume() -> Option<Ref<T>>;
+    auto try_consume() -> Option<Rc<T>>;
 
     /**
      * @brief Attempts to take the current token if it is the given operator, return it,
@@ -141,11 +141,11 @@ namespace goos::parser {
 
     auto unexpected(String expected) -> err::Error;
 
-    auto unexpected(String expected, Box<token::Token> received) -> err::Error;
+    auto unexpected(String expected, Rc<token::Token> received) -> err::Error;
 
     [[nodiscard]] auto get_position() const -> usize;
 
-    [[nodiscard]] auto get_token(usize position) const -> const token::Token&;
+    [[nodiscard]] auto get_token(usize position) const -> Rc<token::Token>;
 
     [[nodiscard]] auto get_string(Range<> tok_range) const -> WideString;
 
@@ -154,12 +154,12 @@ namespace goos::parser {
 
   template<typename T> requires std::is_base_of_v<token::Token, T>
   auto TokenStream::is_curr() const -> bool {
-    return crab::ref::cast<T>(curr()).is_some();
+    return curr().downcast<T>().is_some();
   }
 
   template<typename T> requires std::is_base_of_v<token::Token, T>
-  auto TokenStream::try_consume() -> Option<Ref<T>> {
-    if (Option<Ref<T>> casted{crab::ref::cast<T>(curr())}; casted.is_some()) {
+  auto TokenStream::try_consume() -> Option<Rc<T>> {
+    if (auto casted{curr().downcast<T>()}; casted.is_some()) {
       next();
       return casted;
     }

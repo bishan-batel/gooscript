@@ -7,15 +7,10 @@
 #include <fmt/xchar.h>
 
 namespace goos::token {
-
   Operator::Operator(SourceFile file, const Range<> range, const lexer::Operator op)
     : Token{std::move(file), range}, op{op} {}
 
   auto Operator::get_op() const -> lexer::Operator { return op; }
-
-  auto Operator::clone() const -> Box<Token> {
-    return crab::make_box<Operator>(get_file(), get_range(), op);
-  }
 
   auto Operator::to_string() const -> WideString {
     return fmt::format(L"Operator {{'{}'}}", lexer::OPERATOR_TO_STR_MAP.at(op));
