@@ -6,6 +6,7 @@
 #include "parser/pass/statement/block.hpp"
 #include "runtime/Intepreter.hpp"
 #include "../src/runtime/data/interfaces/IValue.hpp"
+#include <chrono>
 #include "runtime/data/TypeConversion.hpp"
 #include "source/SourceFile.hpp"
 #include <fmt/format.h>
@@ -38,6 +39,8 @@ auto parse(const i32 argc, const char *argv[]) -> Dictionary<String, Vec<String>
     {"-h", "help"},
     {"--h", "help"},
     {"-t", "tokens"},
+    {"-b", "benchmark"},
+    {"--benchmark", "benchmark"},
     {"--tokens", "tokens"},
     {"--emit-ast", "emit-ast"},
     {"--o", "emit-ast"},
@@ -152,8 +155,29 @@ auto main(i32 argc, const char *argv[]) -> i32 {
   print(fg(fmt::color::light_green), "Running Program: \n");
   Intepreter intepreter{};
 
+  using namespace std::chrono;
+
+  // std::chrono::
+  auto start = steady_clock::now();
   Any exit_result = intepreter.evaluate(result.take_unchecked()).take_unchecked();
 
+  auto elapsed{steady_clock::now() - start};
+
   std::wcout << "Program exited with value: " << exit_result->to_string() << std::endl;
+
+  if (args.contains("benchmark")) {
+    const seconds sec{std::chrono::duration_cast<seconds>(elapsed)};
+    const milliseconds milli{std::chrono::duration_cast<milliseconds>(elapsed) % 1s};
+    const microseconds micro{std::chrono::duration_cast<microseconds>(elapsed) % 1ms};
+    const nanoseconds nano{elapsed % 1us};
+    fmt::print("Runtime Benchmark: ");
+    std::flush(std::cout);
+
+    if (sec >= 0s) {
+      std::cout << sec << " ";
+    }
+
+    std::cout << milli << " " << micro << " " << nano << std::endl;
+  }
   return 0;
 }
