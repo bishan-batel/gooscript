@@ -15,7 +15,6 @@ namespace goos::runtime {
 }
 
 namespace goos::runtime {
-  class Intepreter;
   class ExternFunction;
 
   class Variable final {
@@ -47,16 +46,13 @@ namespace goos::runtime {
     Dictionary<meta::Identifier, RcMut<Variable>> bindings{};
     Option<RcMut<Environment>> parent;
     usize depth{0};
-    RefMut<Intepreter> intepreter;
 
   public:
-    explicit Environment(Intepreter &intepreter, RcMut<Environment> parent);
+    explicit Environment(RcMut<Environment> parent);
 
-    explicit Environment(Intepreter &intepreter, Option<RcMut<Environment>> parent = crab::none);
+    explicit Environment(Option<RcMut<Environment>> parent = crab::none);
 
-    static auto get_standard_environment(Intepreter &intepreter) -> RcMut<Environment>;
-
-    static auto top_level_enviornment(Intepreter &intepreter) -> RcMut<Environment>;
+    static auto top_level_enviornment() -> RcMut<Environment>;
 
     static auto enclose(RcMut<Environment> enclosing) -> RcMut<Environment>;
 
@@ -87,8 +83,6 @@ namespace goos::runtime {
     [[nodiscard]] auto get_depth() const -> usize;
 
     auto get_previous() const -> Option<RcMut<Environment>>;
-
-    auto runtime() const -> Intepreter&;
   };
 
   namespace lambda {
