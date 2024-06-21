@@ -18,7 +18,9 @@ namespace goos::runtime::type {
    * @brief Any type that can be used as some form of IValue
    */
   template<typename T>
-  concept value_type = std::derived_from<T, IValue> ;
+  concept value_type = std::derived_from<T, IValue> and requires {
+    { T::TYPE } -> std::convertible_to<meta::VariantType>;
+  };
 
   /**
    * @brief Any non-abstract value type.
@@ -66,11 +68,6 @@ namespace goos::runtime::type {
   template<value_type T>
   struct type_to_goose<T> {
     using type = T;
-  };
-
-  template<typename T>
-  concept convertible_type = requires() {
-    typename type_to_goose_t<T>::type;
   };
 
   // Specific Template Instantiations
@@ -145,8 +142,11 @@ namespace goos::runtime::type {
 
   #undef goos_define_from_cpp
 
-  template<std::derived_from<IValue> T>
+  template<specialized_value T>
   constexpr meta::VariantType variant_type_of = T::TYPE;
+
+  template<convertible_primitive T>
+  constexpr meta::VariantType variant_type_of_primitive = variant_type_of<primitive_to_goose_t<T>>;
 
   // Conversions
   template<specialized_value Wrapper>
@@ -164,9 +164,9 @@ namespace goos::runtime::type {
   }
 
   template<convertible_primitive Primitive>
-  auto try_from_goose(Any wrapper) -> Option<Primitive> {
+  auto try_from_goose(Any wrapper) -> Option<typename crab::ref::decay_type<Primitive>::type> {
     if (auto specialized = wrapper.downcast<primitive_to_goose_t<Primitive>>()) {
-      return crab::some(static_cast<Primitive>(specialized.take_unchecked()->get()));
+      return static_cast<typename crab::ref::decay_type<Primitive>::type>(specialized.take_unchecked()->get());
     }
 
     // Identity case.
