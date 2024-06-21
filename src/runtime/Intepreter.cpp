@@ -119,7 +119,10 @@ namespace goos::runtime {
 
   // AST Expansion Methods
 
-  auto Intepreter::visit_eval([[maybe_unused]] const ast::Eval &eval) -> VoidResult {
+  auto Intepreter::visit_eval(
+    [[maybe_unused]
+    ] const ast::Eval &eval
+  ) -> VoidResult {
     auto expr = evaluate(eval.get_expression());
     if (expr.is_err()) return some(expr.take_err_unchecked());
 
@@ -423,7 +426,7 @@ namespace goos::runtime {
       return ok(UNARY_FUNCTIONS.at(index)(std::move(value)));
     }
 
-    return Any{Unit::value()};
+    return Unit::ok();
   }
 
   auto Intepreter::visit_if([[maybe_unused]] const ast::expression::If &if_expr) -> Result<Any> {
@@ -460,7 +463,7 @@ namespace goos::runtime {
     push_env();
     for (const auto &statement: scope.get_statements()) {
       if (auto err = execute(statement)) {
-        return crab::err(err.take_unchecked());
+        return err.take_unchecked();
       }
 
       if (should_halt_control_flow()) {
