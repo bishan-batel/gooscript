@@ -152,32 +152,47 @@ auto main(i32 argc, const char *argv[]) -> i32 {
 
   using namespace runtime;
 
-  print(fg(fmt::color::light_green), "Running Program: \n");
-  Intepreter intepreter{};
+  if (not args.contains("benchmark")) {
+    print(fg(fmt::color::light_green), "Running Program: \n");
+    Intepreter intepreter{};
+    Any exit_result = intepreter.evaluate(result.take_unchecked()).take_unchecked();
+    std::wcout << "Program exited with value: " << exit_result->to_string() << std::endl;
+    return 0;
+  }
 
   using namespace std::chrono;
 
-  // std::chrono::
-  auto start = steady_clock::now();
-  Any exit_result = intepreter.evaluate(result.take_unchecked()).take_unchecked();
+  const usize benchmark_count = args.at("benchmark").empty() ? 1 : std::stoull(args.at("benchmark").at(0));
 
-  auto elapsed{steady_clock::now() - start};
+  nanoseconds total = 0ns;
 
-  std::wcout << "Program exited with value: " << exit_result->to_string() << std::endl;
+  const auto padding{str::convert(str::repeat(L' ', 2))};
 
-  if (args.contains("benchmark")) {
-    const seconds sec{std::chrono::duration_cast<seconds>(elapsed)};
-    const milliseconds milli{std::chrono::duration_cast<milliseconds>(elapsed) % 1s};
-    const microseconds micro{std::chrono::duration_cast<microseconds>(elapsed) % 1ms};
-    const nanoseconds nano{elapsed % 1us};
-    fmt::print("Runtime Benchmark: ");
+  const auto ast_file{result.take_unchecked()};
+
+  for (usize i: crab::range(benchmark_count)) {
+    fmt::print("\rRunning benchmark ({}/{}) ...{}", i, benchmark_count, padding);
     std::flush(std::cout);
 
-    if (sec >= 0s) {
-      std::cout << sec << " ";
-    }
-
-    std::cout << milli << " " << micro << " " << nano << std::endl;
+    Intepreter intepreter{};
+    auto start = steady_clock::now();
+    std::ignore = intepreter.evaluate(ast_file).take_unchecked();
+    total += steady_clock::now() - start;
   }
+
+  const auto elapsed = total / benchmark_count;
+
+  const seconds sec{std::chrono::duration_cast<seconds>(elapsed)};
+  const milliseconds milli{std::chrono::duration_cast<milliseconds>(elapsed) % 1s};
+  const microseconds micro{std::chrono::duration_cast<microseconds>(elapsed) % 1ms};
+  const nanoseconds nano{elapsed % 1us};
+
+  std::cout << "\rFinished benchmark with an average of: ";
+
+  if (sec >= 0s) {
+    std::cout << sec << " ";
+  }
+
+  std::cout << milli << " " << micro << " " << nano << std::endl;
   return 0;
 }
