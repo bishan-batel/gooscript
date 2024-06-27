@@ -78,7 +78,7 @@ namespace goos::ast {
     return obj;
   }
 
-  auto VariableDeclaration::accept(IVisitor &visitor) const -> runtime::VoidResult {
+  auto VariableDeclaration::accept(IVisitor &visitor) const -> Result<unit, Box<crab::Error>> {
     return visitor.visit_variable_declaration(*this);
   }
 }

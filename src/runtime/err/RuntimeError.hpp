@@ -5,6 +5,7 @@
 #pragma once
 #include "parser/Error.hpp"
 #include "../data/interfaces/IValue.hpp"
+#include <any>
 
 namespace goos::runtime {
   namespace err {
@@ -16,14 +17,19 @@ namespace goos::runtime {
     }
   }
 
-  template<typename T>
-  using Result = Result<T, Box<err::Error>>;
+  // template<typename T>
+  // using Result = Result<T, Box<err::Error>>;
 
-  using VoidResult = Option<Box<err::Error>>;
+  // using VoidResult = Option<Box<err::Error>>;
 
   template<typename T> requires std::is_base_of_v<IValue, T>
-  auto ok(RcMut<T> any) -> Result<Any> {
-    return Result<Any>{any};
+  auto ok(RcMut<T> any) -> Result<std::any, Box<crab::Error>> {
+    return {std::any{Any{any}}};
+  }
+
+  template<std::derived_from<err::Error> T>
+  auto error(Box<T> any) -> Result<std::any, Box<crab::Error>> {
+    return Box<crab::Error>{std::move(any)};
   }
 }
 

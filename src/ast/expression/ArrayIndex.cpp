@@ -44,7 +44,7 @@ namespace goos::ast::expression {
     return crab::make_box<ArrayIndex>(object->clone_expr(), index->clone_expr());
   }
 
-  auto ArrayIndex::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto ArrayIndex::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_array_index(*this);
   }
 }

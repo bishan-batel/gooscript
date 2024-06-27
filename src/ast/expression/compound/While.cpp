@@ -42,7 +42,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto While::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto While::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_while(*this);
   }
 } // namespace goos::ast::expression

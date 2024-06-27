@@ -33,7 +33,7 @@ namespace goos::runtime {
 
     [[nodiscard]] auto length() const -> usize;
 
-    [[nodiscard]] auto index(Any index) -> Result<Any> override;
+    [[nodiscard]] auto index(Any index) -> Result<Any, Box<err::Error>> override;
 
     constexpr static auto TYPE = meta::VariantType::ARRAY;
   };

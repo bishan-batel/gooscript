@@ -4,14 +4,16 @@
 
 #include "Unit.hpp"
 
+#include <any>
+
 namespace goos::runtime {
   auto Unit::value() -> RcMut<Unit> {
     static const RcMut<Unit> VALUE = crab::make_rc_mut<Unit>();
     return VALUE;
   }
 
-  auto Unit::ok() -> Result<Any> {
-    return crab::ok<Any>(value());
+  auto Unit::ok() -> Result<std::any, Box<crab::Error>> {
+    return std::any{Any{value()}};
   }
 
   Unit::Unit() = default;

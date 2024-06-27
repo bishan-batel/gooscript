@@ -132,7 +132,7 @@ namespace goos::runtime::builtin {
         lexer::TokenList list{lexer::Lexer::tokenize(std::move(source)).take_unchecked()};
 
         if (list.empty()) {
-          return ok(Unit::value());
+          return Result<Any, Box<err::Error>>{Unit::value()};
         }
         parser::TokenStream stream{std::move(list)};
         return Intepreter{}.evaluate(parser::pass::block_top_level(stream).take_unchecked());
@@ -209,7 +209,7 @@ namespace goos::runtime::builtin {
 
     BUILTIN->define_builtin(
       L"each",
-      [](Intepreter &runtime, IValue &any, const ICallable &func) -> Result<Any> {
+      [](Intepreter &runtime, IValue &any, const ICallable &func) -> Result<Any, Box<err::Error>> {
         switch (any.get_type()) {
           case meta::VariantType::ARRAY: {
             const auto &arr = any.coerce_unchecked<Array>();
@@ -241,9 +241,9 @@ namespace goos::runtime::builtin {
           }
 
           default:
-            return ok(Nil::value());
+            return Any{Nil::value()};
         }
-        return ok(Unit::value());
+        return Any{Unit::value()};
       }
     );
 
@@ -291,7 +291,7 @@ namespace goos::runtime::builtin {
     BUILTIN->define_builtin(
       L"print",
       ExternFunction::varargs(
-        [](Intepreter &, const Vec<Any> &args) -> Result<Any> {
+        [](Intepreter &, const Vec<Any> &args) -> Result<Any, Box<err::Error>> {
           for (const auto &arg: args) {
             std::wcout << arg->to_string();
           }

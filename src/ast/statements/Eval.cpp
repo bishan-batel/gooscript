@@ -33,7 +33,7 @@ namespace goos::ast {
     return obj;
   }
 
-  auto Eval::accept(IVisitor &visitor) const -> runtime::VoidResult {
+  auto Eval::accept(IVisitor &visitor) const -> Result<unit, Box<crab::Error>> {
     return visitor.visit_eval(*this);
   }
 }

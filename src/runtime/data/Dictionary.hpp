@@ -72,7 +72,7 @@ namespace goos::runtime {
 
     auto get_or_insert_lvalue(const Any &key) -> RcMut<LValue>;
 
-    [[nodiscard]] auto index(Any index) -> Result<Any> override;
+    [[nodiscard]] auto index(Any index) -> Result<Any, Box<err::Error>> override;
 
     auto index(utils::hash_code hashed_key) const -> Option<Pair>;
 

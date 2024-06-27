@@ -36,7 +36,7 @@ namespace goos::ast::expression {
     return crab::make_box<json::Text>(state ? L"true" : L"false");
   }
 
-  auto Boolean::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto Boolean::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_boolean(*this);
   }
 }

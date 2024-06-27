@@ -26,7 +26,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto Unit::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto Unit::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_unit(*this);
   }
 }

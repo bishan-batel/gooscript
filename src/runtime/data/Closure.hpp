@@ -15,7 +15,7 @@ namespace goos::runtime {
   public:
     explicit Closure(RcMut<Environment> captured, Box<ast::expression::Lambda> lambda);
 
-    [[nodiscard]] auto call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any> override;
+    [[nodiscard]] auto call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any, Box<err::Error>> override;
 
     [[nodiscard]] auto get_arity_type() const -> ArityType override;
 

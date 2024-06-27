@@ -27,6 +27,6 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
-    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> override;
+    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
   };
 } // namespace goos::ast::expression

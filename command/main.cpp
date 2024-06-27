@@ -14,6 +14,10 @@
 #include <fmt/xchar.h>
 
 #include "utils/str.hpp"
+#include "vm/Chunk.hpp"
+#include "vm/Vm.hpp"
+
+auto chunk_test() -> void;
 
 template<typename F> requires std::is_invocable_r_v<Vec<String>, F, String&>
 auto parse(Vec<String> args, F word) -> Dictionary<String, Vec<String>> {
@@ -45,6 +49,7 @@ auto parse(const i32 argc, const char *argv[]) -> Dictionary<String, Vec<String>
     {"--emit-ast", "emit-ast"},
     {"--o", "emit-ast"},
     {"-a", "emit-ast"},
+    {"--vm-test", "vm-test"},
 
     {"-D", "emit-args"},
     {"--emit-args", "emit-args"},
@@ -76,6 +81,11 @@ auto main(i32 argc, const char *argv[]) -> i32 {
       }
       print(fg(fmt::color::light_gray), "]\n");
     }
+    return 0;
+  }
+
+  if (args.contains("vm-test")) {
+    chunk_test();
     return 0;
   }
 
@@ -195,4 +205,55 @@ auto main(i32 argc, const char *argv[]) -> i32 {
 
   std::cout << milli << " " << micro << " " << nano << std::endl;
   return 0;
+}
+
+auto chunk_test() -> void {
+  using namespace goos;
+  using namespace vm::op;
+  vm::Chunk chunk{L"Test Chunk"};
+
+  const struct {
+    u16 funny = chunk.define_constant(420);
+    u16 one = chunk.define_constant(1);
+    u16 ten = chunk.define_constant(10);
+    u16 zero = chunk.define_constant(0);
+  } constants{};
+
+  fmt::println("");
+
+  #define line(...) chunk.write_instruction(Code::__VA_ARGS__);
+
+  line(CONSTANT, constants.ten);
+
+  const usize LOOP_BEGIN = chunk.label();
+
+  // line(PRINT);
+
+  line(CONSTANT, constants.one);
+
+  line(PRINT);
+
+  line(NEGATE);
+  line(PRINT);
+
+  line(ADD);
+
+  line(DUP);
+
+  // // 0 >= i
+  line(CONSTANT, constants.zero);
+  line(GREATER_OR_EQUAL_THAN);
+  //
+  line(JUMP_IF_FALSE, LOOP_BEGIN);
+
+  // line(CONSTANT, constants.funny)
+  line(PRINT);
+
+  #undef line
+  chunk.dissassemble();
+
+  vm::Vm vm{std::move(chunk)};
+  const vm::Value val = vm.run().take_unchecked();
+
+  std::cout << "Exited with value " << val.type_name() << std::endl;
 }

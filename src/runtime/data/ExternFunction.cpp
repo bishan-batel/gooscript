@@ -26,7 +26,7 @@ namespace goos::runtime {
     );
   }
 
-  auto ExternFunction::call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any> {
+  auto ExternFunction::call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any, Box<err::Error>> {
     // TODO error checking
     return function(runtime, values);
   }

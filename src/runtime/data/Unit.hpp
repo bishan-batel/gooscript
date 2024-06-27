@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include <any>
+
 #include "interfaces/IValue.hpp"
 #include "runtime/err/RuntimeError.hpp"
 
@@ -13,7 +15,7 @@ namespace goos::runtime {
 
     static auto value() -> RcMut<Unit>;
 
-    static auto ok() -> Result<Any>;
+    static auto ok() -> Result<std::any, Box<crab::Error>>;
 
     Unit();
 

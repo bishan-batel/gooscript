@@ -18,7 +18,10 @@ namespace goos::runtime {
   struct ICallable : IValue {
     static constexpr auto TYPE = meta::VariantType::FUNCTION;
 
-    [[nodiscard]] virtual auto call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any> = 0;
+    [[nodiscard]] virtual auto call(
+      Intepreter &runtime,
+      const Vec<Any> &values
+    ) const -> Result<Any, Box<err::Error>> = 0;
 
     [[nodiscard]] virtual auto get_arity_type() const -> ArityType = 0;
 

@@ -11,7 +11,7 @@ namespace goos::runtime {
   Closure::Closure(RcMut<Environment> captured, Box<ast::expression::Lambda> lambda)
     : lambda{std::move(lambda)}, captured{std::move(captured)} {}
 
-  auto Closure::call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any> {
+  auto Closure::call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any, Box<err::Error>> {
     using namespace meta;
 
     RcMut<Environment> prev_env = runtime.get_env();
@@ -38,7 +38,7 @@ namespace goos::runtime {
       }
     }
 
-    Result<Any> value = runtime.evaluate(lambda->get_body());
+    Result<Any, Box<err::Error>> value = runtime.evaluate(lambda->get_body());
 
     // pop arguments
     runtime.pop_env();

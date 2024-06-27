@@ -17,7 +17,7 @@ namespace goos::runtime {
 
     static auto value() -> RcMut<Nil>;
 
-    static auto ok() -> Result<Any>;
+    static auto ok() -> Result<std::any, Box<crab::Error>>;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 

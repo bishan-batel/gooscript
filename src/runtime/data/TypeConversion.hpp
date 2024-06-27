@@ -196,7 +196,7 @@ namespace goos::runtime::type {
   }
 
   template<value_type Into, value_type From>
-  auto coerce(RcMut<From> from) -> Result<RcMut<Into>> {
+  auto coerce(RcMut<From> from) -> Result<RcMut<Into>, Box<err::Error>> {
     if (Option<RcMut<Into>> obj = from.template downcast<Into>(); obj.is_some())
       return obj.take_unchecked();
 

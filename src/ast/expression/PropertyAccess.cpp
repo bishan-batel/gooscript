@@ -45,7 +45,7 @@ namespace goos::ast::expression {
     return crab::make_box<PropertyAccess>(object->clone_expr(), property);
   }
 
-  auto PropertyAccess::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto PropertyAccess::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_property_access(*this);
   }
 } // runtime

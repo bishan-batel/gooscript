@@ -13,7 +13,7 @@
 
 namespace goos::runtime {
   class ExternFunction final : public ICallable {
-    std::function<Result<Any>(Intepreter &runtime, const Vec<Any> &args)> function;
+    std::function<Result<Any, Box<err::Error>>(Intepreter &runtime, const Vec<Any> &args)> function;
     usize arity{};
     ArityType arity_type;
 
@@ -26,7 +26,7 @@ namespace goos::runtime {
 
     static auto varargs(const decltype(function) &function) -> RcMut<ExternFunction>;
 
-    [[nodiscard]] auto call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any> override;
+    [[nodiscard]] auto call(Intepreter &runtime, const Vec<Any> &values) const -> Result<Any, Box<err::Error>> override;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
@@ -196,41 +196,41 @@ namespace goos::runtime {
 
     // Identity Case
     template<>
-    struct transmute_return<Result<Any>> {
-      auto operator()(Result<Any> result) const -> Result<Any> {
+    struct transmute_return<Result<Any, Box<err::Error>>> {
+      auto operator()(Result<Any, Box<err::Error>> result) const -> Result<Any, Box<err::Error>> {
         return result;
       }
     };
 
     template<type::value_type T>
     struct transmute_return<RcMut<T>> {
-      auto operator()(RcMut<T> returned) const -> Result<Any> {
-        return Result<Any>{Any{returned}};
+      auto operator()(RcMut<T> returned) const -> Result<Any, Box<err::Error>> {
+        return Result<Any, Box<err::Error>>{Any{returned}};
       }
     };
 
     template<type::value_type T>
-    struct transmute_return<Result<RcMut<T>>> {
-      auto operator()(Result<RcMut<T>> returned) const -> Result<Any> {
+    struct transmute_return<Result<RcMut<T>, Box<err::Error>>> {
+      auto operator()(Result<RcMut<T>, Box<err::Error>> returned) const -> Result<Any, Box<err::Error>> {
         if (returned.is_err()) {
           return returned.take_err_unchecked();
         }
-        return Result<Any>{Any{returned.take_unchecked()}};
+        return Result<Any, Box<err::Error>>{Any{returned.take_unchecked()}};
       }
     };
 
     template<type::convertible_primitive T>
     struct transmute_return<T> {
-      auto operator()(T returned) const -> Result<Any> {
-        return Result<Any>{type::to_goos_any(returned)};
+      auto operator()(T returned) const -> Result<Any, Box<err::Error>> {
+        return Result<Any, Box<err::Error>>{type::to_goos_any(returned)};
       }
     };
 
     template<type::convertible_primitive T>
-    struct transmute_return<Result<T>> {
-      auto operator()(Result<T> returned) const -> Result<Any> {
+    struct transmute_return<Result<T, Box<err::Error>>> {
+      auto operator()(Result<T, Box<err::Error>> returned) const -> Result<Any, Box<err::Error>> {
         if (returned.is_err()) return returned.take_err_unchecked();
-        return Result<Any>{type::to_goos_any(returned)};
+        return Result<Any, Box<err::Error>>{type::to_goos_any(returned)};
       }
     };
 
@@ -279,7 +279,7 @@ namespace goos::runtime {
 
       return ExternFunction::from(
         arity,
-        [function](Intepreter &env, const Vec<Any> &args) -> Result<Any> {
+        [function](Intepreter &env, const Vec<Any> &args) -> Result<Any, Box<err::Error>> {
           usize i = 0;
 
           // std::wcout << "::" << args.at(0)->to_string() << std::endl;
@@ -310,7 +310,7 @@ namespace goos::runtime {
             take_unchecked()
             ...
           );
-          return ok(Unit::value());
+          return Any{Unit::value()};
         }
       );
     }

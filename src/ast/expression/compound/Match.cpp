@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <ranges>
 
+#include <range.hpp>
+#include <sstream>
+
 #include "json/Array.hpp"
 #include "json/Object.hpp"
 
@@ -93,7 +96,7 @@ namespace goos::parser::pass::expr {
     );
   }
 
-  auto Match::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto Match::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_match(*this);
   }
 }

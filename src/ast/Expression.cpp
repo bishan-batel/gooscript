@@ -6,9 +6,10 @@
 
 auto goos::ast::Expression::clone() const -> Box<Statement> { return clone_expr(); }
 
-auto goos::ast::Expression::accept(IVisitor &visitor) const -> runtime::VoidResult {
+auto goos::ast::Expression::accept // NOLINT(*-convert-member-functions-to-static)
+(IVisitor &visitor) const -> Result<unit, Box<crab::Error>> {
   if (auto result = accept_expr(visitor); result.is_err()) {
-    return some(result.take_err_unchecked());
+    return result.take_err_unchecked();
   }
-  return crab::none;
+  return unit::val;
 }

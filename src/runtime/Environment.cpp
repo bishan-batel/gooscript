@@ -95,8 +95,8 @@ namespace goos::runtime {
   auto Environment::set_value(
     const meta::Identifier &identifier,
     Any value
-  ) const -> Result<RcMut<Variable>> {
-    Result<RcMut<Variable>> var = get_variable(identifier);
+  ) const -> Result<RcMut<Variable>, Box<err::Error>> {
+    Result<RcMut<Variable>, Box<err::Error>> var = get_variable(identifier);
 
     if (var.is_ok()) {
       var.get_unchecked()->set_value(std::move(value));
@@ -105,7 +105,7 @@ namespace goos::runtime {
     return var;
   }
 
-  auto Environment::get_variable(const meta::Identifier &identifier) const -> Result<RcMut<Variable>> {
+  auto Environment::get_variable(const meta::Identifier &identifier) const -> Result<RcMut<Variable>, Box<err::Error>> {
     // TODO error handling
     // return try_get_variable(identifier).take_unchecked();
     if (bindings.contains(identifier)) {

@@ -67,12 +67,12 @@ namespace goos {
     return values.size();
   }
 
-  auto runtime::Array::index(const Any index) -> Result<Any> {
+  auto runtime::Array::index(const Any index) -> Result<Any, Box<err::Error>> {
     auto integer = type::coerce<Integer>(index);
     if (integer.is_err()) return integer.take_err_unchecked();
 
     // TODO out of bounds index
     const auto i = static_cast<usize>(integer.take_unchecked()->get());
-    return ok(LValue::wrap(values.at(i)));
+    return Any{LValue::wrap(values.at(i))};
   }
 } // goos

@@ -163,6 +163,17 @@ set(SOURCE_FILES
         src/ast/expression/compound/Match.hpp
         src/runtime/builtin/StandardEnviornment.cpp
         src/runtime/builtin/StandardEnviornment.hpp
+        src/vm/Vm.cpp
+        src/vm/Vm.hpp
+        src/vm/Instruction.hpp
+        src/vm/Chunk.cpp
+        src/vm/Chunk.hpp
+        src/vm/Value.cpp
+        src/vm/Value.hpp
+        src/vm/Stack.cpp
+        src/vm/Stack.hpp
+        src/vm/err/Error.hpp
+        src/vm/err/CastError.hpp
 )
 
 

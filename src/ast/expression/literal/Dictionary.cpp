@@ -76,7 +76,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto Dictionary::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto Dictionary::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_dictionary(*this);
   }
 }

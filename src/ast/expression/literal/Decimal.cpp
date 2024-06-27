@@ -33,7 +33,7 @@ namespace goos::ast::expression {
     return crab::make_box<json::Number>(literal);
   }
 
-  auto Decimal::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto Decimal::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_decimal(*this);
   }
 }

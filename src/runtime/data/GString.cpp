@@ -43,8 +43,8 @@ namespace goos::runtime {
     return crab::make_rc_mut<GString>(text);
   }
 
-  auto GString::index(const Any index) -> Result<Any> {
-    auto integer = type::coerce<Integer>(index);
+  auto GString::index(const Any index) -> Result<Any, Box<err::Error>> {
+    Result<RcMut<Integer>, Box<err::Error>> integer = type::coerce<Integer>(index);
 
     if (integer.is_err()) return integer.take_err_unchecked();
 

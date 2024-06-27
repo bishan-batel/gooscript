@@ -4,7 +4,6 @@
 
 #include "ScopeBlock.hpp"
 
-#include <sstream>
 #include <algorithm>
 #include <ranges>
 
@@ -15,6 +14,7 @@
 
 #include "json/Array.hpp"
 #include "json/Object.hpp"
+#include <sstream>
 
 namespace goos::ast::expression {
   ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements)
@@ -76,7 +76,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto ScopeBlock::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto ScopeBlock::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_scope(*this);
   }
 

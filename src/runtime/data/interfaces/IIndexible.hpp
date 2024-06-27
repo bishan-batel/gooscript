@@ -13,6 +13,6 @@ namespace goos::runtime {
   struct IIndexible : IValue {
     static constexpr auto TYPE = meta::VariantType::FUNCTION;
 
-    [[nodiscard]] virtual auto index(Any index) -> Result<Any> = 0;
+    [[nodiscard]] virtual auto index(Any index) -> Result<Any, Box<err::Error>> = 0;
   };
 }

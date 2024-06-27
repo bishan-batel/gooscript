@@ -58,7 +58,7 @@ namespace goos::ast::expression {
     return obj;
   }
 
-  auto If::accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> {
+  auto If::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_if(*this);
   }
 } // namespace goos::ast::expression

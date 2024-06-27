@@ -76,9 +76,11 @@ namespace goos::runtime {
     [[nodiscard]] auto set_value(
       const meta::Identifier &identifier,
       RcMut<IValue> value
-    ) const -> Result<RcMut<Variable>>;
+    ) const -> Result<RcMut<Variable>, Box<err::Error>>;
 
-    [[nodiscard]] auto get_variable(const meta::Identifier &identifier) const -> Result<RcMut<Variable>>;
+    [[nodiscard]] auto get_variable(
+      const meta::Identifier &identifier
+    ) const -> Result<RcMut<Variable>, Box<err::Error>>;
 
     [[nodiscard]] auto get_depth() const -> usize;
 

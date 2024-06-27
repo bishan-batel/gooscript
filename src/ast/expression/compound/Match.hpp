@@ -29,6 +29,6 @@ namespace goos::parser::pass::expr {
 
     [[nodiscard]] auto clone_expr() const -> Box<Expression> override;
 
-    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> runtime::Result<runtime::Any> override;
+    [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
   };
 }

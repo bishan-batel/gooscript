@@ -39,6 +39,6 @@ namespace goos::runtime {
 
     [[nodiscard]] auto clone() const -> Any override;
 
-    [[nodiscard]] auto index(Any index) -> Result<Any> override;
+    [[nodiscard]] auto index(Any index) -> Result<Any, Box<err::Error>> override;
   };
 }

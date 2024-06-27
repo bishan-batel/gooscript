@@ -11,8 +11,8 @@ namespace goos::runtime {
     return VALUE;
   }
 
-  auto Nil::ok() -> Result<Any> {
-    return Result<Any>{value()};
+  auto Nil::ok() -> Result<std::any, Box<crab::Error>> {
+    return std::any{Any{value()}};
   }
 
   Nil::Nil(std::nullptr_t) : Nil{} {}

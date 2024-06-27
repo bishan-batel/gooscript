@@ -95,26 +95,42 @@ namespace goos::runtime {
     return crab::none;
   }
 
-  auto Intepreter::execute(const ast::Statement &statement) -> VoidResult {
-    return statement.accept(*this);
+  auto Intepreter::execute(const ast::Statement &statement) -> Result<unit, Box<err::Error>> {
+    return statement.accept(*this).map_err(
+      [](Box<crab::Error> err) {
+        crab::Error *unwrapped = Box<crab::Error>::unwrap(std::move(err));
+
+        return Box<err::Error>::wrap_unchecked(dynamic_cast<err::Error*>(unwrapped));
+      }
+    );
   }
 
-  auto Intepreter::evaluate(const ast::Expression &expr) -> Result<Any> {
-    Result<Any> res = evaluate_shallow(expr);
+  auto Intepreter::evaluate(const ast::Expression &expr) -> Result<Any, Box<err::Error>> {
+    auto res = evaluate_shallow(expr);
     if (res.is_err()) return res.take_err_unchecked();
 
     Any value = res.take_unchecked();
 
     if (auto lvalue = value.downcast<LValue>(); lvalue.is_some()) {
       // expand out lvalue
-      return ok(lvalue.take_unchecked()->get());
+      return Any{lvalue.take_unchecked()->get()};
     }
 
     return value;
   }
 
-  auto Intepreter::evaluate_shallow(const ast::Expression &expr) -> Result<Any> {
-    return expr.accept_expr(*this);
+  auto Intepreter::evaluate_shallow(const ast::Expression &expr) -> Result<Any, Box<err::Error>> {
+    return expr.accept_expr(*this).map_err(
+      [](Box<crab::Error> err) {
+        return Box<err::Error>::wrap_unchecked(
+          dynamic_cast<Box<err::Error>::MutPtr>(Box<crab::Error>::unwrap(std::move(err)))
+        );
+      }
+    ).map(
+      [](std::any val) {
+        return std::any_cast<Any>(std::move(val));
+      }
+    );
   }
 
   // AST Expansion Methods
@@ -122,41 +138,41 @@ namespace goos::runtime {
   auto Intepreter::visit_eval(
     [[maybe_unused]
     ] const ast::Eval &eval
-  ) -> VoidResult {
+  ) -> Result<unit, Box<crab::Error>> {
     auto expr = evaluate(eval.get_expression());
-    if (expr.is_err()) return some(expr.take_err_unchecked());
+    if (expr.is_err()) return Box<crab::Error>{expr.take_err_unchecked()};
 
     if (should_halt_control_flow()) {
-      return crab::none;
+      return unit::val;
     }
 
     halt(ControlFlowFlag::EVAL, expr.take_unchecked());
 
-    return crab::none;
+    return unit::val;
   }
 
-  auto Intepreter::visit_return([[maybe_unused]] const ast::Return &ret) -> VoidResult {
+  auto Intepreter::visit_return([[maybe_unused]] const ast::Return &ret) -> Result<unit, Box<crab::Error>> {
     auto expr = evaluate(ret.get_expression());
-    if (expr.is_err()) return some(expr.take_err_unchecked());
+    if (expr.is_err()) return Box<crab::Error>(expr.take_err_unchecked());
 
     if (should_halt_control_flow()) {
-      return crab::none;
+      return unit::val;
     }
 
     halt(ControlFlowFlag::RETURN, expr.take_unchecked());
 
-    return crab::none;
+    return unit::val;
   }
 
   auto Intepreter::visit_variable_declaration(
     [[maybe_unused]] const ast::VariableDeclaration &variable_declaration
-  ) -> VoidResult {
+  ) -> Result<unit, Box<crab::Error>> {
     auto initial = evaluate(variable_declaration.get_initializer());
 
-    if (initial.is_err()) return some(initial.take_err_unchecked());
+    if (initial.is_err()) return Box<crab::Error>{initial.take_err_unchecked()};
 
     if (should_halt_control_flow()) {
-      return crab::none;
+      return unit::val;
     }
 
     current_environment->push_variable(
@@ -164,16 +180,18 @@ namespace goos::runtime {
       variable_declaration.get_mutability(),
       initial.take_unchecked()
     );
-    return crab::none;
+    return unit::val;
   }
 
-  auto Intepreter::visit_array([[maybe_unused]] const ast::expression::Array &array) -> Result<Any> {
+  auto Intepreter::visit_array(
+    [[maybe_unused]] const ast::expression::Array &array
+  ) -> Result<std::any, Box<crab::Error>> {
     const RcMut<Array> arr = crab::make_rc_mut<Array>();
 
     for (const auto &val: array.get_values()) {
-      Result<Any> result = evaluate(val);
+      Result<Any, Box<err::Error>> result = evaluate(val);
 
-      if (result.is_err()) return result.take_err_unchecked();
+      if (result.is_err()) return error(result.take_err_unchecked());
 
       if (should_halt_control_flow()) return Unit::ok();
 
@@ -183,7 +201,9 @@ namespace goos::runtime {
     return ok(arr);
   }
 
-  auto Intepreter::visit_dictionary([[maybe_unused]] const ast::expression::Dictionary &dictionary) -> Result<Any> {
+  auto Intepreter::visit_dictionary(
+    [[maybe_unused]] const ast::expression::Dictionary &dictionary
+  ) -> Result<std::any, Box<crab::Error>> {
     const auto dict = crab::make_rc_mut<Dictionary>();
 
     for (const auto &[key , value]: dictionary.get_pairs()) {
@@ -193,7 +213,7 @@ namespace goos::runtime {
         key_expr = crab::make_rc_mut<GString>(ident.get_unchecked()->get_identifier());
       } else {
         auto key_result = evaluate(key);
-        if (key_result.is_err()) return crab::err(key_result.take_err_unchecked());
+        if (key_result.is_err()) return error(key_result.take_err_unchecked());
 
         if (should_halt_control_flow()) {
           // return unit
@@ -204,7 +224,7 @@ namespace goos::runtime {
       }
 
       auto value_result = evaluate(value);
-      if (value_result.is_err()) return crab::err(value_result.take_err_unchecked());
+      if (value_result.is_err()) return error(value_result.take_err_unchecked());
 
       if (should_halt_control_flow()) {
         // return unit
@@ -216,7 +236,9 @@ namespace goos::runtime {
     return ok(dict);
   }
 
-  auto Intepreter::visit_lambda([[maybe_unused]] const ast::expression::Lambda &lambda) -> Result<Any> {
+  auto Intepreter::visit_lambda(
+    [[maybe_unused]] const ast::expression::Lambda &lambda
+  ) -> Result<std::any, Box<crab::Error>> {
     using namespace ast;
     using namespace expression;
 
@@ -228,34 +250,46 @@ namespace goos::runtime {
     );
   }
 
-  auto Intepreter::visit_string_literal([[maybe_unused]] const ast::expression::StringLiteral &str) -> Result<Any> {
+  auto Intepreter::visit_string_literal(
+    [[maybe_unused]] const ast::expression::StringLiteral &str
+  ) -> Result<std::any, Box<crab::Error>> {
     return ok(crab::make_rc_mut<GString>(str.get_string()));
   }
 
-  auto Intepreter::visit_boolean([[maybe_unused]] const ast::expression::Boolean &boolean) -> Result<Any> {
+  auto Intepreter::visit_boolean(
+    [[maybe_unused]] const ast::expression::Boolean &boolean
+  ) -> Result<std::any, Box<crab::Error>> {
     return ok(crab::make_rc_mut<Boolean>(boolean.get_state()));
   }
 
-  auto Intepreter::visit_decimal([[maybe_unused]] const ast::expression::Decimal &decimal) -> Result<Any> {
+  auto Intepreter::visit_decimal(
+    [[maybe_unused]] const ast::expression::Decimal &decimal
+  ) -> Result<std::any, Box<crab::Error>> {
     return ok(crab::make_rc_mut<Decimal>(decimal.get_number()));
   }
 
-  auto Intepreter::visit_integer([[maybe_unused]] const ast::expression::Integer &integer) -> Result<Any> {
+  auto Intepreter::visit_integer(
+    [[maybe_unused]] const ast::expression::Integer &integer
+  ) -> Result<std::any, Box<crab::Error>> {
     return ok(crab::make_rc_mut<Integer>(integer.get_number()));
   }
 
-  auto Intepreter::visit_nil([[maybe_unused]] const ast::expression::Nil &nil) -> Result<Any> {
+  auto Intepreter::visit_nil([[maybe_unused]] const ast::expression::Nil &nil) -> Result<std::any, Box<crab::Error>> {
     return Nil::ok();
   }
 
-  auto Intepreter::visit_unit([[maybe_unused]] const ast::expression::Unit &unit) -> Result<Any> {
+  auto Intepreter::visit_unit(
+    [[maybe_unused]] const ast::expression::Unit &unit
+  ) -> Result<std::any, Box<crab::Error>> {
     return ok(crab::make_rc_mut<Unit>());
   }
 
-  auto Intepreter::visit_binary([[maybe_unused]] const ast::expression::Binary &binary) -> Result<Any> {
+  auto Intepreter::visit_binary(
+    [[maybe_unused]] const ast::expression::Binary &binary
+  ) -> Result<std::any, Box<crab::Error>> {
     if (binary.get_op() == lexer::Operator::ASSIGN) {
-      Result<Any> lhs_result = evaluate_shallow(binary.get_lhs());
-      if (lhs_result.is_err()) return lhs_result.take_err_unchecked();
+      Result<Any, Box<err::Error>> lhs_result = evaluate_shallow(binary.get_lhs());
+      if (lhs_result.is_err()) return error(lhs_result.take_err_unchecked());
 
       if (should_halt_control_flow()) {
         return Unit::ok();
@@ -263,10 +297,8 @@ namespace goos::runtime {
 
       const RcMut<LValue> lvalue = lhs_result.take_unchecked().downcast<LValue>().take_unchecked();
 
-      Result<Any> value_result = evaluate(binary.get_rhs());
-      if (value_result.is_err()) {
-        return value_result.take_err_unchecked();
-      }
+      Result<Any, Box<err::Error>> value_result = evaluate(binary.get_rhs());
+      if (value_result.is_err()) return error(value_result.take_err_unchecked());
 
       const Any value = value_result.take_unchecked();
 
@@ -287,10 +319,10 @@ namespace goos::runtime {
           .take_unchecked()
           ->get_identifier();
 
-      Result<Any> dictionary_value = evaluate(binary.get_lhs());
+      Result<Any, Box<err::Error>> dictionary_value = evaluate(binary.get_lhs());
 
       if (dictionary_value.is_err()) {
-        return crab::err(dictionary_value.take_err_unchecked());
+        return error(dictionary_value.take_err_unchecked());
       }
 
       // TODO: error handling
@@ -309,17 +341,17 @@ namespace goos::runtime {
     }
 
     // LHS
-    Result<Any> lhs_result{evaluate(binary.get_lhs())};
-    if (lhs_result.is_err()) return lhs_result.take_err_unchecked();
+    Result<Any, Box<err::Error>> lhs_result{evaluate(binary.get_lhs())};
+    if (lhs_result.is_err()) return error(lhs_result.take_err_unchecked());
 
     if (should_halt_control_flow()) return Unit::ok();
 
     const Any lhs_val{lhs_result.take_unchecked()};
 
     // RHS
-    Result<Any> rhs_result{evaluate(binary.get_rhs())};
+    Result<Any, Box<err::Error>> rhs_result{evaluate(binary.get_rhs())};
 
-    if (rhs_result.is_err()) return rhs_result.take_err_unchecked();
+    if (rhs_result.is_err()) return error(rhs_result.take_err_unchecked());
 
     if (should_halt_control_flow()) return Unit::ok();
     const Any rhs_val{rhs_result.take_unchecked()};
@@ -348,15 +380,15 @@ namespace goos::runtime {
 
   auto Intepreter::visit_function_call(
     [[maybe_unused]] const ast::expression::FunctionCall &function_call
-  ) -> Result<Any> {
+  ) -> Result<std::any, Box<crab::Error>> {
     auto function_result = evaluate(function_call.get_function());
 
     if (function_result.is_err()) {
-      return crab::err(function_result.take_err_unchecked());
+      return error(function_result.take_err_unchecked());
     }
 
     if (should_halt_control_flow()) {
-      return function_result;
+      return ok(function_result.take_unchecked());
     }
 
     const auto callable_any = function_result.take_unchecked();
@@ -365,9 +397,7 @@ namespace goos::runtime {
 
     // TODO
     if (callable_option.is_none()) {
-      return crab::err<Box<err::Error>>(
-        crab::make_box<err::NotCallable>(callable_any)
-      );
+      return error(crab::make_box<err::NotCallable>(callable_any));
     }
 
     const RcMut<ICallable> callable = callable_option.take_unchecked();
@@ -379,7 +409,7 @@ namespace goos::runtime {
       auto value_result = evaluate(arg);
 
       if (value_result.is_err()) {
-        return crab::err(value_result.take_err_unchecked());
+        return error(value_result.take_err_unchecked());
       }
 
       auto value = value_result.take_unchecked();
@@ -394,24 +424,28 @@ namespace goos::runtime {
     push_env();
     auto result = callable->call(*this, arguments);
     pop_env();
-    return result;
+
+    if (result.is_err()) return error(result.take_err_unchecked());
+    return ok(result.take_unchecked());
   }
 
   auto Intepreter::visit_identifier_binding(
     [[maybe_unused]] const ast::expression::IdentifierBinding &identifier
-  ) -> Result<Any> {
-    Result<RcMut<Variable>> var = current_environment->get_variable(identifier.get_identifier());
+  ) -> Result<std::any, Box<crab::Error>> {
+    Result<RcMut<Variable>, Box<err::Error>> var = current_environment->get_variable(identifier.get_identifier());
     if (var.is_err()) {
-      return crab::err(var.take_err_unchecked());
+      return error(var.take_err_unchecked());
     }
 
     return ok(var.take_unchecked()->as_lvalue());
   }
 
-  auto Intepreter::visit_unary([[maybe_unused]] const ast::expression::Unary &unary) -> Result<Any> {
+  auto Intepreter::visit_unary(
+    [[maybe_unused]] const ast::expression::Unary &unary
+  ) -> Result<std::any, Box<crab::Error>> {
     auto value_result{evaluate(unary.get_expression())};
 
-    if (value_result.is_err()) return value_result.take_err_unchecked();
+    if (value_result.is_err()) return error(value_result.take_err_unchecked());
 
     if (should_halt_control_flow()) {
       return Unit::ok();
@@ -429,28 +463,28 @@ namespace goos::runtime {
     return Unit::ok();
   }
 
-  auto Intepreter::visit_if([[maybe_unused]] const ast::expression::If &if_expr) -> Result<Any> {
-    Result<Any> condition = evaluate(if_expr.get_condition());
+  auto Intepreter::visit_if([[maybe_unused]] const ast::expression::If &if_expr) -> Result<std::any, Box<crab::Error>> {
+    Result<Any, Box<err::Error>> condition = evaluate(if_expr.get_condition());
 
-    if (condition.is_err()) return condition.take_err_unchecked();
+    if (condition.is_err()) return error(condition.take_err_unchecked());
 
     if (should_halt_control_flow()) {
       return Unit::ok();
     }
 
     if (condition.take_unchecked()->is_truthy()) {
-      Result<Any> then = evaluate(if_expr.get_then());
-      if (then.is_err()) return then.take_err_unchecked();
+      Result<Any, Box<err::Error>> then = evaluate(if_expr.get_then());
+      if (then.is_err()) return error(then.take_err_unchecked());
 
       if (should_halt_control_flow()) {
         return Unit::ok();
       }
 
-      return then.take_unchecked();
+      return ok(then.take_unchecked());
     }
 
-    Result<Any> else_then = evaluate(if_expr.get_else_then());
-    if (else_then.is_err()) return crab::err(else_then.take_err_unchecked());
+    Result<Any, Box<err::Error>> else_then = evaluate(if_expr.get_else_then());
+    if (else_then.is_err()) return error(else_then.take_err_unchecked());
 
     if (should_halt_control_flow()) {
       return Unit::ok();
@@ -459,11 +493,13 @@ namespace goos::runtime {
     return ok(else_then.take_unchecked());
   }
 
-  auto Intepreter::visit_scope([[maybe_unused]] const ast::expression::ScopeBlock &scope) -> Result<Any> {
+  auto Intepreter::visit_scope(
+    [[maybe_unused]] const ast::expression::ScopeBlock &scope
+  ) -> Result<std::any, Box<crab::Error>> {
     push_env();
     for (const auto &statement: scope.get_statements()) {
-      if (auto err = execute(statement)) {
-        return err.take_unchecked();
+      if (auto err = execute(statement); err.is_err()) {
+        return error(err.take_err_unchecked());
       }
 
       if (should_halt_control_flow()) {
@@ -475,13 +511,13 @@ namespace goos::runtime {
       }
     }
 
-    Result<Any> value_res = evaluate(scope.get_eval());
+    Result<Any, Box<err::Error>> value_res = evaluate(scope.get_eval());
 
-    if (value_res.is_err()) return crab::err(value_res.take_err_unchecked());
+    if (value_res.is_err()) return error(value_res.take_err_unchecked());
 
     pop_env();
 
-    Any value = value_res.take_unchecked();
+    const Any value = value_res.take_unchecked();
 
     if (auto evaluation = consume_halt_flag(ControlFlowFlag::EVAL)) {
       return ok(evaluation.take_unchecked());
@@ -491,15 +527,17 @@ namespace goos::runtime {
       return Unit::ok();
     }
 
-    return value;
+    return ok(value);
   }
 
-  auto Intepreter::visit_while([[maybe_unused]] const ast::expression::While &while_expr) -> Result<Any> {
+  auto Intepreter::visit_while(
+    [[maybe_unused]] const ast::expression::While &while_expr
+  ) -> Result<std::any, Box<crab::Error>> {
     Any eval = Unit::value();
 
     while (true) {
-      Result<Any> condition = evaluate(while_expr.get_condition());
-      if (condition.is_err()) return crab::err(condition.take_err_unchecked());
+      Result<Any, Box<err::Error>> condition = evaluate(while_expr.get_condition());
+      if (condition.is_err()) return error(condition.take_err_unchecked());
 
       if (should_halt_control_flow()) {
         return Unit::ok();
@@ -509,8 +547,8 @@ namespace goos::runtime {
         break;
       }
 
-      Result<Any> body = evaluate(while_expr.get_body());
-      if (body.is_err()) return crab::err(body.take_err_unchecked());
+      Result<Any, Box<err::Error>> body = evaluate(while_expr.get_body());
+      if (body.is_err()) return error(body.take_err_unchecked());
 
       if (auto value = consume_halt_flag(ControlFlowFlag::BREAK_LOOP)) {
         return ok(value.take_unchecked());
@@ -525,9 +563,11 @@ namespace goos::runtime {
     return ok(eval);
   }
 
-  auto Intepreter::visit_property_access(const ast::expression::PropertyAccess &property_access) -> Result<Any> {
-    Result<Any> obj_result = evaluate(property_access.get_object());
-    if (obj_result.is_err()) return obj_result;
+  auto Intepreter::visit_property_access(
+    const ast::expression::PropertyAccess &property_access
+  ) -> Result<std::any, Box<crab::Error>> {
+    Result<Any, Box<err::Error>> obj_result = evaluate(property_access.get_object());
+    if (obj_result.is_err()) return error(obj_result.take_err_unchecked());
 
     if (should_halt_control_flow()) {
       return Unit::ok();
@@ -551,14 +591,16 @@ namespace goos::runtime {
     return ok(dict.get_lvalue(property).take_unchecked());
   }
 
-  auto Intepreter::visit_array_index(const ast::expression::ArrayIndex &array_index) -> Result<Any> {
-    Result<Any> obj_result = evaluate(array_index.get_object());
-    if (obj_result.is_err()) return obj_result.take_err_unchecked();
+  auto Intepreter::visit_array_index(
+    const ast::expression::ArrayIndex &array_index
+  ) -> Result<std::any, Box<crab::Error>> {
+    Result<Any, Box<err::Error>> obj_result = evaluate(array_index.get_object());
+    if (obj_result.is_err()) return error(obj_result.take_err_unchecked());
 
     if (should_halt_control_flow()) return Unit::ok();
 
-    Result<Any> index_result = evaluate(array_index.get_index());
-    if (index_result.is_err()) return index_result.take_err_unchecked();
+    Result<Any, Box<err::Error>> index_result = evaluate(array_index.get_index());
+    if (index_result.is_err()) return error(index_result.take_err_unchecked());
 
     if (should_halt_control_flow()) return Unit::ok();
 
@@ -566,14 +608,20 @@ namespace goos::runtime {
     Any index = index_result.take_unchecked();
 
     if (auto opt = obj.downcast<IIndexible>()) {
-      return opt.take_unchecked()->index(std::move(index));
+      return opt.take_unchecked()->index(std::move(index))
+                .map([](const Any &v) { return std::any{v}; })
+                .map_err(
+                  [](auto err) {
+                    return Box<crab::Error>{std::move(err)};
+                  }
+                );
     }
 
     // TODO, make an error
     return Nil::ok();
   }
 
-  auto Intepreter::visit_match(const parser::pass::expr::Match &) -> Result<Any> {
+  auto Intepreter::visit_match(const parser::pass::expr::Match &) -> Result<std::any, Box<crab::Error>> {
     throw std::logic_error("Not implemented");
   }
 }
