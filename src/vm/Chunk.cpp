@@ -101,6 +101,14 @@ namespace goos::vm {
         );
         return;
       }
+      case op::Code::JUMP: {
+        println(
+          "{} {}",
+          styled("jmp", fg(color::cornflower_blue)),
+          styled(get_bytes<u16>(i + 1), fg(color::light_golden_rod_yellow))
+        );
+        return;
+      }
       case op::Code::NOT: ; {
           println("{}", styled("not", fg(color::coral)));
           return;
