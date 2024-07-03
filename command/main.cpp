@@ -13,6 +13,7 @@
 #include <fmt/color.h>
 #include <fmt/xchar.h>
 
+#include "codegen/Compiler.hpp"
 #include "utils/str.hpp"
 #include "vm/Chunk.hpp"
 #include "vm/Vm.hpp"
@@ -51,8 +52,13 @@ auto parse(const i32 argc, const char *argv[]) -> Dictionary<String, Vec<String>
     {"-a", "emit-ast"},
     {"--vm-test", "vm-test"},
 
+    {"-vm", "bytecode"},
+
     {"-D", "emit-args"},
     {"--emit-args", "emit-args"},
+
+    {"--vm-emit", "vm-emit-bytecode"},
+    {"-bc", "vm-emit-bytecode"},
   };
 
   auto result = parse(
@@ -160,6 +166,80 @@ auto main(i32 argc, const char *argv[]) -> i32 {
     result.get_unchecked()->json()->write(output);
   }
 
+  if (args.contains("bytecode")) {
+    using namespace codegen;
+    Compiler compiler{L"Bytecode"};
+
+    vm::Chunk chunk{
+      compiler.compile(result.take_unchecked()).map(
+        [&compiler](auto) {
+          return compiler.finalize_chunk();
+        }
+      ).take_unchecked()
+    };
+
+    if (args.contains("vm-emit-bytecode")) {
+      const Vec<String> &emit_args{args.at("vm-emit-bytecode")};
+      const String byte_filepath{emit_args.empty() ? fmt::format("{}.obj", filepath) : emit_args[0]};
+
+      std::wofstream output{byte_filepath};
+      print(fg(fmt::color::light_gray), "Emitted bytecode to: '");
+      print(fg(fmt::color::light_coral), "{}", byte_filepath);
+      print(fg(fmt::color::light_gray), "'\n");
+      chunk.dissassemble();
+    }
+
+    // chunk.write_instruction(vm::op::Code::PRINT);
+
+    if (not args.contains("benchmark")) {
+      vm::Vm vm{std::move(chunk)};
+
+      const vm::Value val = vm.run().take_unchecked();
+      std::cout << "Exited with value " << val.match(
+        []<typename T>(T t) -> String requires requires { std::to_string(t); } { return std::to_string(t); },
+        []<std::convertible_to<String> T>(T t) -> String { return static_cast<String>(t); },
+        [&val](auto) -> String { return String{val.type_name()}; }
+      ) << std::endl;
+
+      return 0;
+    }
+
+    using namespace std::chrono;
+
+    const usize benchmark_count = args.at("benchmark").empty() ? 1 : std::stoull(args.at("benchmark").at(0));
+
+    nanoseconds total = 0ns;
+
+    const auto padding{str::convert(str::repeat(L' ', 2))};
+
+    for (usize i: crab::range(benchmark_count)) {
+      fmt::print("\rRunning benchmark ({}/{}) ...{}", i, benchmark_count, padding);
+      std::flush(std::cout);
+
+      vm::Vm vm{chunk};
+      auto start = steady_clock::now();
+      std::ignore = vm.run().take_unchecked();
+      total += steady_clock::now() - start;
+    }
+
+    const auto elapsed = total / benchmark_count;
+
+    const seconds sec{std::chrono::duration_cast<seconds>(elapsed)};
+    const milliseconds milli{std::chrono::duration_cast<milliseconds>(elapsed) % 1s};
+    const microseconds micro{std::chrono::duration_cast<microseconds>(elapsed) % 1ms};
+    const nanoseconds nano{elapsed % 1us};
+
+    std::cout << "\rFinished benchmark with an average of: ";
+
+    if (sec >= 0s) {
+      std::cout << sec << " ";
+    }
+
+    std::cout << milli << " " << micro << " " << nano << std::endl;
+
+    return 0;
+  }
+
   using namespace runtime;
 
   if (not args.contains("benchmark")) {
@@ -250,6 +330,7 @@ auto chunk_test() -> void {
   line(PRINT);
 
   #undef line
+
   chunk.dissassemble();
 
   vm::Vm vm{std::move(chunk)};

@@ -174,6 +174,13 @@ set(SOURCE_FILES
         src/vm/Stack.hpp
         src/vm/err/Error.hpp
         src/vm/err/CastError.hpp
+        src/codegen/Compiler.cpp
+        src/codegen/Compiler.hpp
+        src/codegen/Builder.cpp
+        src/codegen/Builder.hpp
+        src/codegen/err/Error.hpp
+        src/codegen/Value.cpp
+        src/codegen/Value.hpp
 )
 
 
@@ -192,14 +199,14 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 # add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    add_compile_options(-g -O3)
 else ()
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    add_compile_options(-O3)
 endif ()
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         "DEBUG=$<IF:$<CONFIG:Debug>,1,0>"

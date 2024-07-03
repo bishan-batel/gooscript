@@ -15,9 +15,9 @@ namespace goos::vm {
   public:
     Stack();
 
-    [[nodiscard]] auto peek(usize offset = 0) -> Result<RefMut<Value>>;
+    [[nodiscard]] auto peek(usize offset = 0) -> Result<Value>;
 
-    [[nodiscard]] auto peek(usize offset = 0) const -> Result<Ref<Value>>;
+    [[nodiscard]] auto peek(usize offset = 0) const -> Result<Value>;
 
     auto push(Value value) -> Result<unit>;
 

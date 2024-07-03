@@ -25,6 +25,7 @@ namespace goos::vm::op {
 
     // Condtional Logic
     JUMP_IF_FALSE,
+    JUMP,
 
     // ARITHMETIC
 
@@ -66,9 +67,58 @@ namespace goos::vm::op {
     return std::bit_cast<u8>(code);
   }
 
+  constexpr auto stack_influence(const Code code) -> i64 {
+    switch (code) {
+      // case Code::RETURN:
+
+      case Code::DUP:
+      case Code::GET_LOCAL:
+      case Code::CONSTANT:
+        return -1;
+
+      case Code::POP:
+
+      case Code::JUMP_IF_FALSE:
+      case Code::RETURN:
+      case Code::SET_LOCAL:
+
+      case Code::AND:
+      case Code::OR:
+      case Code::EQUALS:
+      case Code::GREATER_THAN:
+      case Code::LESS_THAN:
+      case Code::GREATER_OR_EQUAL_THAN:
+      case Code::LESS_OR_EQUAL_THAN:
+      case Code::BIT_AND:
+      case Code::BIT_OR:
+      case Code::BIT_XOR:
+      case Code::SHIFT_LEFT:
+      case Code::SHIFT_RIGHT:
+      case Code::ADD:
+      case Code::SUBTRACT:
+      case Code::MULIPLY:
+      case Code::DIVIDE:
+      case Code::MODULO:
+        return 1;
+
+      case Code::NIL:
+      case Code::UNIT:
+      case Code::TRUE:
+      case Code::FALSE:
+      case Code::NOP:
+      case Code::NOT:
+      case Code::NEGATE:
+      case Code::PRINT:
+      case Code::JUMP:
+      default:
+        return 0;
+    }
+  }
+
   constexpr auto byte_arg_count(const Code code) -> usize {
     switch (code) {
       case Code::JUMP_IF_FALSE:
+      case Code::JUMP:
         return sizeof(usize);
 
       case Code::GET_LOCAL:
@@ -79,5 +129,7 @@ namespace goos::vm::op {
       default:
         return 0;
     }
+
+    return 0;
   }
 }

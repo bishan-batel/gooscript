@@ -13,7 +13,7 @@ namespace goos::vm {
   auto Vm::print_stack() -> void {
     for (usize i = 0; i < stack.size(); i++) {
       // should never fail
-      stack.peek(i).take_unchecked()->match(
+      stack.peek(i).take_unchecked().match(
         [&](const i64 x) -> void {
           log("{} => {}", i, x);
         },
@@ -21,7 +21,7 @@ namespace goos::vm {
           log("{} => {}", i, x);
         },
         [&](const bool x) -> void {
-          log("{} => {}", x, i);
+          log("{} => {}", i, x);
         },
         [&](const Nil) -> void {
           log("{} => nil", i);
@@ -33,15 +33,9 @@ namespace goos::vm {
     }
   }
 
-  auto Vm::push(const Value value) -> Result<unit> {
-    stack.push(value);
+  auto Vm::push(const Value value) -> Result<unit> { return stack.push(value); }
 
-    return unit::val;
-  }
-
-  auto Vm::pop() -> Result<Value> {
-    return stack.pop();
-  }
+  auto Vm::pop() -> Result<Value> { return stack.pop(); }
 
   auto Vm::next_byte() const -> u8 { return chunk.get_byte(registers.ip + 1); }
 
@@ -50,28 +44,26 @@ namespace goos::vm {
       case op::Code::RETURN: {
         break;
       }
-      case op::Code::CONSTANT: {
-        return push(chunk.get_constant(next_bytes<u16>()));
-      }
-      case op::Code::NIL: {
-        return push(Nil::val);
-      }
-      case op::Code::UNIT: {
-        return push(unit{});
-      }
-      case op::Code::TRUE: {
-        return push(true);
-      }
-      case op::Code::FALSE: {
-        return push(false);
-      }
-      case op::Code::SET_LOCAL: {
-        break;
-      }
-      case op::Code::GET_LOCAL: { break; }
-      case op::Code::NOP: { break; }
+      case op::Code::CONSTANT: { return push(chunk.get_constant(next_bytes<u16>())); }
+      case op::Code::NIL: { return push(Nil::val); }
+      case op::Code::UNIT: { return push(unit{}); }
+      case op::Code::TRUE: { return push(true); }
+      case op::Code::FALSE: { return push(false); }
+
+      case op::Code::SET_LOCAL: { return unit{}; }
+
+      case op::Code::GET_LOCAL: { return unit{}; }
+
+      case op::Code::NOP: { return unit{}; }
+
       case op::Code::POP: {
-        return pop().map([](auto) { return unit{}; });
+        return stack.pop().map([](auto) { return unit{}; });
+      }
+
+      case op::Code::JUMP: {
+        const usize addr = next_bytes<u16>();
+        registers.ip = addr - 1 - byte_arg_count(op::Code::JUMP_IF_FALSE);
+        return unit{};
       }
 
       case op::Code::JUMP_IF_FALSE: {
@@ -80,14 +72,12 @@ namespace goos::vm {
             if (not condition) {
               const usize addr = next_bytes<u16>();
               registers.ip = addr - 1 - byte_arg_count(op::Code::JUMP_IF_FALSE);
-              log("Jumping to {:#04x} ", addr);
-            } else {
-              log("Skipping");
             }
             return unit{};
           }
         );
       }
+
       case op::Code::NOT: {
         return pop_as<bool>().and_then(
           [this](const bool cond) {
@@ -95,16 +85,18 @@ namespace goos::vm {
           }
         );
       }
+
       case op::Code::AND: {
         return crab::fallible<Box<err::Error>>(
-          [this] { return pop_as<bool>(); },
-          [this] { return pop_as<bool>(); }
-        ).and_then(
-          [this](auto val) {
-            auto [first, second] = val;
-            return this->push(first and second);
-          }
-        );
+              [&] { return pop_as<bool>(); },
+              [&] { return pop_as<bool>(); }
+            )
+            .and_then(
+              [&](auto val) {
+                auto [first, second] = val;
+                return this->push(first and second);
+              }
+            );
       }
       case op::Code::OR: {
         return crab::fallible<Box<err::Error>>(
@@ -132,7 +124,7 @@ namespace goos::vm {
         #define bin_op(name, op) \
         crab::fallible<Box<err::Error>>([this] { return pop(); }, [this] { return pop(); }).and_then(\
           [this](auto tuple) -> Result<unit> {\
-            auto [first, second] = tuple;\
+            auto [second, first] = tuple;\
             return first.match(\
               crab::cases{\
                 [&]<typename T, typename K>(const T a, const K b) {\
@@ -210,6 +202,7 @@ namespace goos::vm {
         print_stack();
         break;
       }
+
       case op::Code::DUP:
         return stack.peek().and_then(
           [this](const Value val) {
@@ -227,19 +220,19 @@ namespace goos::vm {
     while (registers.ip < chunk.byte_count()) {
       const op::Code code = op::from_byte(chunk.get_byte(registers.ip));
 
-      fmt::print("{:#04x}> ", registers.ip);
-      chunk.dissassemble_instruction(registers.ip);
+      // fmt::print("{:#04x}> ", registers.ip);
+      // chunk.dissassemble_instruction(registers.ip);
 
       if (auto err = run_instruction(code); err.is_err()) {
         return err.take_err_unchecked();
       }
       registers.ip += 1 + byte_arg_count(code);
 
-      using namespace std::chrono;
-      std::this_thread::sleep_for(50ms);
+      // using namespace std::chrono;
+      // std::this_thread::sleep_for(50ms);
     }
 
-    if (stack.empty()) return Value{unit::val};
+    // if (stack.empty()) return Value{unit::val};
 
     return pop();
   }

@@ -10,6 +10,7 @@
 #include "err/Error.hpp"
 #include "ast/expression/literal/Array.hpp"
 #include "err/CastError.hpp"
+#include "utils/hash.hpp"
 
 namespace goos::vm {
   struct Object {};
@@ -101,11 +102,15 @@ namespace goos::vm {
   };
 
   constexpr auto Value::as_number() const -> f64 {
-    return match(
-      [](const f64 a) { return a; },
-      [](const i64 b) { return static_cast<f64>(b); },
-      [](const auto &) -> f64 { return 0.; }
-    );
+    if (const i64 *v = std::get_if<i64>(&value)) {
+      return *v;
+    }
+
+    if (const f64 *v = std::get_if<f64>(&value)) {
+      return *v;
+    }
+
+    return 0.;
   }
 
   constexpr auto Value::is_numeric() const -> bool {
@@ -130,3 +135,17 @@ namespace goos::vm {
   template<typename T, typename... Others>
   constexpr auto Value::is() const -> bool { return std::holds_alternative<T, Others...>(value); }
 }
+
+template<>
+struct std::hash<goos::vm::Value> {
+  auto operator()(const goos::vm::Value &value) const noexcept -> usize {
+    using namespace goos;
+
+    return value.match(
+      []<utils::hashable T>(const T &a) -> utils::hash_code { return utils::hash(a); },
+
+      [](const vm::Nil) -> utils::hash_code { return 0; },
+      [](const unit) -> utils::hash_code { return 1; }
+    );
+  }
+};

@@ -7,31 +7,37 @@
 namespace goos {
   vm::Stack::Stack() = default;
 
-  auto vm::Stack::peek(const usize offset) -> Result<RefMut<Value>> {
+  auto vm::Stack::peek(const usize offset) -> Result<Value> {
     const usize index = top - 1 - offset;
 
     // TODO OutOfBounds Error
     debug_assert(index < top, "Invalid Index");
-    return RefMut{buffer.at(index)};
+    return buffer.at(index);
   }
 
-  auto vm::Stack::peek(const usize offset) const -> Result<Ref<Value>> {
+  auto vm::Stack::peek(const usize offset) const -> Result<Value> {
     const usize index = top - 1 - offset;
 
     // TODO OutOfBounds Error
     debug_assert(index < top, "Invalid Index");
-    return Ref{buffer.at(index)};
+    return buffer.at(index);
   }
 
   auto vm::Stack::pop() -> Result<Value> {
-    return peek().map(
-      [&](const RefMut<Value> peek) {
-        const Value peeked = std::exchange(*peek, unit::val);
-        top--;
-        *peek = unit::val;
-        return peeked;
-      }
-    );
+    // return peek().map(
+    //   [this](const Value) {
+    //     top--;
+    //
+    //     const Value val = buffer[top];
+    //     buffer[top] = unit::val;
+    //     return val;
+    //   }
+    // );
+    top--;
+
+    const Value val = buffer[top];
+    buffer[top] = unit::val;
+    return val;
   }
 
   auto vm::Stack::size() const -> usize {
