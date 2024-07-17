@@ -6,21 +6,27 @@
 
 #include <token/Operator.hpp>
 
+#include "ast/Statement.hpp"
+#include "ast/expression/ArrayIndex.hpp"
 #include "ast/expression/Binary.hpp"
 #include "ast/expression/FunctionCall.hpp"
-#include "ast/expression/Unary.hpp"
 #include "ast/expression/PropertyAccess.hpp"
-#include "ast/expression/ArrayIndex.hpp"
+#include "ast/expression/Unary.hpp"
 
 namespace goos::parser::pass::expr {
   auto factor(TokenStream &stream) -> MustEvalResult<ast::Expression> {
+    ast::TokenTrace trace = stream.trace();
+
     if (auto op = stream.curr().downcast<token::Operator>(); op and is_unary(op.get_unchecked()->get_op())) {
       stream.next();
       auto operand{factor(stream)};
 
-      if (operand.is_err()) return crab::err(operand.take_err_unchecked());
+      if (operand.is_err())
+        return crab::err(operand.take_err_unchecked());
 
-      auto unary{crab::make_box<ast::expression::Unary>(op.get_unchecked()->get_op(), operand.take_unchecked())};
+      trace = trace.merge(stream.trace());
+
+      auto unary{crab::make_box<ast::expression::Unary>(op.get_unchecked()->get_op(), operand.take_unchecked(), trace)};
       return crab::ok<Box<ast::Expression>>(std::move(unary));
     }
 
@@ -31,7 +37,8 @@ namespace goos::parser::pass::expr {
         return crab::err(result.take_err_unchecked());
 
       Option<Box<ast::Expression>> option{result.take_unchecked()};
-      if (option.is_none()) continue;
+      if (option.is_none())
+        continue;
 
       Box<ast::Expression> expr = option.take_unchecked();
 
@@ -44,34 +51,30 @@ namespace goos::parser::pass::expr {
   }
 
   auto postfix_pass(TokenStream &stream, Box<ast::Expression> expr) -> MustEvalResult<ast::Expression> {
+    ast::TokenTrace trace = stream.trace();
     if (stream.try_consume(lexer::Operator::DOT) or stream.try_consume(lexer::Operator::COLON)) {
       Result<goos::meta::Identifier> ident = stream.consume_identifier();
-      if (ident.is_err()) return ident.take_err_unchecked();
+      if (ident.is_err())
+        return ident.take_err_unchecked();
+
+      trace = trace.merge(stream.trace());
 
       return postfix_pass(
-        stream,
-        crab::make_box<ast::expression::PropertyAccess>(
-          std::move(expr),
-          ident.take_unchecked()
-        )
-      );
+          stream, crab::make_box<ast::expression::PropertyAccess>(std::move(expr), ident.take_unchecked(), trace));
     }
 
     if (stream.try_consume(lexer::Operator::BRACKET_OPEN)) {
       MustEvalResult<ast::Expression> index = expression(stream);
-      if (index.is_err()) return index.take_err_unchecked();
+      if (index.is_err())
+        return index.take_err_unchecked();
 
       if (auto err = stream.consume_operator(lexer::Operator::BRACKET_CLOSE); err.is_err()) {
         return err.take_err_unchecked();
       }
 
+      trace = trace.merge(stream.trace());
       return postfix_pass(
-        stream,
-        crab::make_box<ast::expression::ArrayIndex>(
-          std::move(expr),
-          index.take_unchecked()
-        )
-      );
+          stream, crab::make_box<ast::expression::ArrayIndex>(std::move(expr), index.take_unchecked(), trace));
     }
 
     if (stream.try_consume(lexer::Operator::PAREN_OPEN)) {
@@ -79,7 +82,8 @@ namespace goos::parser::pass::expr {
       while (not stream.is_curr(lexer::Operator::PAREN_CLOSE)) {
         // consume parameter
         auto param{expression(stream)};
-        if (param.is_err()) return crab::err(param.take_err_unchecked());
+        if (param.is_err())
+          return crab::err(param.take_err_unchecked());
         arguments.push_back(param.take_unchecked());
 
         // if no comma then list is at the end
@@ -92,17 +96,18 @@ namespace goos::parser::pass::expr {
         return crab::err(err.take_err_unchecked());
       }
 
+      trace = trace.merge(stream.trace());
+
       return postfix_pass(
-        stream,
-        crab::make_box<ast::expression::FunctionCall>(std::move(expr), std::move(arguments))
-      );
+          stream, crab::make_box<ast::expression::FunctionCall>(std::move(expr), std::move(arguments), trace));
     }
     return expr;
   }
 
   auto postfix(TokenStream &stream) -> MustEvalResult<ast::Expression> {
     MustEvalResult<ast::Expression> expr_result = factor(stream);
-    if (expr_result.is_err()) return expr_result.take_err_unchecked();
+    if (expr_result.is_err())
+      return expr_result.take_err_unchecked();
     return postfix_pass(stream, expr_result.take_unchecked());
   }
 
@@ -110,9 +115,7 @@ namespace goos::parser::pass::expr {
     if (op_index == 0) {
       return postfix(stream);
     }
-    const auto parse{
-      [&stream, op_index] { return consume_binary_expression(stream, op_index - 1); }
-    };
+    const auto parse{[&stream, op_index] { return consume_binary_expression(stream, op_index - 1); }};
 
     // [[maybe_unused]]
     // usize begin{stream.get_position()};
@@ -137,8 +140,12 @@ namespace goos::parser::pass::expr {
       if (not operators.contains(op))
         break;
 
+      ast::TokenTrace trace = stream.trace();
+
       // skip over operator
       stream.next();
+
+      trace = trace.merge(stream.curr());
 
       debug_assert(lexer::is_binary(op), "Invalid Operator Table, Operator is not Binary");
 
@@ -147,11 +154,7 @@ namespace goos::parser::pass::expr {
       if (rhs.is_err())
         return crab::err(rhs.take_err_unchecked());
 
-      lhs = crab::make_box<ast::expression::Binary>(
-        std::move(lhs),
-        op,
-        rhs.take_unchecked()
-      );
+      lhs = crab::make_box<ast::expression::Binary>(std::move(lhs), op, rhs.take_unchecked(), trace);
     }
 
     return crab::ok(std::move(lhs));
@@ -160,4 +163,4 @@ namespace goos::parser::pass::expr {
   auto expression(TokenStream &stream) -> MustEvalResult<ast::Expression> {
     return consume_binary_expression(stream, ORDER_OF_OPERATIONS.size() - 1);
   }
-}
+} // namespace goos::parser::pass::expr

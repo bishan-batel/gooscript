@@ -3,6 +3,7 @@
 //
 #include "literals.hpp"
 
+#include "ast/Statement.hpp"
 #include "expression.hpp"
 #include "token/Decimal.hpp"
 #include "token/Identifier.hpp"
@@ -11,10 +12,12 @@
 
 namespace goos::parser::pass::expr {
   auto grouping(TokenStream &stream) -> OptionalResult<ast::Expression> {
-    if (not stream.try_consume(lexer::Operator::PAREN_OPEN)) return OptionalResult<ast::Expression>{crab::none};
+    if (not stream.try_consume(lexer::Operator::PAREN_OPEN))
+      return OptionalResult<ast::Expression>{crab::none};
 
     auto expr = expression(stream);
-    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+    if (expr.is_err())
+      return crab::err(expr.take_err_unchecked());
 
     if (auto err = stream.consume_operator(lexer::Operator::PAREN_CLOSE); err.is_err()) {
       return crab::err(err.take_err_unchecked());
@@ -24,72 +27,85 @@ namespace goos::parser::pass::expr {
   }
 
   auto decimal(TokenStream &stream) -> OptionalResult<ast::expression::Decimal> {
+    ast::TokenTrace trace = stream.trace();
+
     if (auto decimal = stream.try_consume<token::Decimal>()) {
       const f64 number{decimal.take_unchecked()->get_number()};
-      return crab::ok(crab::some(crab::make_box<ast::expression::Decimal>(number)));
+      return crab::ok(crab::some(crab::make_box<ast::expression::Decimal>(number, trace)));
     }
 
     return crab::ok<Option<Box<ast::expression::Decimal>>>(crab::none);
   }
 
   auto integer(TokenStream &stream) -> OptionalResult<ast::expression::Integer> {
+    ast::TokenTrace trace = stream.trace();
+
     if (auto decimal = stream.try_consume<token::Integer>()) {
       const i64 number{decimal.take_unchecked()->get_number()};
-      return crab::ok(crab::some(crab::make_box<ast::expression::Integer>(number)));
+      return crab::ok(crab::some(crab::make_box<ast::expression::Integer>(number, trace)));
     }
 
     return crab::ok<Option<Box<ast::expression::Integer>>>(crab::none);
   }
 
   auto string(TokenStream &stream) -> OptionalResult<ast::expression::StringLiteral> {
+    ast::TokenTrace trace = stream.trace();
+
     if (auto str = stream.try_consume<token::StringLiteral>()) {
       return crab::ok(
-        crab::some(
-          crab::make_box<ast::expression::StringLiteral>(str.take_unchecked()->get_string())
-        )
-      );
+          crab::some(crab::make_box<ast::expression::StringLiteral>(str.take_unchecked()->get_string(), trace)));
     }
 
     return crab::ok<Option<Box<ast::expression::StringLiteral>>>(crab::none);
   }
 
   auto unit(TokenStream &stream) -> OptionalResult<ast::expression::Unit> {
+    ast::TokenTrace trace = stream.trace();
+
     if (stream.try_consume(lexer::Keyword::UNIT)) {
-      return crab::ok(crab::some(crab::make_box<ast::expression::Unit>()));
+      return crab::ok(crab::some(crab::make_box<ast::expression::Unit>(trace)));
     }
 
     return crab::ok<Option<Box<ast::expression::Unit>>>(crab::none);
   }
 
   auto null(TokenStream &stream) -> OptionalResult<ast::expression::Nil> {
+    ast::TokenTrace trace = stream.trace();
+
     if (stream.try_consume(lexer::Keyword::NIL)) {
-      return crab::ok(crab::some(crab::make_box<ast::expression::Nil>()));
+      return crab::ok(crab::some(crab::make_box<ast::expression::Nil>(trace)));
     }
     return crab::ok<Option<Box<ast::expression::Nil>>>(crab::none);
   }
 
   auto boolean(TokenStream &stream) -> OptionalResult<ast::expression::Boolean> {
+    ast::TokenTrace trace = stream.trace();
+
     if (stream.try_consume(lexer::Keyword::TRUE)) {
-      return crab::ok(crab::some(crab::make_box<ast::expression::Boolean>(true)));
+      return crab::ok(crab::some(crab::make_box<ast::expression::Boolean>(true, trace)));
     }
 
     if (stream.try_consume(lexer::Keyword::FALSE)) {
-      return crab::ok(crab::some(crab::make_box<ast::expression::Boolean>(false)));
+      return crab::ok(crab::some(crab::make_box<ast::expression::Boolean>(false, trace)));
     }
 
     return crab::ok<Option<Box<ast::expression::Boolean>>>(crab::none);
   }
 
   auto identifier_binding(TokenStream &stream) -> OptionalResult<ast::expression::IdentifierBinding> {
+    ast::TokenTrace trace = stream.trace();
+
     if (auto identifier = stream.try_consume<token::Identifier>()) {
       auto binding =
-          crab::make_box<ast::expression::IdentifierBinding>(identifier.take_unchecked()->get_identifier());
+          crab::make_box<ast::expression::IdentifierBinding>(identifier.take_unchecked()->get_identifier(), trace);
       return crab::ok(crab::some(std::move(binding)));
     }
     return crab::ok<Option<Box<ast::expression::IdentifierBinding>>>(crab::none);
   }
 
   auto array(TokenStream &stream) -> OptionalResult<ast::expression::Array> {
+    ast::TokenTrace trace = stream.trace();
+
     if (not stream.try_consume(lexer::Operator::BRACKET_OPEN)) {
       return OptionalResult<ast::expression::Array>{crab::none};
     }
@@ -98,7 +114,8 @@ namespace goos::parser::pass::expr {
 
     while (not stream.is_curr(lexer::Operator::BRACKET_CLOSE) and not stream.is_eof()) {
       auto expr = expression(stream);
-      if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+      if (expr.is_err())
+        return crab::err(expr.take_err_unchecked());
 
       elements.push_back(expr.take_unchecked());
 
@@ -114,10 +131,14 @@ namespace goos::parser::pass::expr {
       return crab::err(err.take_err_unchecked());
     }
 
-    return crab::ok(crab::some(crab::make_box<ast::expression::Array>(std::move(elements))));
+    trace = trace.merge(stream.trace());
+
+    return crab::ok(crab::some(crab::make_box<ast::expression::Array>(std::move(elements), trace)));
   }
 
   auto dictionary([[maybe_unused]] TokenStream &stream) -> OptionalResult<ast::expression::Dictionary> {
+    ast::TokenTrace trace = stream.trace();
+
     if (not stream.try_consume(lexer::Operator::CURLY_OPEN)) {
       return OptionalResult<ast::expression::Dictionary>{crab::none};
     }
@@ -126,9 +147,11 @@ namespace goos::parser::pass::expr {
 
     while (not stream.is_curr(lexer::Operator::CURLY_CLOSE) and not stream.is_eof()) {
       // Key Value
-      Option<Box<ast::Expression>> key{crab::none}; {
+      Option<Box<ast::Expression>> key{crab::none};
+      {
         auto identifier{identifier_binding(stream)};
-        if (identifier.is_err()) return crab::err(identifier.take_err_unchecked());
+        if (identifier.is_err())
+          return crab::err(identifier.take_err_unchecked());
 
         if (auto value = identifier.take_unchecked()) {
           key = Box<ast::Expression>{value.take_unchecked()};
@@ -138,7 +161,8 @@ namespace goos::parser::pass::expr {
       // if not an identifier, it must be a string
       if (key.is_none()) {
         auto str{string(stream)};
-        if (str.is_err()) return crab::err(str.take_err_unchecked());
+        if (str.is_err())
+          return crab::err(str.take_err_unchecked());
 
         if (auto value = str.take_unchecked()) {
           key = value.take_unchecked();
@@ -157,7 +181,8 @@ namespace goos::parser::pass::expr {
       }
 
       auto value = expression(stream);
-      if (value.is_err()) return crab::err(value.take_err_unchecked());
+      if (value.is_err())
+        return crab::err(value.take_err_unchecked());
 
       pairs.push_back({key.take_unchecked(), value.take_unchecked()});
 
@@ -168,7 +193,8 @@ namespace goos::parser::pass::expr {
     if (auto err = stream.consume_operator(lexer::Operator::BRACKET_CLOSE); err.is_err()) {
       return crab::err(err.take_err_unchecked());
     }
+    trace = trace.merge(stream.trace());
 
-    return crab::ok(crab::some(crab::make_box<ast::expression::Dictionary>(std::move(pairs))));
+    return crab::ok(crab::some(crab::make_box<ast::expression::Dictionary>(std::move(pairs), trace)));
   }
-}
+} // namespace goos::parser::pass::expr

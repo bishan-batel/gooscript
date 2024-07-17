@@ -4,31 +4,28 @@
 
 #include "TokenStream.hpp"
 
-#include <ranges>
-#include <sstream>
 #include <token/Keyword.hpp>
 #include <token/Operator.hpp>
 
+#include "ast/Statement.hpp"
 #include "token/EndOfFile.hpp"
 #include "token/Identifier.hpp"
 #include "utils/str.hpp"
 
 namespace goos::parser {
   TokenStream::TokenStream(lexer::TokenList list)
-    : list{std::move(list)}, eof{crab::make_rc<token::EndOfFile>(this->list[0]->get_file())} {}
+      : list{std::move(list)}, eof{crab::make_rc<token::EndOfFile>(this->list[0]->get_file())} {}
 
-  auto TokenStream::curr() const -> Rc<token::Token> {
-    return get_token(position);
-  }
+  auto TokenStream::curr() const -> Rc<token::Token> { return get_token(position); }
+
+  auto TokenStream::trace() const -> ast::TokenTrace { return ast::TokenTrace{curr()}; }
 
   auto TokenStream::next(const usize i) -> Rc<token::Token> {
     position += i;
     return curr();
   }
 
-  auto TokenStream::is_curr(const token::Token &token) const -> bool {
-    return *curr() == token;
-  }
+  auto TokenStream::is_curr(const token::Token &token) const -> bool { return *curr() == token; }
 
   auto TokenStream::is_curr(const lexer::Operator &op) const -> bool {
     return token::Operator{eof->get_file(), eof->get_range(), op} == curr();
@@ -72,9 +69,7 @@ namespace goos::parser {
       }
     }
 
-    return crab::err(
-      error<err::ExpectedToken>(std::format("Expected a Keyword {}", str::convert(msg.str())), curr())
-    );
+    return crab::err(error<err::ExpectedToken>(std::format("Expected a Keyword {}", str::convert(msg.str())), curr()));
   }
 
   auto TokenStream::consume_keyword(const lexer::Keyword allowed) -> Result<lexer::Keyword> {
@@ -102,8 +97,7 @@ namespace goos::parser {
     }
 
     return crab::err(
-      error<err::ExpectedToken>(std::format("Expected an operator {}", str::convert(msg.str())), curr())
-    );
+        error<err::ExpectedToken>(std::format("Expected an operator {}", str::convert(msg.str())), curr()));
   }
 
   auto TokenStream::consume_identifier() -> Result<meta::Identifier> {
@@ -114,21 +108,15 @@ namespace goos::parser {
     return crab::err(error<err::ExpectedToken>("Identifier.", curr()));
   }
 
-  auto TokenStream::is_eof() const -> bool {
-    return position >= list.size();
-  }
+  auto TokenStream::is_eof() const -> bool { return position >= list.size(); }
 
-  auto TokenStream::unexpected(String expected) -> err::Error {
-    return unexpected(std::move(expected), curr());
-  }
+  auto TokenStream::unexpected(String expected) -> err::Error { return unexpected(std::move(expected), curr()); }
 
   auto TokenStream::unexpected(String expected, Rc<token::Token> received) -> err::Error {
     return error<err::ExpectedToken>(std::move(expected), std::move(received));
   }
 
-  auto TokenStream::get_position() const -> usize {
-    return position;
-  }
+  auto TokenStream::get_position() const -> usize { return position; }
 
   auto TokenStream::get_token(const usize position) const -> Rc<token::Token> {
     if (position < list.size())
@@ -146,7 +134,5 @@ namespace goos::parser {
     return stream.str();
   }
 
-  auto TokenStream::backpedal(const usize i) -> void {
-    position -= i;
-  }
-}
+  auto TokenStream::backpedal(const usize i) -> void { position -= i; }
+} // namespace goos::parser

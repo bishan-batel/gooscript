@@ -4,9 +4,11 @@
 
 #include "statement.hpp"
 
-#include "parser/pass/statement/block.hpp"
 #include <error.hpp>
 #include <token/Operator.hpp>
+#include "ast/Statement.hpp"
+#include "parser/pass/expression/expression.hpp"
+#include "parser/pass/statement/block.hpp"
 
 namespace goos::parser::pass {
   auto statement([[maybe_unused]] TokenStream &stream) -> MustEvalResult<ast::Statement> {
@@ -30,7 +32,8 @@ namespace goos::parser::pass {
 
     MustEvalResult<ast::Expression> expr = expr::expression(stream);
 
-    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+    if (expr.is_err())
+      return crab::err(expr.take_err_unchecked());
 
     return crab::ok<Box<ast::Statement>>(expr.take_unchecked());
   }
@@ -38,13 +41,16 @@ namespace goos::parser::pass {
   auto variable_declare(TokenStream &stream) -> OptionalResult<ast::VariableDeclaration> {
     goos::meta::Mutability mutability;
 
+    ast::TokenTrace trace{stream.curr()};
+
     if (stream.try_consume(lexer::Keyword::LET)) {
       mutability = goos::meta::Mutability::IMMUTABLE;
     } else if (stream.try_consume(lexer::Keyword::VAR)) {
       mutability = goos::meta::Mutability::MUTABLE;
     } else if (stream.try_consume(lexer::Keyword::CONST)) {
       mutability = goos::meta::Mutability::CONSTANT;
-    } else return OptionalResult<ast::VariableDeclaration>{crab::none};
+    } else
+      return OptionalResult<ast::VariableDeclaration>{crab::none};
 
     Result<goos::meta::Identifier> name_result{stream.consume_identifier()};
 
@@ -54,44 +60,61 @@ namespace goos::parser::pass {
 
     goos::meta::Identifier name{name_result.take_unchecked()};
 
-    Box<ast::Expression> initializer{crab::make_box<ast::expression::Unit>()};
+    trace = trace.merge(stream.trace());
+
+    Box<ast::Expression> initializer{crab::make_box<ast::expression::Unit>(trace)};
+    trace = trace.merge(stream.trace());
 
     if (stream.try_consume(lexer::Operator::ASSIGN)) {
       MustEvalResult<ast::Expression> result = expr::expression(stream);
-      if (result.is_err()) return crab::err(result.take_err_unchecked());
+      if (result.is_err())
+        return crab::err(result.take_err_unchecked());
       initializer = result.take_unchecked();
     }
 
-    return crab::ok(crab::some(crab::make_box<ast::VariableDeclaration>(name, mutability, std::move(initializer))));
+    trace = trace.merge(ast::TokenTrace{stream.curr()});
+
+    return crab::ok(
+        crab::some(crab::make_box<ast::VariableDeclaration>(name, mutability, std::move(initializer), trace)));
   }
 
   auto return_statement(TokenStream &stream) -> OptionalResult<ast::Return> {
+    ast::TokenTrace trace{stream.curr()};
+
     if (not stream.try_consume(lexer::Keyword::RETURN)) {
       return OptionalResult<ast::Return>{crab::none};
     }
 
+    trace = trace.merge(stream.trace());
+
     if (stream.is_eof()) {
-      return crab::ok(crab::some(crab::make_box<ast::Return>(crab::make_box<ast::expression::Unit>())));
+      return crab::ok(crab::some(crab::make_box<ast::Return>(crab::make_box<ast::expression::Unit>(trace), trace)));
     }
 
     if (auto op = stream.curr().downcast<token::Operator>();
-      op and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
-      return crab::ok(crab::some(crab::make_box<ast::Return>(crab::make_box<ast::expression::Unit>())));
+        op and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
+      return crab::ok(crab::some(crab::make_box<ast::Return>(crab::make_box<ast::expression::Unit>(trace), trace)));
     }
 
     MustEvalResult<ast::Expression> expr = expr::expression(stream);
-    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+    trace = trace.merge(stream.trace());
 
-    return crab::ok(crab::some(crab::make_box<ast::Return>(expr.take_unchecked())));
+    if (expr.is_err())
+      return crab::err(expr.take_err_unchecked());
+
+    return crab::ok(crab::some(crab::make_box<ast::Return>(expr.take_unchecked(), trace)));
   }
 
   auto fn_statement(TokenStream &stream) -> OptionalResult<ast::VariableDeclaration> {
+    ast::TokenTrace trace = stream.trace();
+
     if (not stream.try_consume(lexer::Keyword::FN)) {
       return OptionalResult<ast::VariableDeclaration>{crab::none};
     }
 
     auto name_result = stream.consume_identifier();
-    if (name_result.is_err()) return name_result.take_err_unchecked();
+    if (name_result.is_err())
+      return name_result.take_err_unchecked();
     goos::meta::Identifier name = name_result.take_unchecked();
 
     Vec<goos::meta::Identifier> parameters{};
@@ -120,22 +143,22 @@ namespace goos::parser::pass {
     if (stream.try_consume(lexer::Operator::ARROW)) {
       MustEvalResult<ast::Expression> expr = expr::expression(stream);
 
-      if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+      trace = trace.merge(stream.trace());
 
-      return crab::ok(
-        crab::some(
-          crab::make_box<ast::VariableDeclaration>(
-            name,
-            goos::meta::Mutability::IMMUTABLE,
-            crab::make_box<ast::expression::Lambda>(std::move(parameters), expr.take_unchecked())
-          )
-        )
-      );
+      if (expr.is_err())
+        return crab::err(expr.take_err_unchecked());
+
+      return crab::ok(crab::some(crab::make_box<ast::VariableDeclaration>(
+          name,
+          goos::meta::Mutability::IMMUTABLE,
+          crab::make_box<ast::expression::Lambda>(std::move(parameters), expr.take_unchecked(), trace),
+          trace)));
     }
 
     auto result = block(stream, false);
 
-    if (result.is_err()) return crab::err(result.take_err_unchecked());
+    if (result.is_err())
+      return crab::err(result.take_err_unchecked());
 
     auto scope_opt = result.take_unchecked();
 
@@ -145,34 +168,39 @@ namespace goos::parser::pass {
 
     auto body = scope_opt.take_unchecked();
 
-    return crab::ok(
-      crab::some(
-        crab::make_box<ast::VariableDeclaration>(
-          name,
-          goos::meta::Mutability::IMMUTABLE,
-          crab::make_box<ast::expression::Lambda>(std::move(parameters), std::move(body))
-        )
-      )
-    );
+    trace = trace.merge(stream.trace());
+
+    return crab::ok(crab::some(crab::make_box<ast::VariableDeclaration>(
+        name,
+        goos::meta::Mutability::IMMUTABLE,
+        crab::make_box<ast::expression::Lambda>(std::move(parameters), std::move(body), trace),
+        trace)));
   }
 
   auto eval(TokenStream &stream) -> OptionalResult<ast::Eval> {
+    ast::TokenTrace trace = stream.trace();
+
     if (not stream.try_consume(lexer::Keyword::EVAL)) {
       return OptionalResult<ast::Eval>{crab::none};
     }
 
+    trace = trace.merge(stream.trace());
+
     if (stream.is_eof()) {
-      return crab::ok(crab::some(crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())));
+      return crab::ok(crab::some(crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>(trace), trace)));
     }
 
     if (auto op = stream.curr().downcast<token::Operator>();
-      op and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
-      return crab::ok(crab::some(crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>())));
+        op and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
+      return crab::ok(crab::some(crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>(trace), trace)));
     }
 
     MustEvalResult<ast::Expression> expr = expr::expression(stream);
-    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+    if (expr.is_err())
+      return crab::err(expr.take_err_unchecked());
 
-    return crab::ok(crab::some(crab::make_box<ast::Eval>(expr.take_unchecked())));
+    trace = trace.merge(stream.curr());
+
+    return crab::ok(crab::some(crab::make_box<ast::Eval>(expr.take_unchecked(), trace)));
   }
-}
+} // namespace goos::parser::pass

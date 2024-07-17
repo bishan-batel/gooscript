@@ -4,9 +4,9 @@
 
 #pragma once
 #include <functional>
-#include <preamble.hpp>
 #include <lexer/Keyword.hpp>
 #include <lexer/Operator.hpp>
+#include <preamble.hpp>
 
 #include "Error.hpp"
 #include "ast/Statement.hpp"
@@ -39,7 +39,7 @@ namespace goos::parser {
   using OptionalPass = std::function<OptionalResult<T>(TokenStream &)>;
 
   template<typename F>
-  concept is_optional_pass = std::is_invocable_v<F, TokenStream&> and requires(F f, TokenStream &stream) {
+  concept is_optional_pass = std::is_invocable_v<F, TokenStream &> and requires(F f, TokenStream &stream) {
     OptionalPass<std::remove_reference_t<decltype(f(stream).take_unchecked())>>{f};
   };
 
@@ -57,6 +57,8 @@ namespace goos::parser {
     [[nodiscard]]
     auto curr() const -> Rc<token::Token>;
 
+    [[nodiscard]] auto trace() const -> ast::TokenTrace;
+
     /**
      * @brief Advances by i times and returns the new current token
      * @param i How much to advance
@@ -67,7 +69,8 @@ namespace goos::parser {
      * @brief Queries if the current token is of type T
      * @tparam T Type to check
      */
-    template<typename T> requires std::is_base_of_v<token::Token, T>
+    template<typename T>
+      requires std::is_base_of_v<token::Token, T>
     [[nodiscard]]
     auto is_curr() const -> bool;
 
@@ -94,7 +97,8 @@ namespace goos::parser {
      * and then move the stream to the next token. The token will not be consumed
      * if it is not of type T and this function will return None
      */
-    template<typename T> requires std::is_base_of_v<token::Token, T>
+    template<typename T>
+      requires std::is_base_of_v<token::Token, T>
     [[nodiscard]]
     auto try_consume() -> Option<Rc<T>>;
 
@@ -126,7 +130,8 @@ namespace goos::parser {
     [[nodiscard]]
     auto consume_operator(lexer::Operator allowed) -> Result<lexer::Operator>;
 
-    template<typename... Operators> requires (std::is_same_v<Operators, lexer::Operator> && ...)
+    template<typename... Operators>
+      requires(std::is_same_v<Operators, lexer::Operator> && ...)
     [[nodiscard]]
     auto consume_operator(Operators... operators) -> Result<lexer::Operator>;
 
@@ -135,9 +140,9 @@ namespace goos::parser {
 
     [[nodiscard]] auto is_eof() const -> bool;
 
-    template<typename T, typename... Args> requires
-      std::is_base_of_v<err::ErrorBase, T>
-    auto error(Args &&... args) -> err::Error;
+    template<typename T, typename... Args>
+      requires std::is_base_of_v<err::ErrorBase, T>
+    auto error(Args &&...args) -> err::Error;
 
     auto unexpected(String expected) -> err::Error;
 
@@ -152,12 +157,14 @@ namespace goos::parser {
     auto backpedal(usize i = 1) -> void;
   };
 
-  template<typename T> requires std::is_base_of_v<token::Token, T>
+  template<typename T>
+    requires std::is_base_of_v<token::Token, T>
   auto TokenStream::is_curr() const -> bool {
     return curr().downcast<T>().is_some();
   }
 
-  template<typename T> requires std::is_base_of_v<token::Token, T>
+  template<typename T>
+    requires std::is_base_of_v<token::Token, T>
   auto TokenStream::try_consume() -> Option<Rc<T>> {
     if (auto casted{curr().downcast<T>()}; casted.is_some()) {
       next();
@@ -167,14 +174,16 @@ namespace goos::parser {
     return crab::none;
   }
 
-  template<typename... Operators> requires (std::is_same_v<Operators, lexer::Operator> && ...)
+  template<typename... Operators>
+    requires(std::is_same_v<Operators, lexer::Operator> && ...)
   auto TokenStream::consume_operator(Operators... operators) -> Result<lexer::Operator> {
     std::array arr{operators...};
     return consume_operator(std::span{arr});
   }
 
-  template<typename T, typename... Args> requires std::is_base_of_v<err::ErrorBase, T>
-  auto TokenStream::error(Args &&... args) -> err::Error {
+  template<typename T, typename... Args>
+    requires std::is_base_of_v<err::ErrorBase, T>
+  auto TokenStream::error(Args &&...args) -> err::Error {
     return err::Error{crab::make_box<T, Args...>(std::forward<Args>(args)...)};
   }
-}
+} // namespace goos::parser

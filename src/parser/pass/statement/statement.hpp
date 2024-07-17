@@ -3,10 +3,10 @@
 //
 
 #pragma once
-#include "../expression/expression.hpp"
 #include "ast/statements/Return.hpp"
 #include "ast/statements/VariableDeclaration.hpp"
 #include "parser/TokenStream.hpp"
+#include "ast/statements/Eval.hpp"
 #include "parser/pass/statement/block.hpp"
 
 namespace goos::parser::pass {
@@ -27,8 +27,7 @@ namespace goos::parser::pass {
   [[nodiscard]] auto eval(TokenStream &stream) -> OptionalResult<ast::Eval>;
 
   namespace meta {
-    template<typename F>
-      requires std::is_invocable_v<F, TokenStream&>
+    template<typename F> requires std::is_invocable_v<F, TokenStream&>
     auto transmute(F f) -> OptionalPass<ast::Statement> {
       return [f](TokenStream &stream) -> OptionalResult<ast::Statement> {
         auto result{f(stream)};

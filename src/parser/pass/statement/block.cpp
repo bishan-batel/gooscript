@@ -7,11 +7,13 @@
 #include <error.hpp>
 #include <token/Operator.hpp>
 
+#include "ast/Statement.hpp"
 #include "ast/expression/literal/Unit.hpp"
 #include "parser/pass/statement/statement.hpp"
 
 namespace goos::parser::pass {
   auto block(TokenStream &stream, const bool require_do) -> OptionalResult<ast::expression::ScopeBlock> {
+
     if (require_do and not stream.try_consume(lexer::Keyword::DO)) {
       return {crab::none};
     }
@@ -20,42 +22,33 @@ namespace goos::parser::pass {
       return crab::err(err.take_err_unchecked());
     }
 
-    auto list{
-      statements_list(
-        stream,
-        [](TokenStream &s) { return s.try_consume(lexer::Operator::CURLY_CLOSE); }
-      )
-    };
+    auto list{statements_list(stream, [](TokenStream &s) { return s.try_consume(lexer::Operator::CURLY_CLOSE); })};
 
     // if failed to read propogate error
-    if (list.is_err()) return crab::err(list.take_err_unchecked());
+    if (list.is_err())
+      return crab::err(list.take_err_unchecked());
 
     return crab::ok(crab::some(list.take_unchecked()));
   }
 
   auto block_top_level(TokenStream &stream) -> MustEvalResult<ast::expression::ScopeBlock> {
-    auto list{
-      statements_list(
-        stream,
-        [](const TokenStream &s) { return s.is_eof(); }
-      )
-    };
+    auto list{statements_list(stream, [](const TokenStream &s) { return s.is_eof(); })};
 
     // if failed to read propogate error
-    if (list.is_err()) return crab::err(list.take_err_unchecked());
+    if (list.is_err())
+      return crab::err(list.take_err_unchecked());
 
     return crab::ok(list.take_unchecked());
   }
 
   // TODO fix missing error when there is no ending delimeter
-  auto statements_list(
-    TokenStream &stream,
-    const std::function<bool(TokenStream &)> &try_consume_end
-  ) -> Result<Box<ast::expression::ScopeBlock>> {
+  auto statements_list(TokenStream &stream, const std::function<bool(TokenStream &)> &try_consume_end)
+      -> Result<Box<ast::expression::ScopeBlock>> {
     // Block must begin with a open curly brace
+    ast::TokenTrace trace = stream.trace();
 
     Vec<Box<ast::Statement>> statements{};
-    Box<ast::Expression> eval{crab::make_box<ast::expression::Unit>()};
+    Box<ast::Expression> eval{crab::make_box<ast::expression::Unit>(trace)};
 
     while (not try_consume_end(stream) and not stream.is_eof()) {
       // const auto &start_tok = stream.curr();
@@ -82,6 +75,8 @@ namespace goos::parser::pass {
       break;
     }
 
-    return crab::ok(crab::make_box<ast::expression::ScopeBlock>(std::move(statements), std::move(eval)));
+    trace = trace.merge(ast::TokenTrace{stream.curr()});
+
+    return crab::ok(crab::make_box<ast::expression::ScopeBlock>(std::move(statements), std::move(eval), trace));
   }
-}
+} // namespace goos::parser::pass

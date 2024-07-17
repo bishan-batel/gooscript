@@ -3,11 +3,14 @@
 //
 #include "functions.hpp"
 
-#include "expression.hpp"
+#include "ast/Statement.hpp"
 #include "ast/expression/literal/Lambda.hpp"
+#include "expression.hpp"
 
 namespace goos::parser::pass::expr {
   auto lambda(TokenStream &stream) -> OptionalResult<ast::expression::Lambda> {
+    ast::TokenTrace trace = stream.trace();
+
     if (not stream.try_consume(lexer::Keyword::FN)) {
       return OptionalResult<ast::expression::Lambda>{crab::none};
     }
@@ -38,18 +41,19 @@ namespace goos::parser::pass::expr {
     if (stream.try_consume(lexer::Operator::ARROW)) {
       MustEvalResult<ast::Expression> expr = expression(stream);
 
-      if (expr.is_err()) return crab::err(expr.take_err_unchecked());
+      if (expr.is_err())
+        return crab::err(expr.take_err_unchecked());
+
+      trace = trace.merge(stream.trace());
 
       return crab::ok(
-        crab::some(
-          crab::make_box<ast::expression::Lambda>(std::move(parameters), expr.take_unchecked())
-        )
-      );
+          crab::some(crab::make_box<ast::expression::Lambda>(std::move(parameters), expr.take_unchecked(), trace)));
     }
 
     auto result = block(stream, false);
 
-    if (result.is_err()) return crab::err(result.take_err_unchecked());
+    if (result.is_err())
+      return crab::err(result.take_err_unchecked());
 
     auto scope_opt = result.take_unchecked();
 
@@ -59,10 +63,8 @@ namespace goos::parser::pass::expr {
 
     auto body = scope_opt.take_unchecked();
 
-    return crab::ok(
-      crab::some(
-        crab::make_box<ast::expression::Lambda>(std::move(parameters), std::move(body))
-      )
-    );
+    trace = trace.merge(stream.trace());
+
+    return crab::ok(crab::some(crab::make_box<ast::expression::Lambda>(std::move(parameters), std::move(body), trace)));
   }
-}
+} // namespace goos::parser::pass::expr
