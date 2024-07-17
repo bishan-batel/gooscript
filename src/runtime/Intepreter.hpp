@@ -109,6 +109,6 @@ namespace goos::runtime {
       const ast::expression::ArrayIndex &array_index
     ) -> Result<std::any, Box<crab::Error>> override;
 
-    auto visit_match(const parser::pass::expr::Match &match) -> Result<std::any, Box<crab::Error>> override;
+    auto visit_match(const ast::expression::Match &match) -> Result<std::any, Box<crab::Error>> override;
   };
 }
