@@ -4,7 +4,6 @@
 
 #include "Chunk.hpp"
 
-#include <stdexcept>
 
 #include <crab/debug.hpp>
 #include <fmt/color.h>
@@ -73,7 +72,7 @@ namespace goos::vm {
         println("{}", styled("false", fg(color::coral)));
         return;
       }
-      case op::Code::SET_LOCAL: {
+      case op::Code::SET: {
         println(
           "{} {}",
           styled("store", fg(color::cornflower_blue)),
@@ -81,7 +80,7 @@ namespace goos::vm {
         );
         return;
       }
-      case op::Code::GET_LOCAL: {
+      case op::Code::GET: {
         println(
           "{} {}",
           styled("load", fg(color::cornflower_blue)),

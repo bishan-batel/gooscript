@@ -16,8 +16,8 @@ namespace goos::vm::op {
     TRUE,
     FALSE,
 
-    SET_LOCAL,
-    GET_LOCAL,
+    SET,
+    GET,
 
     NOP,
 
@@ -72,7 +72,7 @@ namespace goos::vm::op {
       // case Code::RETURN:
 
       case Code::DUP:
-      case Code::GET_LOCAL:
+      case Code::GET:
       case Code::CONSTANT:
         return -1;
 
@@ -80,7 +80,7 @@ namespace goos::vm::op {
 
       case Code::JUMP_IF_FALSE:
       case Code::RETURN:
-      case Code::SET_LOCAL:
+      case Code::SET:
 
       case Code::AND:
       case Code::OR:
@@ -121,8 +121,8 @@ namespace goos::vm::op {
       case Code::JUMP:
         return sizeof(usize);
 
-      case Code::GET_LOCAL:
-      case Code::SET_LOCAL:
+      case Code::GET:
+      case Code::SET:
       case Code::CONSTANT:
         return sizeof(u16);
 

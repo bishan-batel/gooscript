@@ -8,7 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(gooscript VERSION 1.0)
 
 #set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
-#set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+#set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON) if(CMAKE_EXPORT_COMPILE_COMMANDS)
+set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
 
 
 #file(GLOB_RECURSE SOURCE_FILES "src/*.hpp")
@@ -36,6 +37,7 @@ set(SOURCE_FILES
         src/ast/expression/Unary.hpp
         src/ast/Statement.cpp
         src/ast/Statement.hpp
+        src/ast/TokenTrace.hpp
         src/meta/VariantType.hpp
         src/ast/expression/literal/Lambda.cpp
         src/ast/expression/literal/Lambda.hpp
@@ -178,6 +180,8 @@ set(SOURCE_FILES
         src/codegen/Compiler.hpp
         src/codegen/Builder.cpp
         src/codegen/Builder.hpp
+        src/codegen/Enviornment.hpp
+        src/codegen/Enviornment.cpp
         src/codegen/err/Error.hpp
         src/codegen/Value.cpp
         src/codegen/Value.hpp
@@ -227,6 +231,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE crab fmt)
 
 add_subdirectory(command)
 add_subdirectory(test)
+add_subdirectory(lsp)
 
 #add_custom_target(pch COMMAND clang++ -std=gnu++23 -x c++-header
 #        ${CMAKE_CURRENT_SOURCE_DIR}/libs/crabpp/inc/preamble.hpp

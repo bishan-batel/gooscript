@@ -7,20 +7,20 @@
 namespace goos {
   vm::Stack::Stack() = default;
 
-  auto vm::Stack::peek(const usize offset) -> Result<Value> {
+  auto vm::Stack::peek(const usize offset) -> Result<RefMut<Value>> {
     const usize index = top - 1 - offset;
 
     // TODO OutOfBounds Error
     debug_assert(index < top, "Invalid Index");
-    return buffer.at(index);
+    return RefMut{buffer[index]};
   }
 
-  auto vm::Stack::peek(const usize offset) const -> Result<Value> {
+  auto vm::Stack::peek(const usize offset) const -> Result<Ref<Value>> {
     const usize index = top - 1 - offset;
 
     // TODO OutOfBounds Error
     debug_assert(index < top, "Invalid Index");
-    return buffer.at(index);
+    return Ref{buffer[index]};
   }
 
   auto vm::Stack::pop() -> Result<Value> {
@@ -40,13 +40,9 @@ namespace goos {
     return val;
   }
 
-  auto vm::Stack::size() const -> usize {
-    return top;
-  }
+  auto vm::Stack::size() const -> usize { return top; }
 
-  auto vm::Stack::empty() const -> usize {
-    return size() == 0;
-  }
+  auto vm::Stack::empty() const -> usize { return size() == 0; }
 
   auto vm::Stack::push(const Value value) -> Result<unit> {
     if (top >= buffer.size()) {
@@ -58,4 +54,4 @@ namespace goos {
     buffer[top++] = value;
     return unit{};
   }
-} // goos
+} // namespace goos

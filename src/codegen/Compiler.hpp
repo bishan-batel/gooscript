@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include <rc.hpp>
 #include "Builder.hpp"
 #include "ast/Statement.hpp"
 #include "err/Error.hpp"
@@ -10,6 +11,7 @@
 namespace goos::codegen {
   class Compiler final : public ast::Statement::IVisitor {
     Builder builder;
+    // Rc<Enviornment> env = Enviornment::standard_enviornment();
 
   public:
     explicit Compiler(WideString name);
@@ -76,6 +78,6 @@ namespace goos::codegen {
       const ast::expression::ArrayIndex &array_index
     ) -> Result<std::any, Box<crab::Error>> override;
 
-    auto visit_match(const parser::pass::expr::Match &match) -> Result<std::any, Box<crab::Error>> override;
+    auto visit_match(const ast::expression::Match &match) -> Result<std::any, Box<crab::Error>> override;
   };
 } // goos

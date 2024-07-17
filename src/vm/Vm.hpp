@@ -3,29 +3,29 @@
 //
 
 #pragma once
+#include <fmt/color.h>
+#include <fmt/format.h>
 #include <stack>
 #include <variant>
-#include <fmt/format.h>
-#include <fmt/color.h>
 
 #include "Chunk.hpp"
 #include "Stack.hpp"
-#include "err/Error.hpp"
 #include "Value.hpp"
+#include "err/Error.hpp"
 #include "token/Token.hpp"
 
 namespace goos::vm {
   class Vm {
-    struct Local {
-      Option<Rc<token::Token>> name;
-      Value value;
-      usize depth;
-    };
+    // struct Local {
+    //   Option<Rc<token::Token>> name;
+    //   Value value;
+    //   usize depth;
+    // };
 
     Chunk chunk;
 
     Stack stack;
-    std::vector<Local> locals;
+    // std::vector<Local> locals;
 
     struct {
       usize ip = 0;
@@ -54,7 +54,7 @@ namespace goos::vm {
     [[nodiscard]] auto run_instruction(op::Code code) -> Result<unit>;
 
     template<typename S, typename... T>
-    auto log(S fmt, T &&... args);
+    auto log(S fmt, T &&...args);
   };
 
   template<typename T>
@@ -68,15 +68,11 @@ namespace goos::vm {
   }
 
   template<typename S, typename... T>
-  auto Vm::log(S fmt, T &&... args) {
+  auto Vm::log(S fmt, T &&...args) {
     constexpr fmt::text_style comment_style = fg(fmt::color::light_gray) | fmt::emphasis::italic;
 
     print(fg(fmt::color::gray), "    > {}", styled("// ", comment_style));
-    fmt::print(
-      fg(fmt::color::light_gray) | fmt::emphasis::italic,
-      fmt,
-      std::forward<T>(args)...
-    );
+    fmt::print(fg(fmt::color::light_gray) | fmt::emphasis::italic, fmt, std::forward<T>(args)...);
     fmt::println("");
   }
-} // goos
+} // namespace goos::vm
