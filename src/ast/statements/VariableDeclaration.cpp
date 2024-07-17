@@ -10,12 +10,6 @@
 #include "json/Object.hpp"
 
 namespace goos::ast {
-  VariableDeclaration::VariableDeclaration(
-    meta::Identifier name,
-    const meta::Mutability mutability,
-    Box<Expression> initializer
-  )
-    : name{std::move(name)}, mutability{mutability}, initializer{std::move(initializer)} {}
 
   auto VariableDeclaration::to_string() const -> WideString {
     WideStringView ty{};
@@ -34,18 +28,14 @@ namespace goos::ast {
   }
 
   auto VariableDeclaration::clone() const -> Box<Statement> {
-    return crab::make_box<VariableDeclaration>(name, mutability, initializer->clone_expr());
+    return crab::make_box<VariableDeclaration>(name, mutability, initializer->clone_expr(), trace);
   }
 
-  auto VariableDeclaration::get_name() const -> meta::Identifier {
-    return name;
-  }
+  auto VariableDeclaration::get_name() const -> meta::Identifier { return name; }
 
-  auto VariableDeclaration::get_mutability() const -> meta::Mutability {
-    return mutability;
-  }
+  auto VariableDeclaration::get_mutability() const -> meta::Mutability { return mutability; }
 
-  auto VariableDeclaration::get_initializer() const -> const Expression& { return initializer; }
+  auto VariableDeclaration::get_initializer() const -> const Expression & { return initializer; }
 
   auto VariableDeclaration::operator==(const Statement &statement) const -> bool {
     if (Option<Ref<VariableDeclaration>> opt = crab::ref::cast<VariableDeclaration>(statement)) {
@@ -81,4 +71,4 @@ namespace goos::ast {
   auto VariableDeclaration::accept(IVisitor &visitor) const -> Result<unit, Box<crab::Error>> {
     return visitor.visit_variable_declaration(*this);
   }
-}
+} // namespace goos::ast

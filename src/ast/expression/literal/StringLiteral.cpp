@@ -9,8 +9,6 @@
 #include "json/Text.hpp"
 
 namespace goos::ast::expression {
-  StringLiteral::StringLiteral(Rc<WideString> literal) : literal(std::move(literal)) {}
-
   auto StringLiteral::get_string() const -> Rc<WideString> { return literal; }
 
   auto StringLiteral::to_string() const -> WideString {
@@ -18,7 +16,7 @@ namespace goos::ast::expression {
   }
 
   auto StringLiteral::clone_expr() const -> Box<Expression> {
-    return crab::make_box<StringLiteral>(literal);
+    return crab::make_box<StringLiteral>(literal, trace);
   }
 
   auto StringLiteral::operator==(const Statement &statement) const -> bool {

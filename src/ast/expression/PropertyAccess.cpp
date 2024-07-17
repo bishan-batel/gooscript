@@ -8,17 +8,10 @@
 #include "json/Object.hpp"
 
 namespace goos::ast::expression {
-  PropertyAccess::PropertyAccess(Box<Expression> object, meta::Identifier property)
-    : object{std::move(object)},
-      property{std::move(property)} {}
 
-  auto PropertyAccess::get_object() const -> const Expression& {
-    return object;
-  }
+  auto PropertyAccess::get_object() const -> const Expression & { return object; }
 
-  auto PropertyAccess::get_property() const -> meta::Identifier {
-    return property;
-  }
+  auto PropertyAccess::get_property() const -> meta::Identifier { return property; }
 
   auto PropertyAccess::operator==(const Statement &statement) const -> bool {
     if (auto other = statement.try_as<PropertyAccess>()) {
@@ -42,10 +35,13 @@ namespace goos::ast::expression {
   }
 
   auto PropertyAccess::clone_expr() const -> Box<Expression> {
-    return crab::make_box<PropertyAccess>(object->clone_expr(), property);
+    return crab::make_box<PropertyAccess>(object->clone_expr(), property, property_trace);
   }
 
   auto PropertyAccess::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_property_access(*this);
   }
-} // runtime
+  auto PropertyAccess::token_trace() const -> TokenTrace {
+    return TokenTrace::merge_fold(object->token_trace(), property_trace);
+  }
+} // namespace goos::ast::expression

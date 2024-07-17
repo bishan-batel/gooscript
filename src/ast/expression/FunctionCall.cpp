@@ -4,19 +4,13 @@
 
 #include "FunctionCall.hpp"
 
-#include <sstream>
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
 #include "json/Array.hpp"
 #include "json/Object.hpp"
-#include "literal/Array.hpp"
 
 namespace goos::ast::expression {
-  FunctionCall::FunctionCall(Box<Expression> function, Vec<Box<Expression>> arguments)
-    : function{std::move(function)},
-      arguments{std::move(arguments)} {}
-
   auto FunctionCall::to_string() const -> WideString {
     WideStringStream stream{};
 
@@ -34,20 +28,24 @@ namespace goos::ast::expression {
       arguments_clone.push_back(arg->clone_expr());
     }
 
-    return crab::make_box<FunctionCall>(function->clone_expr(), std::move(arguments_clone));
+    return crab::make_box<FunctionCall>(function->clone_expr(), std::move(arguments_clone), trace);
   }
 
   auto FunctionCall::operator==(const Statement &statement) const -> bool {
     Option<Ref<FunctionCall>> other_opt = crab::ref::cast<FunctionCall>(statement);
-    if (other_opt.is_none()) return false;
+    if (other_opt.is_none())
+      return false;
 
     const Ref<FunctionCall> function{other_opt.take_unchecked()};
 
-    if (function->arguments.size() != arguments.size()) return false;
-    if (*function->function != *this->function) return false;
+    if (function->arguments.size() != arguments.size())
+      return false;
+    if (*function->function != *this->function)
+      return false;
 
     for (usize i = 0; i < arguments.size(); i++) {
-      if (*arguments[i] != *function->arguments[i]) return false;
+      if (*arguments[i] != *function->arguments[i])
+        return false;
     }
     return true;
   }
@@ -72,7 +70,7 @@ namespace goos::ast::expression {
     return visitor.visit_function_call(*this);
   }
 
-  auto FunctionCall::get_function() const -> const Expression& { return function; }
+  auto FunctionCall::get_function() const -> const Expression & { return function; }
 
-  auto FunctionCall::get_arguments() const -> const Vec<Box<Expression>>& { return arguments; }
-}
+  auto FunctionCall::get_arguments() const -> const Vec<Box<Expression>> & { return arguments; }
+} // namespace goos::ast::expression

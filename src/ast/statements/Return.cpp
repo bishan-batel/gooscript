@@ -10,15 +10,12 @@
 #include "json/Object.hpp"
 
 namespace goos::ast {
-  Return::Return(Box<Expression> expr) : expression{std::move(expr)} {}
 
-  auto Return::get_expression() const -> const Expression& { return expression; }
+  auto Return::get_expression() const -> const Expression & { return expression; }
 
   auto Return::to_string() const -> WideString { return fmt::format(L"return {}", expression->to_string()); }
 
-  auto Return::clone() const -> Box<Statement> {
-    return crab::make_box<Return>(expression->clone_expr());
-  }
+  auto Return::clone() const -> Box<Statement> { return crab::make_box<Return>(expression->clone_expr(), trace); }
 
   auto Return::operator==(const Statement &statement) const -> bool {
     if (auto other{crab::ref::cast<Return>(statement)}) {
@@ -34,7 +31,5 @@ namespace goos::ast {
     return obj;
   }
 
-  auto Return::accept(IVisitor &visitor) const -> Result<unit, Box<crab::Error>> {
-    return visitor.visit_return(*this);
-  }
+  auto Return::accept(IVisitor &visitor) const -> Result<unit, Box<crab::Error>> { return visitor.visit_return(*this); }
 } // namespace goos::ast

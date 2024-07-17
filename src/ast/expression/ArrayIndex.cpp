@@ -4,20 +4,14 @@
 
 #include "ArrayIndex.hpp"
 
-#include "json/Object.hpp"
 #include "fmt/xchar.h"
+#include "json/Object.hpp"
 
 namespace goos::ast::expression {
-  ArrayIndex::ArrayIndex(Box<Expression> object, Box<Expression> index)
-    : object{std::move(object)}, index{std::move(index)} {}
 
-  auto ArrayIndex::get_object() const -> const Expression& {
-    return object;
-  }
+  auto ArrayIndex::get_object() const -> const Expression & { return object; }
 
-  auto ArrayIndex::get_index() const -> const Expression & {
-    return index;
-  }
+  auto ArrayIndex::get_index() const -> const Expression & { return index; }
 
   auto ArrayIndex::operator==(const Statement &statement) const -> bool {
     if (auto casted = statement.try_as<ArrayIndex>()) {
@@ -41,10 +35,13 @@ namespace goos::ast::expression {
   }
 
   auto ArrayIndex::clone_expr() const -> Box<Expression> {
-    return crab::make_box<ArrayIndex>(object->clone_expr(), index->clone_expr());
+    return crab::make_box<ArrayIndex>(object->clone_expr(), index->clone_expr(), closing_bracket_trace);
   }
 
   auto ArrayIndex::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_array_index(*this);
   }
-}
+  auto ArrayIndex::token_trace() const -> TokenTrace {
+    return TokenTrace::merge_fold(object->token_trace(), index->token_trace(), closing_bracket_trace);
+  }
+} // namespace goos::ast::expression

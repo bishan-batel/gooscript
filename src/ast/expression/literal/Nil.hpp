@@ -4,10 +4,14 @@
 
 #pragma once
 #include "ast/Expression.hpp"
+#include "ast/Statement.hpp"
 
 namespace goos::ast::expression {
   class Nil final : public Expression {
+    TokenTrace trace;
+
   public:
+    explicit Nil(TokenTrace trace) : trace{trace} {}
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
@@ -17,6 +21,9 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
+
+    [[nodiscard]] auto token_trace() const -> TokenTrace override { return trace; }
+
     [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
   };
-} // goos
+} // namespace goos::ast::expression

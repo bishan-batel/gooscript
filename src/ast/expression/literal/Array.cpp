@@ -5,18 +5,13 @@
 #include "Array.hpp"
 #include "json/Array.hpp"
 
-#include <sstream>
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
 #include "json/Object.hpp"
 
 namespace goos::ast::expression {
-  Array::Array(Vec<Box<Expression>> values) : values{std::move(values)} {}
-
-  auto Array::get_values() const -> const Vec<Box<Expression>> & {
-    return values;
-  }
+  auto Array::get_values() const -> const Vec<Box<Expression>> & { return values; }
 
   auto Array::to_string() const -> WideString {
     WideStringStream stream{};
@@ -35,20 +30,23 @@ namespace goos::ast::expression {
       cloned.push_back(value->clone_expr());
     }
 
-    return crab::make_box<Array>(std::move(cloned));
+    return crab::make_box<Array>(std::move(cloned), trace);
   }
 
   auto Array::operator==(const Statement &statement) const -> bool {
     auto other_opt{crab::ref::cast<Array>(statement)};
 
-    if (other_opt.is_none()) return false;
+    if (other_opt.is_none())
+      return false;
 
     const Ref<Array> array{other_opt.take_unchecked()};
 
-    if (array->values.size() != values.size()) return false;
+    if (array->values.size() != values.size())
+      return false;
 
     for (usize i = 0; i < values.size(); i++) {
-      if (*values[i] != *array->values[i]) return false;
+      if (*values[i] != *array->values[i])
+        return false;
     }
     return true;
   }
@@ -70,4 +68,4 @@ namespace goos::ast::expression {
   auto Array::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_array(*this);
   }
-}
+} // namespace goos::ast::expression

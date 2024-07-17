@@ -6,14 +6,16 @@
 #include <preamble.hpp>
 
 #include "ast/Expression.hpp"
+#include "ast/Statement.hpp"
 #include "meta/Identifier.hpp"
 
 namespace goos::ast::expression {
   class IdentifierBinding final : public Expression {
     meta::Identifier identifier;
+    TokenTrace trace;
 
   public:
-    explicit IdentifierBinding(meta::Identifier identifier);
+    explicit IdentifierBinding(meta::Identifier identifier, TokenTrace trace): identifier{identifier}, trace{trace} {}
 
     [[nodiscard]] auto get_identifier() const -> const meta::Identifier&;
 
@@ -26,5 +28,7 @@ namespace goos::ast::expression {
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
     [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
+
+    [[nodiscard]] auto token_trace() const -> TokenTrace override { return trace; }
   };
 }

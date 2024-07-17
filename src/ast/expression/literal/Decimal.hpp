@@ -4,13 +4,15 @@
 
 #pragma once
 #include "ast/Expression.hpp"
+#include "ast/Statement.hpp"
 
-namespace goos ::ast:: expression {
+namespace goos ::ast::expression {
   class Decimal final : public Expression {
     f64 literal;
+    TokenTrace trace;
 
   public:
-    explicit Decimal(f64 literal);
+    explicit Decimal(f64 literal, TokenTrace trace) : literal{literal}, trace { trace } {}
 
     [[nodiscard]] auto get_number() const -> f64;
 
@@ -23,5 +25,7 @@ namespace goos ::ast:: expression {
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
     [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
+
+    [[nodiscard]] auto token_trace() const -> TokenTrace override { return trace; }
   };
-}
+} // namespace goos::ast::expression

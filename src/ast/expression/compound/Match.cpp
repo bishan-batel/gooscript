@@ -4,28 +4,18 @@
 
 #include "Match.hpp"
 
-#include <algorithm>
-#include <ranges>
-
 #include <range.hpp>
-#include <sstream>
 
 #include "json/Array.hpp"
 #include "json/Object.hpp"
 
-namespace goos::parser::pass::expr {
-  Match::Match(Box<Expression> state, Vec<Case> cases, Box<Expression> default_case)
-    : state{std::move(state)},
-      cases{std::move(cases)},
-      default_case{std::move(default_case)} {}
+namespace goos::ast::expression {
 
   auto Match::operator==(const Statement &statement) const -> bool {
     if (auto op = statement.try_as<Match>()) {
       auto &match = *op.take_unchecked();
 
-      const auto case_eq = [](const Case &a, const Case &b) {
-        return *a.state == b.state and *a.then == b.then;
-      };
+      const auto case_eq = [](const Case &a, const Case &b) { return *a.state == b.state and *a.then == b.then; };
 
       if (cases.size() != match.cases.size()) {
         return true;
@@ -89,14 +79,10 @@ namespace goos::parser::pass::expr {
     for (const auto &[state, then]: cases) {
       cases.push_back(Case{state->clone_expr(), then->clone_expr()});
     }
-    return crab::make_box<Match>(
-      state->clone_expr(),
-      std::move(cases),
-      default_case->clone_expr()
-    );
+    return crab::make_box<Match>(state->clone_expr(), std::move(cases), default_case->clone_expr(), trace);
   }
 
   auto Match::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_match(*this);
   }
-}
+} // namespace goos::ast::expression

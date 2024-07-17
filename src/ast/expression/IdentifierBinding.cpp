@@ -8,19 +8,13 @@
 #include "json/Object.hpp"
 
 namespace goos::ast::expression {
-  IdentifierBinding::IdentifierBinding(meta::Identifier identifier)
-    : identifier{
-      crab::make_rc<meta::Identifier>(std::move(identifier))
-    } {}
 
-  auto IdentifierBinding::get_identifier() const -> const meta::Identifier& { return identifier; }
+  auto IdentifierBinding::get_identifier() const -> const meta::Identifier & { return identifier; }
 
-  auto IdentifierBinding::to_string() const -> WideString {
-    return identifier.get_string();
-  }
+  auto IdentifierBinding::to_string() const -> WideString { return identifier.get_string(); }
 
   auto IdentifierBinding::clone_expr() const -> Box<Expression> {
-    return crab::make_box<IdentifierBinding>(identifier);
+    return crab::make_box<IdentifierBinding>(identifier, trace);
   }
 
   auto IdentifierBinding::operator==(const Statement &statement) const -> bool {
@@ -40,4 +34,4 @@ namespace goos::ast::expression {
   auto IdentifierBinding::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_identifier_binding(*this);
   }
-}
+} // namespace goos::ast::expression

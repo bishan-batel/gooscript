@@ -10,9 +10,11 @@ namespace goos::ast::expression {
   class FunctionCall final : public Expression {
     Box<Expression> function;
     Vec<Box<Expression>> arguments;
+    TokenTrace trace;
 
   public:
-    FunctionCall(Box<Expression> function, Vec<Box<Expression>> arguments);
+    FunctionCall(Box<Expression> function, Vec<Box<Expression>> arguments, TokenTrace trace)
+        : function{std::move(function)}, arguments{std::move(arguments)}, trace{trace} {}
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
@@ -24,8 +26,10 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
 
-    [[nodiscard]] auto get_function() const -> const Expression&;
+    [[nodiscard]] auto get_function() const -> const Expression &;
 
-    [[nodiscard]] auto get_arguments() const -> const Vec<Box<Expression>>&;
+    [[nodiscard]] auto get_arguments() const -> const Vec<Box<Expression>> &;
+
+    [[nodiscard]] auto token_trace() const -> TokenTrace override { return trace; }
   };
-}
+} // namespace goos::ast::expression

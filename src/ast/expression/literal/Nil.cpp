@@ -12,7 +12,7 @@ namespace goos::ast::expression {
     return L"nil";
   }
 
-  auto Nil::clone_expr() const -> Box<Expression> { return crab::make_box<Nil>(); }
+  auto Nil::clone_expr() const -> Box<Expression> { return crab::make_box<Nil>(trace); }
 
   auto Nil::operator==(const Statement &statement) const -> bool {
     return crab::ref::cast<Nil>(statement).is_some();

@@ -4,24 +4,13 @@
 
 #include "ScopeBlock.hpp"
 
-#include <algorithm>
-#include <ranges>
-
-#include "ast/expression/literal/Unit.hpp"
-#include "ast/statements/Eval.hpp"
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
 #include "json/Array.hpp"
 #include "json/Object.hpp"
-#include <sstream>
 
 namespace goos::ast::expression {
-  ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements)
-    : statements{std::move(statements)}, eval{crab::make_box<Unit>()} {}
-
-  ScopeBlock::ScopeBlock(Vec<Box<Statement>> statements, Box<Expression> eval)
-    : statements{std::move(statements)}, eval{std::move(eval)} {}
 
   auto ScopeBlock::to_string() const -> WideString {
     WideStringStream stream{};
@@ -42,7 +31,7 @@ namespace goos::ast::expression {
       statements.push_back(statement->clone());
     }
 
-    return crab::make_box<ScopeBlock>(std::move(statements), eval->clone_expr());
+    return crab::make_box<ScopeBlock>(std::move(statements), eval->clone_expr(), trace);
   }
 
   auto ScopeBlock::operator==(const Statement &statement) const -> bool {

@@ -11,9 +11,11 @@
 namespace goos::ast::expression {
   class While final : public Expression {
     Box<Expression> condition, body;
+    TokenTrace trace;
 
   public:
-    While(Box<Expression> condition, Box<Expression> body);
+    While(Box<Expression> condition, Box<Expression> body, TokenTrace trace)
+      : condition{std::move(condition)}, body{std::move(body)}, trace{trace} {}
 
     [[nodiscard]] auto get_condition() const -> const Expression&;
 
@@ -28,5 +30,7 @@ namespace goos::ast::expression {
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
     [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
+
+    [[nodiscard]] auto token_trace() const -> TokenTrace override { return trace; }
   };
 } // namespace goos::ast::expression

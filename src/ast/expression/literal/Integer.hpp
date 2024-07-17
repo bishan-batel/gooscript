@@ -4,15 +4,17 @@
 
 #pragma once
 #include "ast/Expression.hpp"
+#include "ast/Statement.hpp"
 
 namespace goos::ast::expression {
   class Integer final : public Expression {
     i64 number;
+    TokenTrace trace;
 
   public:
-    explicit Integer(i64 number);
+    explicit Integer(i64 number, TokenTrace trace) : number{number}, trace { trace } {}
 
-    [[nodiscard]] auto get_number() const -> i64 ;
+    [[nodiscard]] auto get_number() const -> i64;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
@@ -22,6 +24,8 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
+    [[nodiscard]] auto token_trace() const -> TokenTrace override { return trace; }
+
     [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
   };
-}
+} // namespace goos::ast::expression

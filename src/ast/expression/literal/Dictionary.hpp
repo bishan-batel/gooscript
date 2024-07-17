@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ast/Expression.hpp"
+#include "ast/Statement.hpp"
 
 namespace goos::ast::expression {
   class Dictionary final : public Expression {
@@ -16,11 +17,12 @@ namespace goos::ast::expression {
 
   private:
     Vec<Pair> pairs;
+    TokenTrace trace;
 
   public:
-    explicit Dictionary(Vec<Pair> pairs);
+    explicit Dictionary(Vec<Pair> pairs, TokenTrace trace) : pairs{std::move(pairs)}, trace{std::move(trace)} {}
 
-    [[nodiscard]] auto get_pairs() const -> const Vec<Pair>&;
+    [[nodiscard]] auto get_pairs() const -> const Vec<Pair> &;
 
     [[nodiscard]] auto get(const Expression &key) const -> Option<Ref<Pair>>;
 
@@ -32,6 +34,8 @@ namespace goos::ast::expression {
 
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
+    [[nodiscard]] auto token_trace() const -> TokenTrace override { return trace; }
+
     [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
   };
-}
+} // namespace goos::ast::expression

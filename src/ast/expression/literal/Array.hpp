@@ -4,17 +4,19 @@
 
 #pragma once
 
-#include "box.hpp"
 #include "ast/Expression.hpp"
+#include "ast/Statement.hpp"
+#include "box.hpp"
 
 namespace goos::ast::expression {
   class Array final : public Expression {
     Vec<Box<Expression>> values;
+    TokenTrace trace;
 
   public:
-    explicit Array(Vec<Box<Expression>> values);
+    explicit Array(Vec<Box<Expression>> values, TokenTrace trace) : values{std::move(values)}, trace{trace} {}
 
-    [[nodiscard]] auto get_values() const -> const Vec<Box<Expression>>&;
+    [[nodiscard]] auto get_values() const -> const Vec<Box<Expression>> &;
 
     [[nodiscard]] auto to_string() const -> WideString override;
 
@@ -25,5 +27,7 @@ namespace goos::ast::expression {
     [[nodiscard]] auto json() const -> Box<json::Value> override;
 
     [[nodiscard]] auto accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> override;
+
+    [[nodiscard]] auto token_trace() const -> TokenTrace override { return trace; }
   };
-}
+} // namespace goos::ast::expression

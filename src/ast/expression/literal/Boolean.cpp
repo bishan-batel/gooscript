@@ -6,23 +6,15 @@
 
 #include <fmt/format.h>
 #include <fmt/xchar.h>
-
+#include "ast/Statement.hpp"
 #include "json/Text.hpp"
 
 namespace goos::ast::expression {
-  Boolean::Boolean(const bool state): state{state} {}
+  auto Boolean::get_state() const -> bool { return state; }
 
-  auto Boolean::get_state() const -> bool {
-    return state;
-  }
+  auto Boolean::to_string() const -> WideString { return fmt::format(L"{}", state); }
 
-  auto Boolean::to_string() const -> WideString {
-    return fmt::format(L"{}", state);
-  }
-
-  auto Boolean::clone_expr() const -> Box<Expression> {
-    return crab::make_box<Boolean>(state);
-  }
+  auto Boolean::clone_expr() const -> Box<Expression> { return crab::make_box<Boolean>(state, trace); }
 
   auto Boolean::operator==(const Statement &statement) const -> bool {
     if (auto other{crab::ref::cast<Boolean>(statement)}) {
@@ -39,4 +31,6 @@ namespace goos::ast::expression {
   auto Boolean::accept_expr(IVisitor &visitor) const -> Result<std::any, Box<crab::Error>> {
     return visitor.visit_boolean(*this);
   }
-}
+
+  auto Boolean::token_trace() const -> TokenTrace { return trace; }
+} // namespace goos::ast::expression
