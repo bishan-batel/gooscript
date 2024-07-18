@@ -10,10 +10,12 @@ fn tokenize(source) {
   let length = len(source)
 
 
+
+  let a = 0
+
   let tokens = []
 
   var i = 0
-
 
   let WHITESPACE = "\t\r\n ";
 
@@ -221,6 +223,7 @@ let parsed = any();
 #
 #  return result;
 #}
+
 
 print(parsed);
 # is_eq(parsed, original)

@@ -1,0 +1,1 @@
+{"eval":{"ident":"a","type":"identifier"},"statements":[{"mutability":"let mut","initial":{"else":{"eval":69,"statements":[],"type":"scope"},"then":{"eval":420,"statements":[],"type":"scope"},"condition":"true","type":"if"},"name":"a","type":"declvar"},{"rhs":3,"lhs":{"ident":"a","type":"identifier"},"op":"="}],"type":"scope"}

@@ -1,0 +1,8 @@
+var i = 0
+let ONE = 1
+let COUNT = 1000
+
+while i < COUNT {
+  i = i + ONE
+}
+

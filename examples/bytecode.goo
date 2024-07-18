@@ -1,0 +1,7 @@
+var a = if true { 420 } else { 69 }
+
+
+
+a = 3
+
+a
