@@ -3,6 +3,7 @@
 //
 
 #include "Builder.hpp"
+#include <concepts>
 #include <utility>
 #include "vm/Instruction.hpp"
 
@@ -11,13 +12,12 @@ namespace goos::codegen {
 
   Builder::Builder(WideString name) : name{std::move(name)} {}
 
-  auto Builder::write_push_constant(const vm::Value value) -> Value {
+  auto Builder::write_push_constant(const vm::Value value, ast::TokenTrace trace) -> Value {
     const u16 index = lookup_constant(value);
-    ;
 
-    instructions.emplace_back(op::Code::CONSTANT, index);
+    instructions.emplace_back(op::Code::CONSTANT, index, trace);
 
-    stack_tracker += op::stack_influence(vm::op::Code::CONSTANT);
+    stack_tracker -= op::stack_influence(vm::op::Code::CONSTANT);
 
     return unit{};
   }
@@ -26,15 +26,16 @@ namespace goos::codegen {
 
   auto Builder::define_label(const Label label) -> void { label_lookup[label] = instructions.size(); }
 
-  auto Builder::write_jmp(const Label label) -> Value {
-    instructions.emplace_back(op::Code::JUMP, label);
-    stack_tracker += op::stack_influence(vm::op::Code::JUMP);
+  auto Builder::write_jmp(const Label label, ast::TokenTrace trace) -> Value {
+    instructions.emplace_back(op::Code::JUMP, label, trace);
+
+    stack_tracker -= op::stack_influence(vm::op::Code::JUMP);
     return unit{};
   }
 
-  auto Builder::write_jmp_if_false(const Label label) -> Value {
-    instructions.emplace_back(op::Code::JUMP_IF_FALSE, label);
-    stack_tracker += op::stack_influence(vm::op::Code::JUMP_IF_FALSE);
+  auto Builder::write_jmp_if_false(const Label label, ast::TokenTrace trace) -> Value {
+    instructions.emplace_back(op::Code::JUMP_IF_FALSE, label, trace);
+    stack_tracker -= op::stack_influence(vm::op::Code::JUMP_IF_FALSE);
     return unit{};
   }
 
@@ -53,14 +54,19 @@ namespace goos::codegen {
   auto Builder::finalize_chunk() -> Chunk {
     Chunk chunk{std::move(name)};
 
+    // write<vm::op::Code::NOP>();
+
     for (const auto &constant: constants) {
       chunk.define_constant(constant);
     }
 
-    for (const auto &[code, var]: instructions) {
+    for (const auto &[code, var, tok]: instructions) {
       std::visit(
           crab::cases{
-              [&](const u16 data) { chunk.write_instruction(code, data); },
+              [&]<std::integral T>(const T data) { 
+          chunk.write_instruction<T>(code, data); 
+        },
+              // [&](const u64 data) { chunk.write_instruction(code, data); },
 
               [&](const Label label) {
                 chunk.write_instruction(code, instruction_to_bytecode_index(label_lookup.at(label)));
@@ -91,7 +97,9 @@ namespace goos::codegen {
   auto Builder::push_env() -> void { current_enviornment = Enviornment::enclose(current_enviornment); }
 
   auto Builder::pop_env() -> RcMut<Enviornment> {
-    return std::exchange(current_enviornment, current_enviornment->get_enclosing().get_unchecked());
+    auto old = current_enviornment;
+    current_enviornment = old->get_enclosing().take_unchecked();
+    return old;
   }
 } // namespace goos::codegen
 

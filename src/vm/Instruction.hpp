@@ -4,6 +4,7 @@
 
 #pragma once
 #include <preamble.hpp>
+#include <utility>
 
 namespace goos::vm::op {
   enum class Code : u8 {
@@ -22,6 +23,7 @@ namespace goos::vm::op {
     NOP,
 
     POP,
+    SWAP,
 
     // Condtional Logic
     JUMP_IF_FALSE,
@@ -59,21 +61,20 @@ namespace goos::vm::op {
     PRINT
   };
 
-  constexpr auto from_byte(const u8 byte) -> Code {
-    return std::bit_cast<Code>(byte);
-  }
-
-  constexpr auto to_byte(const Code code) -> u8 {
-    return std::bit_cast<u8>(code);
-  }
+  constexpr auto from_byte(const u8 byte) -> Code { return std::bit_cast<Code>(byte); }
+  constexpr auto to_byte(const Code code) -> u8 { return std::bit_cast<u8>(code); }
 
   constexpr auto stack_influence(const Code code) -> i64 {
     switch (code) {
-      // case Code::RETURN:
+        // case Code::RETURN:
 
       case Code::DUP:
       case Code::GET:
       case Code::CONSTANT:
+      case Code::NIL:
+      case Code::UNIT:
+      case Code::TRUE:
+      case Code::FALSE:
         return -1;
 
       case Code::POP:
@@ -101,28 +102,26 @@ namespace goos::vm::op {
       case Code::MODULO:
         return 1;
 
-      case Code::NIL:
-      case Code::UNIT:
-      case Code::TRUE:
-      case Code::FALSE:
       case Code::NOP:
       case Code::NOT:
       case Code::NEGATE:
       case Code::PRINT:
       case Code::JUMP:
-      default:
+      case Code::SWAP:
         return 0;
     }
+
+    std::unreachable();
   }
 
-  constexpr auto byte_arg_count(const Code code) -> usize {
+  constexpr auto byte_arg_count(const Code code) -> u64 {
     switch (code) {
       case Code::JUMP_IF_FALSE:
       case Code::JUMP:
-        return sizeof(usize);
-
       case Code::GET:
       case Code::SET:
+        return sizeof(u64);
+
       case Code::CONSTANT:
         return sizeof(u16);
 
@@ -130,6 +129,6 @@ namespace goos::vm::op {
         return 0;
     }
 
-    return 0;
+    std::unreachable();
   }
-}
+} // namespace goos::vm::op

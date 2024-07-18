@@ -6,6 +6,7 @@
 #include <crab/debug.hpp>
 #include "Enviornment.hpp"
 #include "Value.hpp"
+#include "ast/Statement.hpp"
 #include "vm/Chunk.hpp"
 #include "vm/Instruction.hpp"
 
@@ -30,9 +31,11 @@ namespace goos::codegen {
   class Builder final {
     struct Instruction {
       vm::op::Code code;
-      std::variant<u16, Label, unit> args;
+      std::variant<u64, u16, Label, unit> args;
+      ast::TokenTrace trace;
 
-      Instruction(const vm::op::Code code, const decltype(args) args) : code{code}, args{args} {}
+      Instruction(const vm::op::Code code, const decltype(args) args, ast::TokenTrace trace)
+          : code{code}, args{args}, trace{trace} {}
     };
 
     // vm::Chunk chunk;
@@ -56,21 +59,33 @@ namespace goos::codegen {
   public:
     explicit Builder(WideString name);
 
-    auto write_push_constant(vm::Value value) -> Value;
-
     auto make_unlinked_label() -> Label;
 
     auto define_label(Label label) -> void;
 
-    auto write_jmp(Label label) -> Value;
+    auto write_push_constant(vm::Value value, ast::TokenTrace trace) -> Value;
 
-    auto write_jmp_if_false(Label label) -> Value;
+    auto write_jmp(Label label, ast::TokenTrace trace) -> Value;
+
+    auto write_jmp_if_false(Label label, ast::TokenTrace trace) -> Value;
 
     template<vm::op::Code Code>
-    auto write() -> Value {
+    auto write(ast::TokenTrace trace) -> Value {
       static_assert(vm::op::byte_arg_count(Code) == 0, "Written bytecode does not have 0 arguments");
-      instructions.emplace_back(Code, unit{});
-      stack_tracker += vm::op::stack_influence(Code);
+      instructions.emplace_back(Code, unit{}, trace);
+      stack_tracker -= vm::op::stack_influence(Code);
+      return unit{};
+    }
+
+    auto write_get(u64 offset, ast::TokenTrace trace) -> Value {
+      instructions.emplace_back(vm::op::Code::GET, offset, trace);
+      stack_tracker -= vm::op::stack_influence(vm::op::Code::GET);
+      return unit{};
+    }
+
+    auto write_set(u64 offset, ast::TokenTrace trace) -> Value {
+      instructions.emplace_back(vm::op::Code::SET, offset, trace);
+      stack_tracker -= vm::op::stack_influence(vm::op::Code::SET);
       return unit{};
     }
 

@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <result.hpp>
+#include "vm/err/Error.hpp"
 
 namespace goos::vm {
   Vm::Vm(Chunk chunk) : chunk{std::move(chunk)} {}
@@ -50,7 +51,7 @@ namespace goos::vm {
       }
 
       case op::Code::SET: {
-        return crab::fallible<Box<err::Error>>([&] { return stack.peek(next_bytes<u16>()); }, [&] { return pop(); })
+        return crab::fallible<Box<err::Error>>([&] { return stack.peek(next_bytes<u64>()); }, [&] { return pop(); })
             .map([&](std::tuple<RefMut<Value>, Value> values) {
               const auto [target, val] = values;
               *target = val;
@@ -59,7 +60,7 @@ namespace goos::vm {
       }
 
       case op::Code::GET: {
-        return stack.peek(next_bytes<u16>()).and_then([&](Ref<Value> v) { return push(v); });
+        return stack.peek(next_bytes<u64>()).and_then([&](Ref<Value> v) { return push(v); });
       }
 
       case op::Code::NOP: {
@@ -69,7 +70,18 @@ namespace goos::vm {
       case op::Code::POP: {
         return stack.pop().map([](auto) { return unit{}; });
       }
+      case op::Code::SWAP: {
+        return crab::fallible<Box<err::Error>>([&] { return stack.pop(); }, [&] { return stack.pop(); })
+            .and_then([&](const std::tuple<Value, Value> vals) -> Result<unit> {
+              const auto [first, second] = vals;
 
+              if (Result<unit> r = stack.push(first); r.is_err()) {
+                return r.take_err_unchecked();
+              }
+
+              return stack.push(second);
+            });
+      }
       case op::Code::JUMP: {
         const usize addr = next_bytes<u16>();
         registers.ip = addr - 1 - byte_arg_count(op::Code::JUMP_IF_FALSE);

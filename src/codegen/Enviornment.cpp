@@ -1,5 +1,6 @@
 #include "Enviornment.hpp"
 #include <rc.hpp>
+#include "meta/Identifier.hpp"
 
 namespace goos::codegen {
   auto Enviornment::standard_enviornment() -> RcMut<Enviornment> {
@@ -15,25 +16,23 @@ namespace goos::codegen {
     return crab::make_rc_mut<Enviornment>(std::move(env));
   }
 
-  auto Enviornment::register_variable(Rc<WideString> name, u64 stack_pos) -> Result<unit, DuplicateName> {
-    VariableName key{std::move(name)};
-
+  auto Enviornment::register_variable(meta::Identifier key, u64 stack_pos, meta::Mutability mutability)
+      -> Result<unit, DuplicateName> {
     if (variable_to_stack.contains(key)) {
       return crab::err(DuplicateName{});
     }
 
-    variable_to_stack.emplace(std::move(key), stack_pos);
+    variable_to_stack.emplace(std::move(key), Variable{stack_pos, mutability});
 
     return crab::ok(unit{});
   }
 
-  auto Enviornment::find_variable(Rc<WideString> name) const -> Option<usize> {
-    VariableName key{name};
+  auto Enviornment::find_variable(meta::Identifier key) const -> Option<Variable> {
     if (variable_to_stack.contains(key)) {
       return variable_to_stack.at(key);
     }
 
     // attempt to search upwards if there is an enclosing scope
-    return Option{enclosing}.flat_map([&](const auto env) { return env->find_variable(name); });
+    return Option{enclosing}.flat_map([&](const auto env) { return env->find_variable(key); });
   }
 } // namespace goos::codegen

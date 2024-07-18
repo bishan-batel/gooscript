@@ -3,19 +3,18 @@
 //
 
 #pragma once
-#include <iostream>
 
-#include "Instruction.hpp"
 #include <crab/debug.hpp>
+#include "Instruction.hpp"
 
-#include "Value.hpp"
 #include <bit>
+#include "Value.hpp"
 
 namespace goos::vm {
   class Chunk {
     WideString name;
-    std::vector<u8> bytes{};
-    std::vector<Value> constants{};
+    Vec<u8> bytes{};
+    Vec<Value> constants{};
 
   public:
     explicit Chunk(WideString name);
@@ -24,21 +23,22 @@ namespace goos::vm {
     template<std::convertible_to<u8>... Bytes>
     auto write_instruction(op::Code code, Bytes... bytes) -> void;
 
-    template<std::copyable T> requires (not std::same_as<T, u8>)
+    template<std::copyable T>
+      requires(not std::same_as<T, u8>)
     auto write_instruction(op::Code code, T obj) -> void;
 
     auto define_constant(Value value) -> u16;
 
-    [[nodiscard]] auto get_constant(usize id) const -> const Value&;
+    [[nodiscard]] auto get_constant(usize id) const -> const Value &;
 
     auto write_byte(u8 byte) -> void;
 
     template<std::convertible_to<u8>... Bytes>
     auto write_bytes(Bytes... bytes) -> void;
 
-    auto operator<<(u8 byte) -> Chunk&;
+    auto operator<<(u8 byte) -> Chunk &;
 
-    auto operator<<(op::Code code) -> Chunk&;
+    auto operator<<(op::Code code) -> Chunk &;
 
     // Dissassembly
     auto dissassemble_instruction(usize i) const -> void;
@@ -62,21 +62,22 @@ namespace goos::vm {
     std::ignore = ((*this << code) << ... << bytes);
   }
 
-  template<std::copyable T> requires (not std::same_as<T, u8>)
+  template<std::copyable T>
+    requires(not std::same_as<T, u8>)
   auto Chunk::write_instruction(const op::Code code, const T obj) -> void {
     debug_assert(op::byte_arg_count(code) == sizeof(T), "Incorrect number of arguments");
 
     *this << code;
 
     for (usize i = 0; i < sizeof(T); i++) {
-      this->write_byte(std::bit_cast<const u8*>(&obj)[i]);
+      this->write_byte(std::bit_cast<const u8 *>(&obj)[i]);
     }
 
     // write_instruction(code);
     // write_instruction();
   }
 
-  template<std::convertible_to<u8> ... Bytes>
+  template<std::convertible_to<u8>... Bytes>
   auto Chunk::write_bytes(Bytes... bytes) -> void {
     std::ignore << (*this << ... << bytes);
   }
@@ -89,4 +90,4 @@ namespace goos::vm {
     std::memcpy(buffer, &bytes[i], sizeof(T));
     return std::bit_cast<T>(buffer);
   }
-} // goos
+} // namespace goos::vm

@@ -94,7 +94,7 @@ namespace goos::vm {
       }
       case op::Code::JUMP_IF_FALSE: {
         println(
-          "{} {}",
+          "{} {:#04x}",
           styled("jmpnif", fg(color::cornflower_blue)),
           styled(get_bytes<u16>(i + 1), fg(color::light_golden_rod_yellow))
         );
@@ -102,7 +102,7 @@ namespace goos::vm {
       }
       case op::Code::JUMP: {
         println(
-          "{} {}",
+          "{} {:#04x}",
           styled("jmp", fg(color::cornflower_blue)),
           styled(get_bytes<u16>(i + 1), fg(color::light_golden_rod_yellow))
         );
@@ -192,6 +192,9 @@ namespace goos::vm {
         break;
       case op::Code::DUP:
         println("{}", styled("dup", fg(color::coral)));
+        break;
+      case op::Code::SWAP:
+        println("{}", styled("swap", fg(color::coral)));
         break;
     }
   }

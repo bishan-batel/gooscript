@@ -8,7 +8,7 @@ namespace goos {
   vm::Stack::Stack() = default;
 
   auto vm::Stack::peek(const usize offset) -> Result<RefMut<Value>> {
-    const usize index = top - 1 - offset;
+    const usize index = top - offset - 1;
 
     // TODO OutOfBounds Error
     debug_assert(index < top, "Invalid Index");
@@ -16,7 +16,7 @@ namespace goos {
   }
 
   auto vm::Stack::peek(const usize offset) const -> Result<Ref<Value>> {
-    const usize index = top - 1 - offset;
+    const usize index = top - offset - 1;
 
     // TODO OutOfBounds Error
     debug_assert(index < top, "Invalid Index");

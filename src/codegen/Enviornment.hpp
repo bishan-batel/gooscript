@@ -1,31 +1,24 @@
 #pragma once
 
 #include "Value.hpp"
+#include "meta/Identifier.hpp"
+#include "meta/Mutability.hpp"
+#include "runtime/Environment.hpp"
 #include "utils/hash.hpp"
 
 namespace goos::codegen {
-  struct VariableName final {
-    Rc<WideString> value;
-
-    auto operator==(const VariableName &l) const -> bool { return *value == *l.value; }
-  };
-} // namespace goos::codegen
-
-template<>
-struct std::hash<goos::codegen::VariableName> {
-  [[nodiscard]] auto operator()(const goos::codegen::VariableName &val) const noexcept -> usize {
-    return goos::utils::hash(val.value.get());
-  }
-};
-
-static_assert(goos::utils::hashable<goos::codegen::VariableName>, "Failed hashing impl");
-
-namespace goos::codegen {
   class Enviornment final {
+  public:
+    struct Variable {
+      u64 stack_offset;
+      meta::Mutability mutability;
+    };
+
+  private:
     Option<RcMut<Enviornment>> enclosing{crab::none};
     usize depth{0};
 
-    Dictionary<VariableName, usize> variable_to_stack{};
+    Dictionary<meta::Identifier, Variable> variable_to_stack{};
 
   public:
     Enviornment() = default;
@@ -44,9 +37,9 @@ namespace goos::codegen {
       [[nodiscard]] auto what() const -> String override { return "Duplicate variable name"; }
     };
 
-    [[nodiscard]] auto register_variable(Rc<WideString> name, u64 stack_pos) -> Result<unit, DuplicateName>;
+    [[nodiscard]] auto register_variable(meta::Identifier name, u64 stack_pos, meta::Mutability mutability) -> Result<unit, DuplicateName>;
 
-    [[nodiscard]] auto find_variable(Rc<WideString> name) const -> Option<usize>;
+    [[nodiscard]] auto find_variable(meta::Identifier name) const -> Option<Variable>;
 
     [[nodiscard]] auto is_top_level() const -> bool { return enclosing.is_some(); }
 
