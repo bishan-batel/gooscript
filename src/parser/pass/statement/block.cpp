@@ -70,6 +70,8 @@ namespace goos::parser::pass {
       // if last statement is an expression, it can be used as evaluation
       if (Option<Ref<ast::Expression>> expr = statement->try_as<ast::Expression>()) {
         eval = expr.take_unchecked()->clone_expr();
+      } else {
+        statements.push_back(std::move(statement));
       }
 
       break;
