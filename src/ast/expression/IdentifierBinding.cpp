@@ -18,7 +18,7 @@ namespace goos::ast::expression {
   }
 
   auto IdentifierBinding::operator==(const Statement &statement) const -> bool {
-    if (auto other = crab::ref::cast<IdentifierBinding>(statement)) {
+    if (auto other = crab::ref::cast<IdentifierBinding>(statement); other.is_some()) {
       return other.take_unchecked()->identifier == identifier;
     }
     return false;

@@ -7,6 +7,7 @@
 #include <error.hpp>
 #include <token/Operator.hpp>
 #include "ast/Statement.hpp"
+#include "meta/Mutability.hpp"
 #include "parser/pass/expression/expression.hpp"
 #include "parser/pass/statement/block.hpp"
 
@@ -25,21 +26,20 @@ namespace goos::parser::pass {
         return crab::err(result.take_err_unchecked());
       }
 
-      if (auto statement = result.take_unchecked()) {
+      if (auto statement = result.take_unchecked(); statement.is_some()) {
         return crab::ok(statement.take_unchecked());
       }
     }
 
     MustEvalResult<ast::Expression> expr = expr::expression(stream);
 
-    if (expr.is_err())
-      return crab::err(expr.take_err_unchecked());
+    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
 
     return crab::ok<Box<ast::Statement>>(expr.take_unchecked());
   }
 
   auto variable_declare(TokenStream &stream) -> OptionalResult<ast::VariableDeclaration> {
-    goos::meta::Mutability mutability;
+    goos::meta::Mutability mutability{goos::meta::Mutability::IMMUTABLE};
 
     ast::TokenTrace trace{stream.curr()};
 
@@ -67,8 +67,7 @@ namespace goos::parser::pass {
 
     if (stream.try_consume(lexer::Operator::ASSIGN)) {
       MustEvalResult<ast::Expression> result = expr::expression(stream);
-      if (result.is_err())
-        return crab::err(result.take_err_unchecked());
+      if (result.is_err()) return crab::err(result.take_err_unchecked());
       initializer = result.take_unchecked();
     }
 
@@ -92,15 +91,14 @@ namespace goos::parser::pass {
     }
 
     if (auto op = stream.curr().downcast<token::Operator>();
-        op and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
+        op.is_some() and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
       return crab::ok(crab::some(crab::make_box<ast::Return>(crab::make_box<ast::expression::Unit>(trace), trace)));
     }
 
     MustEvalResult<ast::Expression> expr = expr::expression(stream);
     trace = trace.merge(stream.trace());
 
-    if (expr.is_err())
-      return crab::err(expr.take_err_unchecked());
+    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
 
     return crab::ok(crab::some(crab::make_box<ast::Return>(expr.take_unchecked(), trace)));
   }
@@ -113,8 +111,7 @@ namespace goos::parser::pass {
     }
 
     auto name_result = stream.consume_identifier();
-    if (name_result.is_err())
-      return name_result.take_err_unchecked();
+    if (name_result.is_err()) return name_result.take_err_unchecked();
     goos::meta::Identifier name = name_result.take_unchecked();
 
     Vec<goos::meta::Identifier> parameters{};
@@ -145,8 +142,7 @@ namespace goos::parser::pass {
 
       trace = trace.merge(stream.trace());
 
-      if (expr.is_err())
-        return crab::err(expr.take_err_unchecked());
+      if (expr.is_err()) return crab::err(expr.take_err_unchecked());
 
       return crab::ok(crab::some(crab::make_box<ast::VariableDeclaration>(
           name,
@@ -157,8 +153,7 @@ namespace goos::parser::pass {
 
     auto result = block(stream, false);
 
-    if (result.is_err())
-      return crab::err(result.take_err_unchecked());
+    if (result.is_err()) return crab::err(result.take_err_unchecked());
 
     auto scope_opt = result.take_unchecked();
 
@@ -191,13 +186,12 @@ namespace goos::parser::pass {
     }
 
     if (auto op = stream.curr().downcast<token::Operator>();
-        op and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
+        op.is_some() and op.get_unchecked()->get_op() == lexer::Operator::CURLY_CLOSE) {
       return crab::ok(crab::some(crab::make_box<ast::Eval>(crab::make_box<ast::expression::Unit>(trace), trace)));
     }
 
     MustEvalResult<ast::Expression> expr = expr::expression(stream);
-    if (expr.is_err())
-      return crab::err(expr.take_err_unchecked());
+    if (expr.is_err()) return crab::err(expr.take_err_unchecked());
 
     trace = trace.merge(stream.curr());
 

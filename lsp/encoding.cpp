@@ -46,7 +46,7 @@ namespace goos::lsp::rpc {
       return err::make<err::MalformedDecode>(err::MalformedDecode::Type::INVALID_CONTENT_LENGTH);
     }
 
-    [[maybe_unused]] const Span<std::byte> content = bytes.subspan(seperator_index + SEPERATOR.size());
+    [[maybe_unused]] const Span<std::byte> content = bytes.subspan(seperator_index.get_unchecked() + SEPERATOR.size());
 
     return 0;
   }
