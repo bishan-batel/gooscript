@@ -40,6 +40,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         "DEBUG=$<IF:$<CONFIG:Debug>,1,0>"
         "RELEASE=$<IF:$<CONFIG:Debug>,0,1>"
+        "_CRAB_IMPLICIT_BOOL_CONVERSION=1"
 )
 
 
@@ -49,9 +50,8 @@ CPMAddPackage("gh:bishan-batel/crab#main")
 CPMAddPackage("gh:fmtlib/fmt#10.2.1")
 
 
-# Executable
+# linking & libraries for the gs library
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src ${crab_SOURCE_DIR}/include)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE crab fmt)
 
 add_subdirectory(command)

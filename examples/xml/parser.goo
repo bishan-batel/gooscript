@@ -1,0 +1,71 @@
+
+
+fn error(fmt_str) {
+  print("[ERROR] ", fmt_str)
+  fatal(1)
+}
+
+let VALID_IDENTIFIER_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+let WHITESPACE_CHARS = "\t\n "
+
+# utility methods
+fn is_whitespace(c) { str.contains(WHITESPACE_CHARS, c) }
+
+let source = include_str("test.xml")
+
+fn create_tag(name) => {
+  name = name, 
+  attributes = [] 
+}
+
+# state
+let source_length = len(source)
+var position = 0
+
+fn not_eof => position < source_length
+
+fn current_char {
+  if not_eof() { source[position] } else { " " }
+} 
+
+fn advance {
+  position = position + 1
+  current_char()
+}
+
+fn backpedal {
+  position = position - 1
+  current_char()
+}
+
+fn parse_tag(tag) {
+}
+
+fn parse_identifier() {
+  while not_eof() and is_whitespace(current_char()) {
+    advance()
+  }
+}
+
+fn skip_header {
+  while not_eof() and is_whitespace(current_char()) {
+    advance()
+  }
+
+  let start_pos = position
+
+  fn parse_failure {
+    
+    nil
+  }
+
+  if current_char() != '<' {
+    
+  }
+}
+
+print(source)
+
+skip_header()
+
+parse_tag()

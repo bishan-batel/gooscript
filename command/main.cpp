@@ -18,6 +18,8 @@
 #include "vm/Chunk.hpp"
 #include "vm/Vm.hpp"
 
+#include "result.hpp"
+
 auto chunk_test() -> void;
 
 template<typename F> requires std::is_invocable_r_v<Vec<String>, F, String&>
