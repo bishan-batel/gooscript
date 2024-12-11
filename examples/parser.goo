@@ -8,11 +8,7 @@ fn error(fmt_str) {
 
 fn tokenize(source) {
   let length = len(source)
-
-
-
   let a = 0
-
   let tokens = []
 
   var i = 0
@@ -154,11 +150,13 @@ fn array {
   next();
   let arr = [];
 
+
   until is_curr(Token:CLOSE_BRACKET) {
     push(arr, any())
 
     if is_curr(Token:COMMA) then next()
   }
+
   next()
 
   arr
@@ -167,63 +165,19 @@ fn array {
 
 let parsed = any();
 
-#fn is_eq(a, b) { 
-#  let result = (fn {
-#    let ty = typeof(a);
-#
-#    if ty != typeof(b) {
-#      return unless a == b {
-#        print(0)
-#        false
-#      } else true
-#    } else if ty == "object" {
-#      let equals = true
-#      each(a, fn(k, v) {
-#        unless is_eq(v, b[k]) {
-#      print(1)
-#          equals = false;
-#        }
-#      })
-#      return equals
-#    } else if ty == "array" {
-#      if len(a) != len(b) {
-#        print(2)
-  #        return false;
-  #      }
-#
-#      var i = 0
-#
-#      while i < len(a) {
-  #        unless is_eq(a[i], b[i]) {
-#          print(3)
-#          return false
-#        }
-  #        i = i + 1
-  #      }
-#      return true
-#    } else if ty == "unit" or ty == "nil" {
-#      print(5)
-#      return true
-#    } else if a == b {
-#      return true;
-#    } else {
-#      false
-#      return false;
-#    }
-#
-#  })() 
-#
-#
-#  unless result {
-#    if a == b {
-#      return true;
-#    }
-#    fatal(1);
-#  }
-#
-#  return result;
-#}
-
-
 print(parsed);
 # is_eq(parsed, original)
+
+
+{
+  draw = fn(ctx) {
+    ctx.draw_square(vec2(0, 0), vec2(20, 20), color.red)
+  }
+}
+
+
+
+
+
+
+# vim: ft=gooscript

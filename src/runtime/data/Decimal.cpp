@@ -5,6 +5,7 @@
 #include "Decimal.hpp"
 
 #include <fmt/xchar.h>
+#include "json/utils.hpp"
 
 namespace goos::runtime {
   Decimal::Decimal(const f64 value): value{value} {}
@@ -40,4 +41,5 @@ namespace goos::runtime {
   auto Decimal::clone() const -> Any {
     return crab::make_rc_mut<Decimal>(value);
   }
-}
+  auto Decimal::to_json() const -> Box<json::Value> { return json::to_json(value); }
+} // namespace goos::runtime

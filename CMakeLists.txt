@@ -12,182 +12,7 @@ project(gooscript VERSION 1.0)
 set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
 
 
-#file(GLOB_RECURSE SOURCE_FILES "src/*.hpp")
-set(SOURCE_FILES
-        src/lexer/Keyword.cpp
-        src/lexer/Operator.cpp
-        src/token/Token.cpp
-        src/token/Keyword.cpp
-        src/token/Operator.cpp
-        src/lexer/Lexer.cpp
-        src/lexer/Lexer.hpp
-        src/token/Identifier.cpp
-        src/token/Identifier.hpp
-        src/token/Decimal.cpp
-        src/token/Decimal.hpp
-        src/token/Integer.cpp
-        src/token/Integer.hpp
-        src/token/StringLiteral.cpp
-        src/token/StringLiteral.hpp
-        src/ast/Expression.cpp
-        src/ast/Expression.hpp
-        src/ast/expression/Binary.cpp
-        src/ast/expression/Binary.hpp
-        src/ast/expression/Unary.cpp
-        src/ast/expression/Unary.hpp
-        src/ast/Statement.cpp
-        src/ast/Statement.hpp
-        src/ast/TokenTrace.hpp
-        src/meta/VariantType.hpp
-        src/ast/expression/literal/Lambda.cpp
-        src/ast/expression/literal/Lambda.hpp
-        src/ast/expression/FunctionCall.cpp
-        src/ast/expression/FunctionCall.hpp
-        src/ast/expression/literal/StringLiteral.cpp
-        src/ast/expression/literal/StringLiteral.hpp
-        src/ast/expression/literal/Decimal.cpp
-        src/ast/expression/literal/Decimal.hpp
-        src/ast/expression/literal/Integer.cpp
-        src/ast/expression/literal/Integer.hpp
-        src/ast/expression/literal/Boolean.cpp
-        src/ast/expression/literal/Boolean.hpp
-        src/ast/expression/compound/ScopeBlock.cpp
-        src/ast/expression/compound/ScopeBlock.hpp
-        src/ast/statements/Eval.cpp
-        src/ast/statements/Eval.hpp
-        src/ast/expression/literal/Unit.cpp
-        src/ast/expression/literal/Unit.hpp
-        src/ast/expression/literal/Nil.cpp
-        src/ast/expression/literal/Nil.hpp
-        src/ast/statements/Return.cpp
-        src/ast/statements/Return.hpp
-        src/ast/expression/compound/If.cpp
-        src/ast/expression/compound/If.hpp
-        src/ast/expression/compound/While.cpp
-        src/ast/expression/compound/While.hpp
-        src/ast/expression/IdentifierBinding.cpp
-        src/ast/expression/IdentifierBinding.hpp
-        src/ast/expression/literal/Array.cpp
-        src/ast/expression/literal/Array.hpp
-        src/ast/expression/literal/Dictionary.cpp
-        src/ast/expression/literal/Dictionary.hpp
-        src/parser/TokenStream.cpp
-        src/parser/TokenStream.hpp
-        src/token/EndOfFile.cpp
-        src/token/EndOfFile.hpp
-        src/parser/Error.cpp
-        src/parser/Error.hpp
-        src/parser/pass/statement/block.cpp
-        src/parser/pass/statement/block.hpp
-        src/parser/pass/statement/statement.hpp
-        src/parser/pass/statement/statement.cpp
-        src/source/SourceFile.cpp
-        src/source/SourceFile.hpp
-        src/source/IoError.cpp
-        src/source/IoError.hpp
-        src/utils/str.cpp
-        src/utils/str.hpp
-        src/parser/pass/expression/expression.hpp
-        src/ast/statements/VariableDeclaration.cpp
-        src/ast/statements/VariableDeclaration.hpp
-        src/meta/Mutability.cpp
-        src/meta/Mutability.hpp
-        src/parser/pass/expression/expression.cpp
-        src/parser/pass/expression/literals.hpp
-        src/parser/pass/expression/literals.cpp
-        src/json/Value.cpp
-        src/json/Value.hpp
-        src/json/Object.cpp
-        src/json/Object.hpp
-        src/json/Number.cpp
-        src/json/Number.hpp
-        src/json/Text.cpp
-        src/json/Text.hpp
-        src/json/Array.cpp
-        src/json/Array.hpp
-        src/parser/pass/expression/conditionals.hpp
-        src/parser/pass/expression/conditionals.cpp
-        src/runtime/Intepreter.cpp
-        src/runtime/Intepreter.hpp
-        src/runtime/data/interfaces/IValue.hpp
-        src/runtime/data/Nil.cpp
-        src/runtime/data/Nil.hpp
-        src/runtime/data/Integer.cpp
-        src/runtime/data/Integer.hpp
-        src/runtime/Environment.cpp
-        src/runtime/Environment.hpp
-        src/runtime/data/Boolean.cpp
-        src/runtime/data/Boolean.hpp
-        src/runtime/data/Unit.cpp
-        src/runtime/data/Unit.hpp
-        src/runtime/data/Decimal.cpp
-        src/runtime/data/Decimal.hpp
-        src/meta/Identifier.cpp
-        src/meta/Identifier.hpp
-        src/runtime/data/GString.cpp
-        src/runtime/data/GString.hpp
-        src/runtime/data/interfaces/ICallable.hpp
-        src/runtime/err/RuntimeError.cpp
-        src/runtime/err/RuntimeError.hpp
-        src/runtime/err/VariableNotFound.cpp
-        src/runtime/err/VariableNotFound.hpp
-        src/runtime/data/ExternFunction.cpp
-        src/runtime/data/ExternFunction.hpp
-        src/runtime/err/NotCallable.cpp
-        src/runtime/err/NotCallable.hpp
-        src/parser/pass/expression/functions.hpp
-        src/parser/pass/expression/functions.cpp
-        src/runtime/PrimitiveOperations.cpp
-        src/runtime/PrimitiveOperations.hpp
-        src/runtime/err/DuplicateName.hpp
-        src/runtime/err/DuplicateName.cpp
-        src/runtime/data/TypeConversion.hpp
-        src/runtime/data/interfaces/INumeric.hpp
-        src/runtime/data/Dictionary.cpp
-        src/runtime/data/Dictionary.hpp
-        src/utils/hash.hpp
-        src/utils/hash.cpp
-        src/runtime/err/InvalidCast.cpp
-        src/runtime/err/InvalidCast.hpp
-        src/ast/expression/PropertyAccess.cpp
-        src/ast/expression/PropertyAccess.hpp
-        src/runtime/data/LValue.cpp
-        src/runtime/data/LValue.hpp
-        src/runtime/data/Array.cpp
-        src/runtime/data/Array.hpp
-        src/ast/expression/ArrayIndex.cpp
-        src/ast/expression/ArrayIndex.hpp
-        src/runtime/data/interfaces/ICallable.hpp
-        src/runtime/data/interfaces/INumeric.hpp
-        src/runtime/data/Closure.cpp
-        src/runtime/data/Closure.hpp
-        src/ast/expression/compound/Match.cpp
-        src/ast/expression/compound/Match.hpp
-        src/runtime/builtin/StandardEnviornment.cpp
-        src/runtime/builtin/StandardEnviornment.hpp
-        src/vm/Vm.cpp
-        src/vm/Vm.hpp
-        src/vm/Instruction.hpp
-        src/vm/Chunk.cpp
-        src/vm/Chunk.hpp
-        src/vm/Value.cpp
-        src/vm/Value.hpp
-        src/vm/Stack.cpp
-        src/vm/Stack.hpp
-        src/vm/err/Error.hpp
-        src/vm/err/CastError.hpp
-        src/codegen/Compiler.cpp
-        src/codegen/Compiler.hpp
-        src/codegen/Builder.cpp
-        src/codegen/Builder.hpp
-        src/codegen/Enviornment.hpp
-        src/codegen/Enviornment.cpp
-        src/codegen/err/Error.hpp
-        src/codegen/Value.cpp
-        src/codegen/Value.hpp
-)
-
-
+file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 
 
@@ -202,7 +27,7 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 
 # add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+if (${CMAKE_BUILD_TYPE} STREQUAL "debug")
     add_compile_options(-g -O3)
 else ()
     add_compile_options(-O3)
@@ -232,7 +57,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE crab fmt)
 add_subdirectory(command)
 add_subdirectory(test)
 add_subdirectory(lsp)
-
 #add_custom_target(pch COMMAND clang++ -std=gnu++23 -x c++-header
 #        ${CMAKE_CURRENT_SOURCE_DIR}/libs/crabpp/inc/preamble.hpp
 #        -o ${CMAKE_CURRENT_BINARY_DIR}/preamble.hpp.pch)

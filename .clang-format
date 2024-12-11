@@ -1,15 +1,15 @@
 ---
 Language: Cpp
 BasedOnStyle: LLVM
-AlignAfterOpenBracket: AlwaysBreak
+AlignAfterOpenBracket: BlockIndent
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignOperands: true
-AlignTrailingComments: true
+AlignTrailingComments: false
 AlwaysBreakTemplateDeclarations: Yes
 BinPackArguments: false
 BinPackParameters: false
-BraceWrapping:
+BraceWrapping: 
   AfterCaseLabel: false
   AfterClass: false
   AfterControlStatement: false
@@ -27,8 +27,9 @@ BraceWrapping:
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
 BreakBeforeBraces: Custom
+ContinuationIndentWidth: 2
 ColumnLimit: 120
-IncludeCategories:
+IncludeCategories: 
   - Regex: '^<.*'
     Priority: 1
   - Regex: '^".*'
@@ -38,6 +39,7 @@ IncludeCategories:
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IndentCaseLabels: true
 IndentPPDirectives: BeforeHash
+IndentWidth: 2
 InsertNewlineAtEOF: true
 MacroBlockBegin: ''
 MacroBlockEnd: ''

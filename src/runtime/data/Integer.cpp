@@ -3,6 +3,7 @@
 //
 
 #include "Integer.hpp"
+#include "json/utils.hpp"
 
 namespace goos::runtime {
   Integer::Integer(const i64 value) : value{value} {}
@@ -38,4 +39,5 @@ namespace goos::runtime {
   auto Integer::clone() const -> Any {
     return crab::make_rc_mut<Integer>(value);
   }
-}
+  auto Integer::to_json() const -> Box<json::Value> { return json::to_json(value); }
+} // namespace goos::runtime

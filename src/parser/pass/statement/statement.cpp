@@ -11,7 +11,7 @@
 #include "parser/pass/statement/block.hpp"
 
 namespace goos::parser::pass {
-  auto statement([[maybe_unused]] TokenStream &stream) -> MustEvalResult<ast::Statement> {
+ auto statement([[maybe_unused]] TokenStream &stream) -> MustEvalResult<ast::Statement> {
     if (stream.is_eof()) {
       return crab::err(stream.unexpected("Statement"));
     }
@@ -99,10 +99,11 @@ namespace goos::parser::pass {
     MustEvalResult<ast::Expression> expr = expr::expression(stream);
     trace = trace.merge(stream.trace());
 
-    if (expr.is_err())
-      return crab::err(expr.take_err_unchecked());
+    if (expr.is_err()) {
+      return expr.take_err_unchecked();
+    }
 
-    return crab::ok(crab::some(crab::make_box<ast::Return>(expr.take_unchecked(), trace)));
+    return crab::some(crab::make_box<ast::Return>(expr.take_unchecked(), trace));
   }
 
   auto fn_statement(TokenStream &stream) -> OptionalResult<ast::VariableDeclaration> {

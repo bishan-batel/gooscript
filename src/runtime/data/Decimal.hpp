@@ -31,5 +31,7 @@ namespace goos::runtime {
     auto base_hash() const -> usize override;
 
     [[nodiscard]] auto clone() const -> Any override;
+
+    [[nodiscard]] auto to_json() const -> Box<json::Value> override;
   };
 }

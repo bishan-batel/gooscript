@@ -1,0 +1,11 @@
+Started LSP
+Decoding Message:
+DECODE: Start
+DECODE: Getting Content Length
+DECODE: Tokenizing
+DECODE: Parsing
+DECODE: Intepreter
+DECODE: Coercing to Object
+DECODE: Success.
+HANDLER: Found handler for method: initialize
+Initialized Request: Neovim@v0.10.0-dev

@@ -1,8 +1,8 @@
 //
 // Created by bishan_ on 6/14/24.
 //
-
 #pragma once
+
 #include <functional>
 
 #include <option.hpp>
@@ -39,6 +39,8 @@ namespace goos::runtime {
     [[nodiscard]] auto base_hash() const -> usize override;
 
     [[nodiscard]] auto clone() const -> Any override;
+
+    [[nodiscard]] auto to_json() const -> Box<json::Value> override;
   };
 
   namespace lambda {

@@ -5,7 +5,7 @@ clangStdenv.mkDerivation {
 
   src = null;
 
-  nativeBuildInputs = [ gcc clang ninja python39 ];
+  nativeBuildInputs = [ gcc clang ninja python39 cmake ];
 
   permittedInsecurePackages = [  ];
 

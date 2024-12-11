@@ -3,7 +3,7 @@
 //
 
 #include <fmt/xchar.h>
-#include <string>
+#include "json/utils.hpp"
 #include "Closure.hpp"
 #include "runtime/Intepreter.hpp"
 
@@ -83,4 +83,5 @@ namespace goos::runtime {
   auto Closure::base_hash() const -> utils::hash_code {
     return utils::hash(this);
   }
-}
+  auto Closure::to_json() const -> Box<json::Value> { return json::to_json("[closure]"); }
+} // namespace goos::runtime

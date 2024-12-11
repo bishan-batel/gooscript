@@ -8,6 +8,7 @@
 
 #include <preamble.hpp>
 
+#include "json/Value.hpp"
 #include "meta/VariantType.hpp"
 
 namespace goos::runtime {
@@ -47,7 +48,10 @@ namespace goos::runtime {
 
     [[nodiscard]] virtual auto base_hash() const -> utils::hash_code = 0;
 
+    [[nodiscard]] virtual auto to_json() const -> Box<json::Value> = 0;
+
     [[nodiscard]] auto hash() const -> utils::hash_code;
+
   };
 
   inline auto IValue::hash() const -> utils::hash_code {

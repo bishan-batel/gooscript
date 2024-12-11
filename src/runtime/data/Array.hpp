@@ -35,6 +35,7 @@ namespace goos::runtime {
 
     [[nodiscard]] auto index(Any index) -> Result<Any, Box<err::Error>> override;
 
+    [[nodiscard]] auto to_json() const -> Box<json::Value> override;
     constexpr static auto TYPE = meta::VariantType::ARRAY;
   };
 } // goos

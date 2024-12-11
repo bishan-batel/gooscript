@@ -99,8 +99,7 @@ auto main(i32 argc, const char *argv[]) -> i32 {
     print(fg(fmt::color::light_green) | fmt::emphasis::bold, "[USAGE]: ");
     fmt::print("goos ");
     print(fg(fmt::color::yellow), "{{FILE_NAME}} ");
-    print(fg(fmt::color::light_sky_blue), "{{FLAGS}}");
-    fmt::println("");
+    print(fg(fmt::color::light_sky_blue), "{{FLAGS}}"); fmt::println("");
     return 1;
   }
 

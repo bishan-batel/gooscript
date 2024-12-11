@@ -1,4 +1,9 @@
-420
 
-if false then 420 else print()
+fn comp(f1, f2) => fn (x) => f2(f1(x))
 
+fn double(x) { x * 2 }
+
+print(69 / 2)
+print(comp(double, print)(69.0 / 2))
+
+let builtin = {}

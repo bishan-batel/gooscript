@@ -9,7 +9,7 @@ namespace goos::lsp {
     struct Error : crab::Error {};
 
     struct MalformedDecode final : Error {
-      enum class Type { FAILED_TO_FIND_SEPERATOR, INVALID_CONTENT_LENGTH } type;
+      enum class Type { FAILED_TO_FIND_SEPERATOR, INVALID_CONTENT_LENGTH, MALFORMED_JSON } type;
 
       explicit MalformedDecode(Type type) : type{type} {}
 
@@ -19,6 +19,9 @@ namespace goos::lsp {
             return "Failed to find seperator";
           case Type::INVALID_CONTENT_LENGTH:
             return "Invalid Content Length";
+
+          case Type::MALFORMED_JSON:
+            return "Malformed JSON";
 
           default:
             debug_assert(false, "Invalid decode type");

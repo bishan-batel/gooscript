@@ -40,5 +40,7 @@ namespace goos::runtime {
     [[nodiscard]] auto clone() const -> Any override;
 
     [[nodiscard]] auto index(Any index) -> Result<Any, Box<err::Error>> override;
+
+    [[nodiscard]] auto to_json() const -> Box<json::Value> override;
   };
 }

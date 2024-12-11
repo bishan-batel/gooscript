@@ -1,11 +1,11 @@
 
 # CPMAddPackage("gh:catchorg/Catch2@3.5.4")
 
+file(GLOB_RECURSE SOURCE_FILES "./*.cpp" "./*.hpp")
+
 # Tests
-add_executable(gooscript-lsp
-        main.cpp
-        encoding.cpp
-)
+add_executable(gooscript-lsp ${SOURCE_FILES})
+target_include_directories(gooscript-lsp PUBLIC ./)
 
 target_link_libraries(gooscript-lsp PRIVATE crab fmt gooscript)
 

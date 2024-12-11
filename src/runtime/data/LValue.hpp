@@ -30,5 +30,6 @@ namespace goos::runtime {
     [[nodiscard]] auto get_type() const -> meta::VariantType override;
 
     [[nodiscard]] auto base_hash() const -> utils::hash_code override;
+    [[nodiscard]] auto to_json() const -> Box<json::Value> override;
   };
 }

@@ -96,6 +96,8 @@ namespace goos::runtime {
     [[nodiscard]] auto clone() const -> Any override;
 
     auto force_recompute_hash() const -> void;
+
+    [[nodiscard]] auto to_json() const -> Box<json::Value> override;
   };
 
   template<typename>

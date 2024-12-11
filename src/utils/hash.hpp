@@ -59,7 +59,6 @@ namespace goos::utils {
   // Template Impl
 
   constexpr auto hash_code_mix(const hash_code seed, const hash_code next) -> hash_code {
-    // https://stackoverflow.com/questions/2590677/how-do-i-combine-hash-values-in-c0x
     return next + 0x9e3779b9 + (seed << 6) + (seed >> 2) ^ seed;
   }
 

@@ -1,5 +1,7 @@
 let $ = {};
 
+let 💀 = 0
+
 $:STRING_LITERAL = 0
 $:NUMBER = 1
 $:BOOL = 2

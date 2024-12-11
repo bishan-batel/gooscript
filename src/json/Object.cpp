@@ -3,10 +3,12 @@
 //
 
 #include "Object.hpp"
+#include <box.hpp>
 #include <option.hpp>
 
 #include "Text.hpp"
 #include "Value.hpp"
+#include "json/Number.hpp"
 
 namespace goos::json {
   Object::Object() = default;
@@ -16,9 +18,9 @@ namespace goos::json {
     values.emplace(std::move(key), std::move(val));
   }
 
-  auto Object::put(WideString key, WideString val) -> void {
-    values.emplace(key, crab::make_box<Text>(std::move(val)));
-  }
+  // auto Object::put(WideString key, WideString val) -> void {
+  //   values.emplace(key, crab::make_box<Text>(std::move(val)));
+  // }
 
   auto Object::erase(const WideString &key) -> bool {
     if (values.contains(key)) {
@@ -66,4 +68,14 @@ namespace goos::json {
 
     return clone;
   }
-}
+
+  auto Object::operator[](const WideString &key) -> Value & {
+    if (Option<RefMut<Value>> ref = get(key)) {
+      return ref.take_unchecked();
+    }
+
+    put(key, crab::make_box<Number>(0));
+
+    return get(key).take_unchecked();
+  }
+} // namespace goos::json
