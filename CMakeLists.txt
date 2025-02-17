@@ -27,8 +27,8 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 
 # add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-if (${CMAKE_BUILD_TYPE} STREQUAL "debug")
-    add_compile_options(-g -O3)
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    add_compile_options(-g)
 else ()
     add_compile_options(-O3)
 endif ()
