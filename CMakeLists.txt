@@ -12,7 +12,7 @@ project(gooscript VERSION 1.0)
 set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
 
 
-file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
+file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 
 
@@ -40,7 +40,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         "DEBUG=$<IF:$<CONFIG:Debug>,1,0>"
         "RELEASE=$<IF:$<CONFIG:Debug>,0,1>"
-        "_CRAB_IMPLICIT_BOOL_CONVERSION=1"
 )
 
 
@@ -56,7 +55,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE crab fmt)
 
 add_subdirectory(command)
 add_subdirectory(test)
-add_subdirectory(lsp)
+# add_subdirectory(lsp)
 #add_custom_target(pch COMMAND clang++ -std=gnu++23 -x c++-header
 #        ${CMAKE_CURRENT_SOURCE_DIR}/libs/crabpp/inc/preamble.hpp
 #        -o ${CMAKE_CURRENT_BINARY_DIR}/preamble.hpp.pch)
