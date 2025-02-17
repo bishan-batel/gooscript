@@ -12,30 +12,35 @@
 #include <codecvt>
 
 namespace goos {
-  auto SourceFile::from_file(const std::filesystem::path &path) -> Result<SourceFile, io::Error> {
+  auto SourceFile::from_file(const std::filesystem::path& path)
+    -> Result<SourceFile, io::Error> {
     errno = 0;
     std::wifstream stream{path};
 
-    if (stream.bad()) return err(io::Error{errno});;
+    if (stream.bad()) {
+      return err(io::Error{errno});
+    };
+    if (stream.fail()) {
+      return err(io::Error{errno});
+    };
 
     stream.imbue(std::locale(std::locale{}, new std::codecvt_utf8<widechar>));
     WideStringStream collector{};
     collector << stream.rdbuf();
 
-    return crab::ok(
-      SourceFile(
-        path.string(),
-        collector.str()
-      )
-    );
+    return crab::ok(SourceFile(path.string(), collector.str()));
   }
 
   auto SourceFile::get_name() const -> Option<Ref<String>> {
-    if (name->is_none()) return crab::none;
+    if (name->is_none()) {
+      return crab::none;
+    }
     return crab::some(Ref{name->get_unchecked()});
   }
 
-  auto SourceFile::get_contents() const -> const WideString& { return contents; }
+  auto SourceFile::get_contents() const -> const WideString& {
+    return contents;
+  }
 
   auto SourceFile::slice(const Range<> range) const -> WideString {
     return slice(range.lower_bound(), range.upper_bound());
@@ -53,14 +58,14 @@ namespace goos {
     return contents->at(clamp_index(position));
   }
 
-  auto SourceFile::length() const -> usize {
-    return contents->size();
-  }
+  auto SourceFile::length() const -> usize { return contents->size(); }
 
   auto SourceFile::get_line(const usize line_number) const -> Range<> {
     usize index{0}, line{1};
     for (const widechar c: *contents) {
-      if (line == line_number) break;
+      if (line == line_number) {
+        break;
+      }
 
       if (c == '\n') {
         line++;
@@ -68,17 +73,17 @@ namespace goos {
       index++;
     }
 
-    usize end;
-    for (end = index; get_char(end) != '\n'; end++) {}
+    usize end{index};
+    while (get_char(end++) != '\n');
     return crab::range(index, end);
   }
 
-  SourceFile::SourceFile(String name, WideString contents)
-    : name{crab::make_rc<Option<String>>(crab::some(std::move(name)))},
+  SourceFile::SourceFile(String name, WideString contents):
+      name{crab::make_rc<Option<String>>(crab::some(std::move(name)))},
       contents{crab::make_rc<WideString>(std::move(contents))} {}
 
-  SourceFile::SourceFile(WideString contents)
-    : name{crab::make_rc<Option<String>>(crab::none)},
+  SourceFile::SourceFile(WideString contents):
+      name{crab::make_rc<Option<String>>(crab::none)},
       contents{crab::make_rc<WideString>(std::move(contents))} {}
 
   auto SourceFile::create(String name, WideString contents) -> SourceFile {
